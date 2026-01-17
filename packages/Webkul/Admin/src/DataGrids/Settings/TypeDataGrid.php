@@ -33,6 +33,7 @@ class TypeDataGrid extends DataGrid
             'index'      => 'id',
             'label'      => trans('admin::app.settings.types.index.datagrid.id'),
             'type'       => 'string',
+            'searchable' => true,
             'filterable' => true,
             'sortable'   => true,
         ]);
@@ -41,6 +42,7 @@ class TypeDataGrid extends DataGrid
             'index'      => 'name',
             'label'      => trans('admin::app.settings.types.index.datagrid.name'),
             'type'       => 'string',
+            'searchable' => true,
             'filterable' => true,
             'sortable'   => true,
         ]);
