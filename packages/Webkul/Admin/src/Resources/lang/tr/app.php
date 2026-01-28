@@ -1020,6 +1020,7 @@ return [
                     'delete-success'      => 'Etkinlik başarıyla silindi.',
                     'delete-failed'       => 'Etkinlik silinemedi.',
                     'mass-delete-success' => 'Etkinlikler başarıyla silindi',
+                    'delete-failed-associated-campaigns' => 'Kampanya silinemiyor çünkü mevcut adaylarla ilişkili. Lütfen bu adayları silmeden önce bağlantılarını kaldırın veya güncelleyin.',
                     'datagrid'            => [
                         'delete'      => 'Sil',
                         'edit'        => 'Düzenle',
@@ -1049,7 +1050,7 @@ return [
                     'delete-success'      => 'Kampanya başarıyla silindi.',
                     'delete-failed'       => 'Kampanya silinemedi.',
                     'mass-delete-success' => 'Kampanyalar başarıyla silindi',
-                    'delete-failed-associated-leads' => 'Kampanya silinemiyor çünkü mevcut adaylarla ilişkili. Lütfen bu adayları silmeden önce bağlantılarını kaldırın veya güncelleyin.',
+
                     'datagrid'            => [
                         'id'       => 'ID',
                         'name'     => 'Ad',
