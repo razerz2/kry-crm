@@ -468,7 +468,7 @@ async function createProduct(page) {
     await page.getByRole('textbox', { name: 'Name *' }).fill(name);
     await page.getByRole('textbox', { name: 'Description' }).fill(description);
     await page.getByRole('textbox', { name: 'SKU *' }).fill(sku);
-    await page.getByRole('textbox', { name: 'Price *' }).fill(price);
+    await page.getByRole('textbox', { name: /price/i }).fill(price);
     await page.getByRole('textbox', { name: 'Quantity *' }).fill(quantity);
 
     await page.getByRole('button', { name: 'Save Products' }).click();
