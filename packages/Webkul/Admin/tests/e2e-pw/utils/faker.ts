@@ -505,6 +505,6 @@ export {
     createOrganization,
     generateCompanyName,
     createPerson,
-    getRandomDateTime
+    getRandomDateTime,
     createProduct
 };
