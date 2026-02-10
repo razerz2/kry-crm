@@ -44,6 +44,7 @@ return [
         'import'          => 'Import',
         'event'           => 'Evento',
         'campaigns'       => 'Campanhas',
+        'warehouses'      => 'Armazéns',
     ],
     'users' => [
         'activate-warning' => 'Sua conta ainda não foi ativada. Por favor, entre em contato com o administrador.',

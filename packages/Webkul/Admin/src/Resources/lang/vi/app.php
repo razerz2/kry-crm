@@ -44,6 +44,7 @@ return [
         'import'          => 'Import',
         'event'           => 'Sự kiện',
         'campaigns'       => 'Chiến dịch',
+        'warehouses'      => 'Kho',
     ],
     'users' => [
         'activate-warning' => 'Tài khoản của bạn chưa được kích hoạt. Vui lòng liên hệ quản trị viên.',

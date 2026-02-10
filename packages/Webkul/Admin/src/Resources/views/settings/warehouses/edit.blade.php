@@ -32,7 +32,7 @@
                 <div class="flex items-center gap-x-2.5">
                     <div class="flex items-center gap-x-2.5">
                         {!! view_render_event('admin.settings.warehouses.edit.save_button.after') !!}
-
+                        @if (bouncer()->hasPermission('settings.warehouse.edit'))
                         <!-- Create button for person -->
                         <button
                             type="submit"
@@ -40,6 +40,7 @@
                         >
                             @lang('admin::app.settings.warehouses.edit.save-btn')
                         </button>
+                        @endif
 
                         {!! view_render_event('admin.settings.warehouses.edit.save_button.before') !!}
                     </div>

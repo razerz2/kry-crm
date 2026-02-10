@@ -44,6 +44,7 @@ return [
         'import'          => 'İthalat',
         'event'           => 'Etkinlik',
         'campaigns'       => 'Kampanyalar',
+        'warehouses'      => 'Depolar',
     ],
     'users' => [
         'activate-warning' => 'Hesabınız henüz etkinleştirilmedi. Lütfen yönetici ile iletişime geçin.',

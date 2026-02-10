@@ -151,7 +151,7 @@ return [
         'name'  => 'admin::app.acl.delete',
         'route' => ['admin.contacts.persons.delete', 'admin.contacts.persons.mass_delete'],
         'sort'  => 4,
-    ],  [
+    ], [
         'key'   => 'contacts.persons.view',
         'name'  => 'admin::app.acl.view',
         'route' => 'admin.contacts.persons.view',
@@ -251,7 +251,7 @@ return [
         'name'  => 'admin::app.acl.delete',
         'route' => 'admin.settings.roles.delete',
         'sort'  => 3,
-    ],  [
+    ], [
         'key'   => 'settings.user.users',
         'name'  => 'admin::app.acl.users',
         'route' => 'admin.settings.users.index',
@@ -337,10 +337,35 @@ return [
         'route' => 'admin.settings.types.delete',
         'sort'  => 3,
     ], [
+        'key'   => 'settings.warehouse',
+        'name'  => 'admin::app.acl.warehouses',
+        'route' => ['admin.settings.warehouses.index'],
+        'sort'  => 3,
+    ], [
+        'key'   => 'settings.warehouse.view',
+        'name'  => 'admin::app.acl.view',
+        'route' => ['admin.settings.warehouses.index', 'admin.settings.warehouses.view'],
+        'sort'  => 1,
+    ], [
+        'key'   => 'settings.warehouse.create',
+        'name'  => 'admin::app.acl.create',
+        'route' => ['admin.settings.warehouses.create', 'admin.settings.warehouses.store'],
+        'sort'  => 1,
+    ], [
+        'key'   => 'settings.warehouse.edit',
+        'name'  => 'admin::app.acl.edit',
+        'route' => ['admin.settings.warehouses.edit', 'admin.settings.warehouses.update'],
+        'sort'  => 2,
+    ], [
+        'key'   => 'settings.warehouse.delete',
+        'name'  => 'admin::app.acl.delete',
+        'route' => 'admin.settings.warehouses.delete',
+        'sort'  => 3,
+    ], [
         'key'   => 'settings.automation',
         'name'  => 'admin::app.acl.automation',
         'route' => ['admin.settings.attributes.index', 'admin.settings.email_templates.index', 'admin.settings.workflows.index'],
-        'sort'  => 3,
+        'sort'  => 4,
     ], [
         'key'   => 'settings.automation.attributes',
         'name'  => 'admin::app.acl.attributes',
@@ -365,7 +390,7 @@ return [
         'key'   => 'settings.automation.email_templates',
         'name'  => 'admin::app.acl.email-templates',
         'route' => 'admin.settings.email_templates.index',
-        'sort'  => 7,
+        'sort'  => 2,
     ], [
         'key'   => 'settings.automation.email_templates.create',
         'name'  => 'admin::app.acl.create',
@@ -385,7 +410,7 @@ return [
         'key'   => 'settings.automation.workflows',
         'name'  => 'admin::app.acl.workflows',
         'route' => 'admin.settings.workflows.index',
-        'sort'  => 2,
+        'sort'  => 3,
     ], [
         'key'   => 'settings.automation.workflows.create',
         'name'  => 'admin::app.acl.create',
@@ -405,7 +430,7 @@ return [
         'key'   => 'settings.automation.events',
         'name'  => 'admin::app.acl.event',
         'route' => 'admin.settings.marketing.events.index',
-        'sort'  => 2,
+        'sort'  => 4,
     ], [
         'key'   => 'settings.automation.events.create',
         'name'  => 'admin::app.acl.create',
@@ -425,7 +450,7 @@ return [
         'key'   => 'settings.automation.campaigns',
         'name'  => 'admin::app.acl.campaigns',
         'route' => 'admin.settings.marketing.campaigns.index',
-        'sort'  => 2,
+        'sort'  => 5,
     ], [
         'key'   => 'settings.automation.campaigns.create',
         'name'  => 'admin::app.acl.create',
@@ -445,7 +470,7 @@ return [
         'key'   => 'settings.automation.webhooks',
         'name'  => 'admin::app.acl.webhook',
         'route' => 'admin.settings.webhooks.index',
-        'sort'  => 1,
+        'sort'  => 6,
     ], [
         'key'   => 'settings.automation.webhooks.create',
         'name'  => 'admin::app.acl.create',
@@ -462,36 +487,10 @@ return [
         'route' => 'admin.settings.webhooks.delete',
         'sort'  => 3,
     ], [
-        'key'   => 'settings.other_settings',
-        'name'  => 'admin::app.acl.other-settings',
-        'route' => 'admin.settings.tags.index',
-        'sort'  => 4,
-    ], [
-        'key'   => 'settings.other_settings.tags',
-        'name'  => 'admin::app.acl.tags',
-        'route' => 'admin.settings.tags.index',
-        'sort'  => 1,
-    ], [
-        'key'   => 'settings.other_settings.tags.create',
-        'name'  => 'admin::app.acl.create',
-        'route' => ['admin.settings.tags.create', 'admin.settings.tags.store', 'admin.leads.tags.attach'],
-        'sort'  => 1,
-    ], [
-        'key'   => 'settings.other_settings.tags.edit',
-        'name'  => 'admin::app.acl.edit',
-        'route' => ['admin.settings.tags.edit', 'admin.settings.tags.update'],
-        'sort'  => 1,
-    ], [
-        'key'   => 'settings.other_settings.tags.delete',
-        'name'  => 'admin::app.acl.delete',
-        'route' => ['admin.settings.tags.delete', 'admin.settings.tags.mass_delete', 'admin.leads.tags.detach'],
-        'sort'  => 2,
-    ],
-    [
         'key'   => 'settings.automation.data_transfer',
         'name'  => 'admin::app.acl.data-transfer',
         'route' => 'admin.settings.data_transfer.imports.index',
-        'sort'  => 10,
+        'sort'  => 7,
     ], [
         'key'   => 'settings.automation.data_transfer.imports',
         'name'  => 'admin::app.acl.imports',
@@ -517,8 +516,32 @@ return [
         'name'  => 'admin::app.acl.import',
         'route' => 'admin.settings.data_transfer.imports.imports',
         'sort'  => 4,
-    ],
-    [
+    ], [
+        'key'   => 'settings.other_settings',
+        'name'  => 'admin::app.acl.other-settings',
+        'route' => 'admin.settings.tags.index',
+        'sort'  => 5,
+    ], [
+        'key'   => 'settings.other_settings.tags',
+        'name'  => 'admin::app.acl.tags',
+        'route' => 'admin.settings.tags.index',
+        'sort'  => 1,
+    ], [
+        'key'   => 'settings.other_settings.tags.create',
+        'name'  => 'admin::app.acl.create',
+        'route' => ['admin.settings.tags.create', 'admin.settings.tags.store', 'admin.leads.tags.attach'],
+        'sort'  => 1,
+    ], [
+        'key'   => 'settings.other_settings.tags.edit',
+        'name'  => 'admin::app.acl.edit',
+        'route' => ['admin.settings.tags.edit', 'admin.settings.tags.update'],
+        'sort'  => 1,
+    ], [
+        'key'   => 'settings.other_settings.tags.delete',
+        'name'  => 'admin::app.acl.delete',
+        'route' => ['admin.settings.tags.delete', 'admin.settings.tags.mass_delete', 'admin.leads.tags.detach'],
+        'sort'  => 2,
+    ], [
         'key'   => 'configuration',
         'name'  => 'admin::app.acl.configuration',
         'route' => 'admin.configuration.index',

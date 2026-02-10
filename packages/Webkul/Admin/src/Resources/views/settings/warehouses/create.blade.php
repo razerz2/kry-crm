@@ -29,14 +29,15 @@
                 <div class="flex items-center gap-x-2.5">
                     <div class="flex items-center gap-x-2.5">
                         {!! view_render_event('admin.settings.warehouses.create.save_button.before') !!}
-
-                        <!-- Create button for person -->
-                        <button
-                            type="submit"
-                            class="primary-button"
-                        >
-                            @lang('admin::app.settings.warehouses.create.save-btn')
-                        </button>
+                        @if (bouncer()->hasPermission('settings.warehouse.create'))
+                            <!-- Create button for person -->
+                            <button
+                                type="submit"
+                                class="primary-button"
+                            >
+                                @lang('admin::app.settings.warehouses.create.save-btn')
+                            </button>
+                        @endif
                     
                         {!! view_render_event('admin.settings.warehouses.create.save_button.after') !!}
                     </div>

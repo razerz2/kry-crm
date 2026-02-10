@@ -44,6 +44,7 @@ return [
         'import'          => 'استيراد',
         'event'           => 'حدث',
         'campaigns'       => 'الحملات',
+        'warehouses'      => 'المستودعات',
     ],
     'users' => [
         'activate-warning' => 'حسابك لم يتم تفعيله بعد. يرجى الاتصال بالمسؤول.',

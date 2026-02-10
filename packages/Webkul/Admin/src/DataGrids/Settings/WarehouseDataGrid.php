@@ -123,31 +123,37 @@ class WarehouseDataGrid extends DataGrid
      */
     public function prepareActions()
     {
-        $this->addAction([
-            'icon'   => 'icon-eye',
-            'title'  => trans('admin::app.settings.warehouses.index.datagrid.view'),
-            'method' => 'GET',
-            'url'    => function ($row) {
-                return route('admin.settings.warehouses.view', $row->id);
-            },
-        ]);
+        if (bouncer()->hasPermission('settings.warehouse.view')) {
+            $this->addAction([
+                'icon'   => 'icon-eye',
+                'title'  => trans('admin::app.settings.warehouses.index.datagrid.view'),
+                'method' => 'GET',
+                'url'    => function ($row) {
+                    return route('admin.settings.warehouses.view', $row->id);
+                },
+            ]);
+        }
 
-        $this->addAction([
-            'icon'   => 'icon-edit',
-            'title'  => trans('admin::app.settings.warehouses.index.datagrid.edit'),
-            'method' => 'GET',
-            'url'    => function ($row) {
-                return route('admin.settings.warehouses.edit', $row->id);
-            },
-        ]);
+        if (bouncer()->hasPermission('settings.warehouse.edit')) {
+            $this->addAction([
+                'icon'   => 'icon-edit',
+                'title'  => trans('admin::app.settings.warehouses.index.datagrid.edit'),
+                'method' => 'GET',
+                'url'    => function ($row) {
+                    return route('admin.settings.warehouses.edit', $row->id);
+                },
+            ]);
+        }
 
-        $this->addAction([
-            'icon'   => 'icon-delete',
-            'title'  => trans('admin::app.settings.warehouses.index.datagrid.delete'),
-            'method' => 'DELETE',
-            'url'    => function ($row) {
-                return route('admin.settings.warehouses.delete', $row->id);
-            },
-        ]);
+        if (bouncer()->hasPermission('settings.warehouse.delete')) {
+            $this->addAction([
+                'icon'   => 'icon-delete',
+                'title'  => trans('admin::app.settings.warehouses.index.datagrid.delete'),
+                'method' => 'DELETE',
+                'url'    => function ($row) {
+                    return route('admin.settings.warehouses.delete', $row->id);
+                },
+            ]);
+        }
     }
 }

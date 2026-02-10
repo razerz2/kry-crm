@@ -20,7 +20,7 @@
                 <div class="flex items-center gap-x-2.5">
                     {!! view_render_event('admin.settings.warehouses.index.create_button.before') !!}
 
-                    @if (bouncer()->hasPermission('settings.automation.warehouses.create'))
+                    @if (bouncer()->hasPermission('settings.warehouse.create'))
                         <a
                             href="{{ route('admin.settings.warehouses.create') }}"
                             class="primary-button"
