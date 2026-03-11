@@ -118,7 +118,7 @@ email:admin@example.com
 password:admin123
 ```
 
-### Krayin Cloud System
+### Krayin Cloud Hosting
 
 [Krayin CRM Cloud Hosting](https://krayincrm.com/crm-cloud-hosting) is a fully managed hosting solution where our team sets up, secures, and configures your Krayin CRM on reliable infrastructure.
 
