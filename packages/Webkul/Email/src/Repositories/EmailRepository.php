@@ -28,7 +28,7 @@ class EmailRepository extends Repository
     /**
      * Create.
      *
-     * @return \Webkul\Email\Contracts\Email
+     * @return Email
      */
     public function create(array $data)
     {
@@ -64,7 +64,7 @@ class EmailRepository extends Repository
      *
      * @param  int  $id
      * @param  string  $attribute
-     * @return \Webkul\Email\Contracts\Email
+     * @return Email
      */
     public function update(array $data, $id, $attribute = 'id')
     {

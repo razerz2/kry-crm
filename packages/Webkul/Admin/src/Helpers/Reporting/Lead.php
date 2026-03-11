@@ -130,8 +130,8 @@ class Lead extends AbstractReporting
     /**
      * Retrieves total leads by date
      *
-     * @param  \Carbon\Carbon  $startDate
-     * @param  \Carbon\Carbon  $endDate
+     * @param  Carbon  $startDate
+     * @param  Carbon  $endDate
      */
     public function getTotalLeads($startDate, $endDate): int
     {
@@ -156,8 +156,8 @@ class Lead extends AbstractReporting
     /**
      * Retrieves average leads per day
      *
-     * @param  \Carbon\Carbon  $startDate
-     * @param  \Carbon\Carbon  $endDate
+     * @param  Carbon  $startDate
+     * @param  Carbon  $endDate
      */
     public function getAverageLeadsPerDay($startDate, $endDate): float
     {
@@ -186,8 +186,8 @@ class Lead extends AbstractReporting
     /**
      * Retrieves total lead value
      *
-     * @param  \Carbon\Carbon  $startDate
-     * @param  \Carbon\Carbon  $endDate
+     * @param  Carbon  $startDate
+     * @param  Carbon  $endDate
      */
     public function getTotalLeadValue($startDate, $endDate): float
     {
@@ -213,8 +213,8 @@ class Lead extends AbstractReporting
     /**
      * Retrieves average lead value
      *
-     * @param  \Carbon\Carbon  $startDate
-     * @param  \Carbon\Carbon  $endDate
+     * @param  Carbon  $startDate
+     * @param  Carbon  $endDate
      */
     public function getAverageLeadValue($startDate, $endDate): float
     {
@@ -240,8 +240,8 @@ class Lead extends AbstractReporting
     /**
      * Retrieves average won lead value
      *
-     * @param  \Carbon\Carbon  $startDate
-     * @param  \Carbon\Carbon  $endDate
+     * @param  Carbon  $startDate
+     * @param  Carbon  $endDate
      * @return array
      */
     public function getTotalWonLeadValue($startDate, $endDate): ?float
@@ -269,8 +269,8 @@ class Lead extends AbstractReporting
     /**
      * Retrieves average lost lead value
      *
-     * @param  \Carbon\Carbon  $startDate
-     * @param  \Carbon\Carbon  $endDate
+     * @param  Carbon  $startDate
+     * @param  Carbon  $endDate
      * @return array
      */
     public function getTotalLostLeadValue($startDate, $endDate): ?float
@@ -341,8 +341,8 @@ class Lead extends AbstractReporting
     /**
      * Returns over time stats.
      *
-     * @param  \Carbon\Carbon  $startDate
-     * @param  \Carbon\Carbon  $endDate
+     * @param  Carbon  $startDate
+     * @param  Carbon  $endDate
      * @param  string  $valueColumn
      * @param  string  $dateColumn
      * @param  string  $period

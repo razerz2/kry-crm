@@ -2,7 +2,10 @@
 
 namespace Webkul\Email\InboundEmailProcessor;
 
+use Carbon\Carbon;
 use Webklex\IMAP\Facades\Client;
+use Webklex\IMAP\Support\FolderCollection;
+use Webklex\PHPIMAP\Message;
 use Webkul\Email\Enums\SupportedFolderEnum;
 use Webkul\Email\InboundEmailProcessor\Contracts\InboundEmailProcessor;
 use Webkul\Email\Repositories\AttachmentRepository;
@@ -58,7 +61,7 @@ class WebklexImapEmailProcessor implements InboundEmailProcessor
     /**
      * Process the inbound email.
      *
-     * @param  ?\Webklex\PHPIMAP\Message  $message
+     * @param  ?Message  $message
      */
     public function processMessage($message = null): void
     {
@@ -156,7 +159,7 @@ class WebklexImapEmailProcessor implements InboundEmailProcessor
     /**
      * Process the messages from all folders.
      *
-     * @param  \Webklex\IMAP\Support\FolderCollection  $rootFoldersCollection
+     * @param  FolderCollection  $rootFoldersCollection
      */
     protected function processMessagesFromLeafFolders($rootFoldersCollection = null): void
     {
@@ -194,7 +197,7 @@ class WebklexImapEmailProcessor implements InboundEmailProcessor
     /**
      * Convert the date to the desired timezone.
      *
-     * @param  \Carbon\Carbon  $carbonDate
+     * @param  Carbon  $carbonDate
      * @param  ?string  $targetTimezone
      */
     protected function convertToDesiredTimezone($carbonDate, $targetTimezone = null)

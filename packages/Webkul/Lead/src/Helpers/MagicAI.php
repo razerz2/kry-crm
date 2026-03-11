@@ -3,6 +3,7 @@
 namespace Webkul\Lead\Helpers;
 
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Webkul\Admin\Http\Requests\LeadForm;
 
 class MagicAI
@@ -73,7 +74,7 @@ class MagicAI
         ]);
 
         if ($validator->fails()) {
-            throw new \Illuminate\Validation\ValidationException(
+            throw new ValidationException(
                 $validator,
                 response()->json(self::errorHandler($validator->errors()->getMessages()), 400)
             );
