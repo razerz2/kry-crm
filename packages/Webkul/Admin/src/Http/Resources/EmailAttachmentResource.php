@@ -16,15 +16,15 @@ class EmailAttachmentResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'           => $this->id,
-            'name'         => $this->name,
-            'path'         => $this->path,
-            'url'          => $this->url,
-            'size'         => $this->size,
+            'id' => $this->id,
+            'name' => $this->name,
+            'path' => $this->path,
+            'url' => $this->url,
+            'size' => $this->size,
             'content_type' => $this->content_type,
-            'content_id'   => $this->content_id,
-            'created_at'   => $this->created_at,
-            'updated_at'   => $this->updated_at,
+            'content_id' => $this->content_id,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }

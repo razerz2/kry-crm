@@ -46,7 +46,7 @@ class AttributeRepository extends Repository
             foreach ($options as $optionInputs) {
                 $this->attributeOptionRepository->create(array_merge([
                     'attribute_id' => $attribute->id,
-                    'sort_order'   => $sortOrder++,
+                    'sort_order' => $sortOrder++,
                 ], $optionInputs));
             }
         }

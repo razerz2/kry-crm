@@ -2,10 +2,10 @@
 
 namespace Webkul\Admin\Exceptions;
 
-use App\Exceptions\Handler as AppExceptionHandler;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
@@ -13,7 +13,7 @@ use PDOException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
-class Handler extends AppExceptionHandler
+class Handler extends ExceptionHandler
 {
     /**
      * Json error messages.

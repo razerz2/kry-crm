@@ -52,19 +52,19 @@ trait ProvideDropdownOptions
     {
         return [
             [
-                'value'    => '',
-                'label'    => __('admin::app.common.select-options'),
+                'value' => '',
+                'label' => __('admin::app.common.select-options'),
                 'disabled' => true,
                 'selected' => true,
             ],
             [
-                'label'    => trans('admin::app.datagrid.active'),
-                'value'    => 1,
+                'label' => trans('admin::app.datagrid.active'),
+                'value' => 1,
                 'disabled' => false,
                 'selected' => false,
             ], [
-                'label'    => trans('admin::app.datagrid.inactive'),
-                'value'    => 0,
+                'label' => trans('admin::app.datagrid.inactive'),
+                'value' => 0,
                 'disabled' => false,
                 'selected' => false,
             ],
@@ -78,19 +78,19 @@ trait ProvideDropdownOptions
     {
         return [
             [
-                'value'    => '',
-                'label'    => __('admin::app.common.select-options'),
+                'value' => '',
+                'label' => __('admin::app.common.select-options'),
                 'disabled' => true,
                 'selected' => true,
             ],
             [
-                'value'    => 0,
-                'label'    => __('admin::app.common.no'),
+                'value' => 0,
+                'label' => __('admin::app.common.no'),
                 'disabled' => false,
                 'selected' => false,
             ], [
-                'value'    => 1,
-                'label'    => __('admin::app.common.yes'),
+                'value' => 1,
+                'label' => __('admin::app.common.yes'),
                 'disabled' => false,
                 'selected' => false,
             ],
@@ -115,8 +115,8 @@ trait ProvideDropdownOptions
 
         return [
             [
-                'label'    => __('admin::app.common.select-users'),
-                'value'    => '',
+                'label' => __('admin::app.common.select-users'),
+                'value' => '',
                 'disabled' => true,
                 'selected' => true,
             ],
@@ -142,8 +142,8 @@ trait ProvideDropdownOptions
 
         return [
             [
-                'label'    => __('admin::app.common.select-users'),
-                'value'    => '',
+                'label' => __('admin::app.common.select-users'),
+                'value' => '',
                 'disabled' => true,
                 'selected' => true,
             ],
@@ -169,8 +169,8 @@ trait ProvideDropdownOptions
 
         return [
             [
-                'label'    => __('admin::app.common.select-organization'),
-                'value'    => '',
+                'label' => __('admin::app.common.select-organization'),
+                'value' => '',
                 'disabled' => true,
                 'selected' => true,
             ],
@@ -185,13 +185,13 @@ trait ProvideDropdownOptions
     {
         return [
             [
-                'label'    => trans('admin::app.settings.roles.all'),
-                'value'    => 'all',
+                'label' => trans('admin::app.settings.roles.all'),
+                'value' => 'all',
                 'disabled' => false,
                 'selected' => false,
             ], [
-                'label'    => trans('admin::app.settings.roles.custom'),
-                'value'    => 'custom',
+                'label' => trans('admin::app.settings.roles.custom'),
+                'value' => 'custom',
                 'disabled' => false,
                 'selected' => false,
             ],
@@ -205,23 +205,23 @@ trait ProvideDropdownOptions
     {
         return [
             [
-                'label'    => trans('admin::app.common.select-type'),
-                'value'    => '',
+                'label' => trans('admin::app.common.select-type'),
+                'value' => '',
                 'disabled' => true,
                 'selected' => true,
             ], [
-                'label'    => trans('admin::app.common.select-call'),
-                'value'    => 'call',
+                'label' => trans('admin::app.common.select-call'),
+                'value' => 'call',
                 'disabled' => false,
                 'selected' => false,
             ], [
-                'label'    => trans('admin::app.common.select-meeting'),
-                'value'    => 'meeting',
+                'label' => trans('admin::app.common.select-meeting'),
+                'value' => 'meeting',
                 'disabled' => false,
                 'selected' => false,
             ], [
-                'label'    => trans('admin::app.common.select-lunch'),
-                'value'    => 'lunch',
+                'label' => trans('admin::app.common.select-lunch'),
+                'value' => 'lunch',
                 'disabled' => false,
                 'selected' => false,
             ],
@@ -235,20 +235,20 @@ trait ProvideDropdownOptions
     {
         return [
             [
-                'label'    => trans('admin::app.common.select-options'),
-                'value'    => '',
+                'label' => trans('admin::app.common.select-options'),
+                'value' => '',
                 'disabled' => true,
                 'selected' => true,
             ],
             [
-                'label'    => trans('admin::app.common.system_attribute'),
-                'value'    => '0',
+                'label' => trans('admin::app.common.system_attribute'),
+                'value' => '0',
                 'disabled' => false,
                 'selected' => false,
             ],
             [
-                'label'    => trans('admin::app.common.custom_attribute'),
-                'value'    => '1',
+                'label' => trans('admin::app.common.custom_attribute'),
+                'value' => '1',
                 'disabled' => false,
                 'selected' => false,
             ],
@@ -273,8 +273,8 @@ trait ProvideDropdownOptions
 
         return [
             [
-                'label'    => __('admin::app.common.select-warehouse'),
-                'value'    => '',
+                'label' => __('admin::app.common.select-warehouse'),
+                'value' => '',
                 'disabled' => true,
                 'selected' => true,
             ],

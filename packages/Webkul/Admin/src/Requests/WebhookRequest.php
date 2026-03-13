@@ -24,13 +24,13 @@ class WebhookRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'         => 'required|string|max:255',
-            'entity_type'  => 'required|string|max:255',
-            'description'  => 'nullable|string|max:255',
-            'method'       => 'required|string|max:255',
-            'end_point'    => 'required|string|max:255',
+            'name' => 'required|string|max:255',
+            'entity_type' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+            'method' => 'required|string|max:255',
+            'end_point' => 'required|string|max:255',
             'query_params' => 'nullable',
-            'headers'      => 'nullable',
+            'headers' => 'nullable',
             'payload_type' => [
                 'required',
                 'string',

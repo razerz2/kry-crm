@@ -136,7 +136,7 @@ class Core
 
         $collection = $this->countryStateRepository->findByField([
             'country_code' => $countryCode,
-            'code'         => $stateCode,
+            'code' => $stateCode,
         ]);
 
         if (count($collection)) {

@@ -69,11 +69,11 @@ class ActivityController extends Controller
     public function store(): RedirectResponse|JsonResponse
     {
         $this->validate(request(), [
-            'type'          => 'required',
-            'comment'       => 'required_if:type,note',
+            'type' => 'required',
+            'comment' => 'required_if:type,note',
             'schedule_from' => 'required_unless:type,note,file',
-            'schedule_to'   => 'required_unless:type,note,file',
-            'file'          => 'required_if:type,file',
+            'schedule_to' => 'required_unless:type,note,file',
+            'file' => 'required_if:type,file',
         ]);
 
         if (request('type') === 'meeting') {
@@ -111,7 +111,7 @@ class ActivityController extends Controller
 
         if (request()->ajax()) {
             return response()->json([
-                'data'    => new ActivityResource($activity),
+                'data' => new ActivityResource($activity),
                 'message' => trans('admin::app.activities.create-success'),
             ]);
         }
@@ -163,7 +163,7 @@ class ActivityController extends Controller
 
         if (request()->ajax()) {
             return response()->json([
-                'data'    => new ActivityResource($activity),
+                'data' => new ActivityResource($activity),
                 'message' => trans('admin::app.activities.update-success'),
             ]);
         }

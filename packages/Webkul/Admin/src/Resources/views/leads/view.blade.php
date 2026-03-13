@@ -24,7 +24,7 @@
                     @if (($days = $lead->rotten_days) > 0)
                         @php
                             $lead->tags->prepend([
-                                'name'  => '<span class="icon-rotten text-base"></span>' . trans('admin::app.leads.view.rotten-days', ['days' => $days]),
+                                'name' => '<span class="icon-rotten text-base"></span>' . trans('admin::app.leads.view.rotten-days', ['days' => $days]),
                                 'color' => '#FEE2E2'
                             ]);
                         @endphp

@@ -3,8 +3,8 @@
 
     if (isset($lead)) {
         $quote->fill([
-            'person_id'       => $lead->person_id,
-            'user_id'         => $lead->user_id,
+            'person_id' => $lead->person_id,
+            'user_id' => $lead->user_id,
             'billing_address' => $lead->person->organization ? $lead->person->organization->address : null
         ]);
     }
@@ -194,7 +194,7 @@
                             <!-- Custom Attributes -->
                             <x-admin::attributes
                                 :custom-attributes="app('Webkul\Attribute\Repositories\AttributeRepository')->findWhere([
-                                    'entity_type'     => 'quotes',
+                                    'entity_type' => 'quotes',
                                     'is_user_defined' => 1,
                                 ])->sortBy('sort_order')"
                                 :custom-validations="[

@@ -277,7 +277,7 @@
                     updateOrCreate(params, {resetForm, setErrors}) {
                         this.isProcessing = true;
 
-                        this.$axios.post(params.id ? `{{ route('admin.settings.sources.update', '') }}/${params.id}` : "{{ route('admin.settings.sources.store') }}", {
+                        this.$axios.post(params.id ? "{{ route('admin.settings.sources.update', '__PLACEHOLDER__') }}".replace('__PLACEHOLDER__', params.id) : "{{ route('admin.settings.sources.store') }}", {
                             ...params,
                             _method: params.id ? 'put' : 'post'
                         },

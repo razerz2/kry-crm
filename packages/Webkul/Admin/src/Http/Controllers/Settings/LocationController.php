@@ -47,7 +47,7 @@ class LocationController extends Controller
         Event::dispatch('settings.location.create.after', $location);
 
         return new JsonResponse([
-            'data'    => $location,
+            'data' => $location,
             'message' => trans('admin::app.settings.warehouses.view.locations.create-success'),
         ]);
     }

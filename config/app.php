@@ -1,33 +1,5 @@
 <?php
 
-use App\Providers\AppServiceProvider;
-use App\Providers\AuthServiceProvider;
-use App\Providers\EventServiceProvider;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Support\Facades\Facade;
-use Illuminate\Support\ServiceProvider;
-use Konekt\Concord\ConcordServiceProvider;
-use Prettus\Repository\Providers\RepositoryServiceProvider;
-use Webkul\Activity\Providers\ActivityServiceProvider;
-use Webkul\Admin\Providers\AdminServiceProvider;
-use Webkul\Attribute\Providers\AttributeServiceProvider;
-use Webkul\Automation\Providers\WorkflowServiceProvider;
-use Webkul\Contact\Providers\ContactServiceProvider;
-use Webkul\Core\Providers\CoreServiceProvider;
-use Webkul\DataGrid\Providers\DataGridServiceProvider;
-use Webkul\DataTransfer\Providers\DataTransferServiceProvider;
-use Webkul\Email\Providers\EmailServiceProvider;
-use Webkul\EmailTemplate\Providers\EmailTemplateServiceProvider;
-use Webkul\Installer\Providers\InstallerServiceProvider;
-use Webkul\Lead\Providers\LeadServiceProvider;
-use Webkul\Marketing\Providers\MarketingServiceProvider;
-use Webkul\Product\Providers\ProductServiceProvider;
-use Webkul\Quote\Providers\QuoteServiceProvider;
-use Webkul\Tag\Providers\TagServiceProvider;
-use Webkul\User\Providers\UserServiceProvider;
-use Webkul\Warehouse\Providers\WarehouseServiceProvider;
-use Webkul\WebForm\Providers\WebFormServiceProvider;
-
 return [
 
     /*
@@ -94,7 +66,7 @@ return [
 
     'admin_path' => env('APP_ADMIN_PATH', 'admin'),
 
-    'asset_url' => env('ASSET_URL', null),
+    'asset_url' => env('ASSET_URL'),
 
     /*
     |--------------------------------------------------------------------------
@@ -133,13 +105,13 @@ return [
      */
 
     'available_locales' => [
-        'ar'    => 'Arabic',
-        'en'    => 'English',
-        'es'    => 'Español',
-        'fa'    => 'Persian',
+        'ar' => 'Arabic',
+        'en' => 'English',
+        'es' => 'Español',
+        'fa' => 'Persian',
         'pt_BR' => 'Portuguese',
-        'tr'    => 'Türkçe',
-        'vi'    => 'Vietnamese',
+        'tr' => 'Türkçe',
+        'vi' => 'Vietnamese',
     ],
 
     /*
@@ -196,67 +168,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Autoloaded Service Providers
+    | Maintenance Mode Driver
     |--------------------------------------------------------------------------
     |
-    | The service providers listed here will be automatically loaded on the
-    | request to your application. Feel free to add your own services to
-    | this array to grant expanded functionality to your applications.
+    | These configuration options determine the driver used to determine and
+    | manage Laravel's "maintenance mode" status. The "cache" driver will
+    | allow maintenance mode to be controlled across multiple machines.
+    |
+    | Supported drivers: "file", "cache"
     |
      */
 
-    'providers' => ServiceProvider::defaultProviders()->merge([
-        /*
-         * Package Service Providers...
-         */
-        Barryvdh\DomPDF\ServiceProvider::class,
-        ConcordServiceProvider::class,
-        RepositoryServiceProvider::class,
-
-        /*
-         * Application Service Providers...
-         */
-        AppServiceProvider::class,
-        AuthServiceProvider::class,
-        // App\Providers\BroadcastServiceProvider::class,
-        EventServiceProvider::class,
-        RouteServiceProvider::class,
-
-        /*
-         * Webkul Service Providers...
-         */
-        ActivityServiceProvider::class,
-        AdminServiceProvider::class,
-        AttributeServiceProvider::class,
-        WorkflowServiceProvider::class,
-        ContactServiceProvider::class,
-        CoreServiceProvider::class,
-        DataGridServiceProvider::class,
-        DataTransferServiceProvider::class,
-        EmailTemplateServiceProvider::class,
-        EmailServiceProvider::class,
-        MarketingServiceProvider::class,
-        InstallerServiceProvider::class,
-        LeadServiceProvider::class,
-        ProductServiceProvider::class,
-        QuoteServiceProvider::class,
-        TagServiceProvider::class,
-        UserServiceProvider::class,
-        WarehouseServiceProvider::class,
-        WebFormServiceProvider::class,
-    ])->toArray(),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Class Aliases
-    |--------------------------------------------------------------------------
-    |
-    | This array of class aliases will be registered when this application
-    | is started. However, feel free to register as many as you wish as
-    | the aliases are "lazy" loaded so they don't hinder performance.
-    |
-     */
-
-    'aliases' => Facade::defaultAliases()->merge([])->toArray(),
-
+    'maintenance' => [
+        'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
+        'store' => env('APP_MAINTENANCE_STORE', 'database'),
+    ],
 ];

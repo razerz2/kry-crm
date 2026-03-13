@@ -26,7 +26,7 @@ class Organization extends AbstractReporting
     {
         return [
             'previous' => $previous = $this->getTotalOrganizations($this->lastStartDate, $this->lastEndDate),
-            'current'  => $current = $this->getTotalOrganizations($this->startDate, $this->endDate),
+            'current' => $current = $this->getTotalOrganizations($this->startDate, $this->endDate),
             'progress' => $this->getPercentageChange($previous, $current),
         ];
     }
@@ -69,9 +69,9 @@ class Organization extends AbstractReporting
 
         $items = $items->map(function ($item) {
             return [
-                'id'                => $item->id,
-                'name'              => $item->name,
-                'revenue'           => $item->revenue,
+                'id' => $item->id,
+                'name' => $item->name,
+                'revenue' => $item->revenue,
                 'formatted_revenue' => core()->formatBasePrice($item->revenue),
             ];
         });

@@ -56,7 +56,7 @@ class CoreConfigRepository extends Repository
                 : $configuration->getFields();
 
             $tempPath = array_merge($path, [[
-                'key'   => $configuration->getKey() ?? null,
+                'key' => $configuration->getKey() ?? null,
                 'title' => $this->getTranslatedTitle($configuration),
             ]]);
 
@@ -84,7 +84,7 @@ class CoreConfigRepository extends Repository
 
                 $results[] = [
                     'title' => implode(' > ', [...Arr::pluck($path, 'title'), $title]),
-                    'url'   => route('admin.configuration.index', Str::replace('.', '/', $queryParam)),
+                    'url' => route('admin.configuration.index', Str::replace('.', '/', $queryParam)),
                 ];
             }
 
@@ -156,7 +156,7 @@ class CoreConfigRepository extends Repository
                     }
 
                     $preparedData[] = [
-                        'code'  => $fieldName,
+                        'code' => $fieldName,
                         'value' => $value,
                     ];
                 }

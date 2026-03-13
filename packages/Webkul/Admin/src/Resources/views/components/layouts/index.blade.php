@@ -35,7 +35,7 @@
         name="currency"
         content="{{
             json_encode([
-                'code'   => config('app.currency'),
+                'code' => config('app.currency'),
                 'symbol' => core()->currencySymbol(config('app.currency'))])
             }}
         "

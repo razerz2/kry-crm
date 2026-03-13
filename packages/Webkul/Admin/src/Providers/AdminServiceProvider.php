@@ -54,12 +54,12 @@ class AdminServiceProvider extends ServiceProvider
         $this->app->bind(ExceptionHandler::class, Handler::class);
 
         Relation::morphMap([
-            'leads'         => Lead::class,
+            'leads' => Lead::class,
             'organizations' => Organization::class,
-            'persons'       => Person::class,
-            'products'      => Product::class,
-            'quotes'        => Quote::class,
-            'warehouses'    => Warehouse::class,
+            'persons' => Person::class,
+            'products' => Product::class,
+            'quotes' => Quote::class,
+            'warehouses' => Warehouse::class,
         ]);
 
         $this->app->register(EventServiceProvider::class);

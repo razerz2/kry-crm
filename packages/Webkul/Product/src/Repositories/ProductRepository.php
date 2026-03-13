@@ -120,7 +120,7 @@ class ProductRepository extends Repository
             foreach ($data['inventories'] as $inventoryId => $inventoryData) {
                 if (Str::contains($inventoryId, 'inventory_')) {
                     $this->productInventoryRepository->create(array_merge($inventoryData, [
-                        'product_id'   => $id,
+                        'product_id' => $id,
                         'warehouse_id' => $warehouseId,
                     ]));
                 } else {
@@ -166,11 +166,11 @@ class ProductRepository extends Repository
         foreach ($product->inventories as $inventory) {
             if (! isset($warehouses[$inventory->warehouse_id])) {
                 $warehouses[$inventory->warehouse_id] = [
-                    'id'        => $inventory->warehouse_id,
-                    'name'      => $inventory->warehouse->name,
-                    'in_stock'  => $inventory->in_stock,
+                    'id' => $inventory->warehouse_id,
+                    'name' => $inventory->warehouse->name,
+                    'in_stock' => $inventory->in_stock,
                     'allocated' => $inventory->allocated,
-                    'on_hand'   => $inventory->on_hand,
+                    'on_hand' => $inventory->on_hand,
                 ];
             } else {
                 $warehouses[$inventory->warehouse_id]['in_stock'] += $inventory->in_stock;
@@ -179,11 +179,11 @@ class ProductRepository extends Repository
             }
 
             $warehouses[$inventory->warehouse_id]['locations'][] = [
-                'id'        => $inventory->warehouse_location_id,
-                'name'      => $inventory->location->name,
-                'in_stock'  => $inventory->in_stock,
+                'id' => $inventory->warehouse_location_id,
+                'name' => $inventory->location->name,
+                'in_stock' => $inventory->in_stock,
                 'allocated' => $inventory->allocated,
-                'on_hand'   => $inventory->on_hand,
+                'on_hand' => $inventory->on_hand,
             ];
         }
 

@@ -52,9 +52,9 @@ class SettingController extends Controller
             if ($this->matchesQuery($item, $query)) {
                 $results->push([
                     'name' => $item->getName(),
-                    'url'  => $item->getUrl(),
+                    'url' => $item->getUrl(),
                     'icon' => $item->getIcon(),
-                    'key'  => $item->getKey(),
+                    'key' => $item->getKey(),
                 ]);
             }
 

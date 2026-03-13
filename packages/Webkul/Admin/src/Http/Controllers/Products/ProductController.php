@@ -87,12 +87,12 @@ class ProductController extends Controller
             ->get()
             ->map(function ($inventory) {
                 return [
-                    'id'                    => $inventory->id,
-                    'name'                  => $inventory->location->name,
-                    'warehouse_id'          => $inventory->warehouse_id,
+                    'id' => $inventory->id,
+                    'name' => $inventory->location->name,
+                    'warehouse_id' => $inventory->warehouse_id,
                     'warehouse_location_id' => $inventory->warehouse_location_id,
-                    'in_stock'              => $inventory->in_stock,
-                    'allocated'             => $inventory->allocated,
+                    'in_stock' => $inventory->in_stock,
+                    'allocated' => $inventory->allocated,
                 ];
             });
 
@@ -127,11 +127,11 @@ class ProductController extends Controller
     public function storeInventories(int $id, ?int $warehouseId = null): JsonResponse
     {
         $this->validate(request(), [
-            'inventories'                         => 'array',
+            'inventories' => 'array',
             'inventories.*.warehouse_location_id' => 'required',
-            'inventories.*.warehouse_id'          => 'required',
-            'inventories.*.in_stock'              => 'required|integer|min:0',
-            'inventories.*.allocated'             => 'required|integer|min:0',
+            'inventories.*.warehouse_id' => 'required',
+            'inventories.*.in_stock' => 'required|integer|min:0',
+            'inventories.*.allocated' => 'required|integer|min:0',
         ]);
 
         $product = $this->productRepository->findOrFail($id);

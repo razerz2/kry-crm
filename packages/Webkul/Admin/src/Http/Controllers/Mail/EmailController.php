@@ -112,9 +112,9 @@ class EmailController extends Controller
     public function store()
     {
         $this->validate(request(), [
-            'reply_to'   => 'required|array|min:1',
+            'reply_to' => 'required|array|min:1',
             'reply_to.*' => 'email',
-            'reply'      => 'required',
+            'reply' => 'required',
         ]);
 
         Event::dispatch('email.create.before');
@@ -136,7 +136,7 @@ class EmailController extends Controller
 
         if (request()->ajax()) {
             return response()->json([
-                'data'    => new EmailResource($email),
+                'data' => new EmailResource($email),
                 'message' => trans('admin::app.mail.create-success'),
             ]);
         }
@@ -149,7 +149,7 @@ class EmailController extends Controller
 
         session()->flash('success', trans('admin::app.mail.create-success'));
 
-        return redirect()->route('admin.mail.index', ['route'   => SupportedFolderEnum::SENT->value]);
+        return redirect()->route('admin.mail.index', ['route' => SupportedFolderEnum::SENT->value]);
     }
 
     /**
@@ -197,7 +197,7 @@ class EmailController extends Controller
 
         if (request()->ajax()) {
             return response()->json([
-                'data'    => new EmailResource($email->refresh()),
+                'data' => new EmailResource($email->refresh()),
                 'message' => trans('admin::app.mail.update-success'),
             ]);
         }

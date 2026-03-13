@@ -204,14 +204,14 @@ class QuoteController extends Controller
     private function additionalValidation(): void
     {
         $this->validate(request(), [
-            'items'                   => 'required|array',
-            'items.*.product_id'      => 'required|exists:products,id',
-            'items.*.quantity'        => 'required|numeric|min:0',
-            'items.*.price'           => 'required|numeric|min:0',
-            'items.*.total'           => 'required|numeric|min:0',
+            'items' => 'required|array',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|numeric|min:0',
+            'items.*.price' => 'required|numeric|min:0',
+            'items.*.total' => 'required|numeric|min:0',
             'items.*.discount_amount' => 'required|numeric|min:0',
-            'items.*.tax_amount'      => 'required|numeric|min:0',
-            'items.*.final_total'     => 'required|numeric|min:0',
+            'items.*.tax_amount' => 'required|numeric|min:0',
+            'items.*.final_total' => 'required|numeric|min:0',
         ]);
     }
 }

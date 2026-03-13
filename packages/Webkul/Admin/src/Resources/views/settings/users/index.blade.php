@@ -552,7 +552,7 @@
 
                         this.$axios.post(
                                 params.id
-                                ? `{{ route('admin.settings.users.update', '') }}/${params.id}`
+                                ? "{{ route('admin.settings.users.update', '__PLACEHOLDER__') }}".replace('__PLACEHOLDER__', params.id)
                                 : "{{ route('admin.settings.users.store') }}", userForm
                             )
                             .then(response => {

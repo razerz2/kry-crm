@@ -1022,7 +1022,7 @@
                                                             :custom-attributes="app('Webkul\Attribute\Repositories\AttributeRepository')->findWhere([
                                                                 ['code', 'IN', ['title']],
                                                                 'entity_type' => 'leads',
-                                                                'quick_add'   => 1
+                                                                'quick_add' => 1
                                                             ])"
                                                         />
                                                     </div>
@@ -1032,7 +1032,7 @@
                                                             :custom-attributes="app('Webkul\Attribute\Repositories\AttributeRepository')->findWhere([
                                                                 ['code', 'IN', ['lead_value']],
                                                                 'entity_type' => 'leads',
-                                                                'quick_add'   => 1
+                                                                'quick_add' => 1
                                                             ])"
                                                         />
                                                     </div>
@@ -1044,7 +1044,7 @@
                                                         :custom-attributes="app('Webkul\Attribute\Repositories\AttributeRepository')->findWhere([
                                                             ['code', 'IN', ['description']],
                                                             'entity_type' => 'leads',
-                                                            'quick_add'   => 1
+                                                            'quick_add' => 1
                                                         ])"
                                                     />
                                                 </div>
@@ -1056,7 +1056,7 @@
                                                             :custom-attributes="app('Webkul\Attribute\Repositories\AttributeRepository')->findWhere([
                                                                 ['code', 'IN', ['lead_pipeline_id']],
                                                                 'entity_type' => 'leads',
-                                                                'quick_add'   => 1
+                                                                'quick_add' => 1
                                                             ])"
                                                         />
                                                     </div>
@@ -1066,7 +1066,7 @@
                                                             :custom-attributes="app('Webkul\Attribute\Repositories\AttributeRepository')->findWhere([
                                                                 ['code', 'IN', ['lead_pipeline_stage_id']],
                                                                 'entity_type' => 'leads',
-                                                                'quick_add'   => 1
+                                                                'quick_add' => 1
                                                             ])"
                                                         />
                                                     </div>
@@ -1078,7 +1078,7 @@
                                                             :custom-attributes="app('Webkul\Attribute\Repositories\AttributeRepository')->findWhere([
                                                                 ['code', 'IN', ['lead_type_id']],
                                                                 'entity_type' => 'leads',
-                                                                'quick_add'   => 1
+                                                                'quick_add' => 1
                                                             ])"
                                                         />
                                                     </div>
@@ -1088,7 +1088,7 @@
                                                             :custom-attributes="app('Webkul\Attribute\Repositories\AttributeRepository')->findWhere([
                                                                 ['code', 'IN', ['lead_source_id']],
                                                                 'entity_type' => 'leads',
-                                                                'quick_add'   => 1
+                                                                'quick_add' => 1
                                                             ])"
                                                         />
                                                     </div>
@@ -1100,7 +1100,7 @@
                                                             :custom-attributes="app('Webkul\Attribute\Repositories\AttributeRepository')->findWhere([
                                                                 ['code', 'IN', ['user_id']],
                                                                 'entity_type' => 'leads',
-                                                                'quick_add'   => 1
+                                                                'quick_add' => 1
                                                             ])"
                                                         />
                                                     </div>
@@ -1110,7 +1110,7 @@
                                                             :custom-attributes="app('Webkul\Attribute\Repositories\AttributeRepository')->findWhere([
                                                                 ['code', 'IN', ['expected_close_date']],
                                                                 'entity_type' => 'leads',
-                                                                'quick_add'   => 1
+                                                                'quick_add' => 1
                                                             ])"
                                                             :custom-validations="[
                                                                 'expected_close_date' => [

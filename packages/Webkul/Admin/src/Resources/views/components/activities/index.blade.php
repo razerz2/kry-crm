@@ -1,9 +1,9 @@
 @props([
     'endpoint',
     'emailDetachEndpoint' => null,
-    'activeType'          => 'all',
-    'types'               => null,
-    'extraTypes'          => null,
+    'activeType' => 'all',
+    'types' => null,
+    'extraTypes' => null,
 ])
 
 {!! view_render_event('admin.components.activities.before') !!}

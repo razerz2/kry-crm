@@ -1,6 +1,6 @@
 @props([
-    'attribute'   => '',
-    'value'       => '',
+    'attribute' => '',
+    'value' => '',
     'validations' => '',
 ])
 

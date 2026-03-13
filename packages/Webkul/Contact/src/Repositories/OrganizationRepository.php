@@ -109,7 +109,7 @@ class OrganizationRepository extends Repository
 
         DB::transaction(function () use ($organization, $id) {
             $this->attributeValueRepository->deleteWhere([
-                'entity_id'   => $id,
+                'entity_id' => $id,
                 'entity_type' => 'organizations',
             ]);
 

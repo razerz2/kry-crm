@@ -24,7 +24,7 @@ class Quote extends AbstractReporting
     {
         return [
             'previous' => $previous = $this->getTotalQuotes($this->lastStartDate, $this->lastEndDate),
-            'current'  => $current = $this->getTotalQuotes($this->startDate, $this->endDate),
+            'current' => $current = $this->getTotalQuotes($this->startDate, $this->endDate),
             'progress' => $this->getPercentageChange($previous, $current),
         ];
     }
