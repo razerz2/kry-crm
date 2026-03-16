@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -36,7 +36,7 @@ jobs:
           tools: composer:v2
 
       - name: Running Composer Install
-        run: composer install --no-interaction --prefer-dist --no-progress
+        run: composer install
 
       - name: Set Testing Environment
         run: |
@@ -51,5 +51,5 @@ jobs:
       - name: Running Krayin Installer
         run: php artisan krayin-crm:install --skip-env-check --skip-admin-creation
 
-      - name: Running Pest Test
+       - name: Running Pest Test
         run: vendor/bin/pest --parallel --colors=always
