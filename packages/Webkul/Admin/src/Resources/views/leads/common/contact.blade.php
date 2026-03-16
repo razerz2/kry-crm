@@ -77,7 +77,7 @@
             @php
                 $organizationAttribute = app('Webkul\Attribute\Repositories\AttributeRepository')->findOneWhere([
                     'entity_type' => 'persons',
-                    'code'        => 'organization_id'
+                    'code' => 'organization_id'
                 ]);
 
                 $organizationAttribute->code = 'person[' . $organizationAttribute->code . ']';

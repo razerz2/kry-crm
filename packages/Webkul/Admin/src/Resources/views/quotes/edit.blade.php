@@ -185,7 +185,7 @@
                             <!-- Custom Attributes -->
                             <x-admin::attributes
                                 :custom-attributes="app('Webkul\Attribute\Repositories\AttributeRepository')->findWhere([
-                                    'entity_type'     => 'quotes',
+                                    'entity_type' => 'quotes',
                                     'is_user_defined' => 1,
                                 ])->sortBy('sort_order')"
                                 :custom-validations="[

@@ -22,7 +22,7 @@ class UserResetPassword extends ResetPassword
         return (new MailMessage)
             ->view('admin::emails.users.forget-password', [
                 'user_name' => $notifiable->name,
-                'token'     => $this->token,
+                'token' => $this->token,
             ]);
     }
 }

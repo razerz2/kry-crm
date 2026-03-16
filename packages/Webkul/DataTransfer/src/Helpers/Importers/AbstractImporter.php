@@ -61,13 +61,13 @@ abstract class AbstractImporter
      * Error message templates.
      */
     protected array $errorMessages = [
-        self::ERROR_CODE_SYSTEM_EXCEPTION    => 'data_transfer::app.validation.errors.system',
-        self::ERROR_CODE_COLUMN_NOT_FOUND    => 'data_transfer::app.validation.errors.column-not-found',
+        self::ERROR_CODE_SYSTEM_EXCEPTION => 'data_transfer::app.validation.errors.system',
+        self::ERROR_CODE_COLUMN_NOT_FOUND => 'data_transfer::app.validation.errors.column-not-found',
         self::ERROR_CODE_COLUMN_EMPTY_HEADER => 'data_transfer::app.validation.errors.column-empty-headers',
         self::ERROR_CODE_COLUMN_NAME_INVALID => 'data_transfer::app.validation.errors.column-name-invalid',
-        self::ERROR_CODE_INVALID_ATTRIBUTE   => 'data_transfer::app.validation.errors.invalid-attribute',
-        self::ERROR_CODE_WRONG_QUOTES        => 'data_transfer::app.validation.errors.wrong-quotes',
-        self::ERROR_CODE_COLUMNS_NUMBER      => 'data_transfer::app.validation.errors.column-numbers',
+        self::ERROR_CODE_INVALID_ATTRIBUTE => 'data_transfer::app.validation.errors.invalid-attribute',
+        self::ERROR_CODE_WRONG_QUOTES => 'data_transfer::app.validation.errors.wrong-quotes',
+        self::ERROR_CODE_COLUMNS_NUMBER => 'data_transfer::app.validation.errors.column-numbers',
     ];
 
     public const BATCH_SIZE = 100;
@@ -283,7 +283,7 @@ abstract class AbstractImporter
             ) {
                 $this->importBatchRepository->create([
                     'import_id' => $this->import->id,
-                    'data'      => $batchRows,
+                    'data' => $batchRows,
                 ]);
 
                 $batchRows = [];
@@ -329,23 +329,23 @@ abstract class AbstractImporter
                 }
 
                 $validations = [
-                    $attribute->code.'.address'  => 'required',
-                    $attribute->code.'.country'  => 'required',
-                    $attribute->code.'.state'    => 'required',
-                    $attribute->code.'.city'     => 'required',
+                    $attribute->code.'.address' => 'required',
+                    $attribute->code.'.country' => 'required',
+                    $attribute->code.'.state' => 'required',
+                    $attribute->code.'.city' => 'required',
                     $attribute->code.'.postcode' => 'required',
                 ];
             } elseif ($attribute->type == 'email') {
                 $validations = [
-                    $attribute->code              => [$attribute->is_required ? 'required' : 'nullable'],
-                    $attribute->code.'.*.value'   => [$attribute->is_required ? 'required' : 'nullable', 'email'],
-                    $attribute->code.'.*.label'   => $attribute->is_required ? 'required' : 'nullable',
+                    $attribute->code => [$attribute->is_required ? 'required' : 'nullable'],
+                    $attribute->code.'.*.value' => [$attribute->is_required ? 'required' : 'nullable', 'email'],
+                    $attribute->code.'.*.label' => $attribute->is_required ? 'required' : 'nullable',
                 ];
             } elseif ($attribute->type == 'phone') {
                 $validations = [
-                    $attribute->code              => [$attribute->is_required ? 'required' : 'nullable'],
-                    $attribute->code.'.*.value'   => [$attribute->is_required ? 'required' : 'nullable'],
-                    $attribute->code.'.*.label'   => $attribute->is_required ? 'required' : 'nullable',
+                    $attribute->code => [$attribute->is_required ? 'required' : 'nullable'],
+                    $attribute->code.'.*.value' => [$attribute->is_required ? 'required' : 'nullable'],
+                    $attribute->code.'.*.label' => $attribute->is_required ? 'required' : 'nullable',
                 ];
             } else {
                 $validations[$attribute->code] = [$attribute->is_required ? 'required' : 'nullable'];

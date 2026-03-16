@@ -54,9 +54,9 @@ class TinyMCEController extends Controller
         $this->sanitizeSVG($path, $file);
 
         return [
-            'file'      => $path,
+            'file' => $path,
             'file_name' => $file->getClientOriginalName(),
-            'file_url'  => Storage::url($path),
+            'file_url' => Storage::url($path),
         ];
     }
 }

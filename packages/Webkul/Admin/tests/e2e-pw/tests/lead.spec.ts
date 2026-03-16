@@ -12,7 +12,7 @@ async function generateLead(adminPage) {
     /**
      * Fill the lead form.
      */
-    const leadTitle = generateName();
+    const leadTitle = `${generateName()}-${Date.now()}`;
     const leadDescription = generateDescription();
     const leadDate = generateDate();
     const leadEmail = generateEmail();
@@ -61,6 +61,21 @@ function generateFile(fileName, content) {
     return fileName;
 }
 
+async function openLeadByTitle(adminPage, leadTitle) {
+  await adminPage.goto("admin/leads");
+  const searchInput = adminPage.getByRole("textbox", { name: "Search by Title" });
+  await searchInput.fill(leadTitle);
+  await searchInput.press("Enter");
+
+  const leadLink = adminPage
+    .locator('a[href*="/admin/leads/view/"]')
+    .filter({ hasText: leadTitle })
+    .first();
+
+  await expect(leadLink).toBeVisible();
+  await leadLink.click();
+}
+
 test.describe("lead management", () => {
     
     test("should create a new lead", async ({ adminPage }) => {
@@ -79,7 +94,7 @@ test.describe("lead management", () => {
        /**
         * Update the lead.
         */
-       await adminPage.getByRole('link', { name: lead.leadTitle }).click();
+      await openLeadByTitle(adminPage, lead.leadTitle);
        const page1Promise = adminPage.waitForEvent('popup');
        await adminPage.getByRole('link', { name: '' }).first().click();
        const page1 = await page1Promise;
@@ -116,7 +131,7 @@ test.describe("lead management", () => {
        /**
         * fill mail detail.
         */
-       await adminPage.getByRole('link', { name: lead.leadTitle}).click();
+       await openLeadByTitle(adminPage, lead.leadTitle);
        await adminPage.getByRole('button', { name: ' Mail' }).click();
        await adminPage.fill('input[name="temp-reply_to"]', generateEmail());
        await adminPage.fill('input[name="subject"]', generateEmailSubject());
@@ -139,7 +154,7 @@ test.describe("lead management", () => {
     /**
      * fill the file detail or upload a file.
      */
-    await adminPage.getByRole('link', { name: lead.leadTitle}).click();
+    await openLeadByTitle(adminPage, lead.leadTitle);
     await adminPage.getByRole('button', { name: ' File' }).click();
     await adminPage.locator('input[name="title"]').fill(lead.leadTitle);
     await adminPage.locator('textarea[name="comment"]').fill(generateDescription());
@@ -157,7 +172,7 @@ test.describe("lead management", () => {
     /**
      * write a notes 
      */
-    await adminPage.getByRole('link', { name: lead.leadTitle}).click();
+    await openLeadByTitle(adminPage, lead.leadTitle);
     await adminPage.getByRole('button', { name: ' Note' }).click();
     await adminPage.locator('textarea[name="comment"]').fill(generateDescription());
     await adminPage.getByRole('button', { name: 'Save Note' }).click();
@@ -172,7 +187,7 @@ test.describe("lead management", () => {
      /**
       * write a call activity detail 
       */
-     await adminPage.getByRole('link', { name: lead.leadTitle}).click();
+     await openLeadByTitle(adminPage, lead.leadTitle);
      await adminPage.getByRole('button', { name: ' Activity' }).click();
      await adminPage.getByRole('heading', { name: 'Add Activity - Call ' }).locator('span').click();
      await adminPage.getByText('Call', { exact: true }).click();
@@ -196,7 +211,7 @@ test.describe("lead management", () => {
     /**
      * write a call activity detail 
      */
-    await adminPage.getByRole('link', { name: lead.leadTitle}).click();
+    await openLeadByTitle(adminPage, lead.leadTitle);
     await adminPage.getByRole('button', { name: ' Activity' }).click();
     await adminPage.getByRole('heading', { name: 'Add Activity' }).locator('span').click();
     await adminPage.getByText('Meeting', { exact: true }).click();
@@ -219,7 +234,7 @@ test.describe("lead management", () => {
     /**
      * write a call activity detail 
      */
-    await adminPage.getByRole('link', { name: lead.leadTitle}).click();
+    await openLeadByTitle(adminPage, lead.leadTitle);
     await adminPage.getByRole('button', { name: ' Activity' }).click();
     await adminPage.getByRole('heading', { name: 'Add Activity' }).locator('span').click();
     await adminPage.getByText('Lunch', { exact: true }).click();

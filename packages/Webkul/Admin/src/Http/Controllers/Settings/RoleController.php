@@ -45,9 +45,9 @@ class RoleController extends Controller
     public function store(): RedirectResponse
     {
         $this->validate(request(), [
-            'name'            => 'required',
+            'name' => 'required',
             'permission_type' => 'required|in:all,custom',
-            'description'     => 'required',
+            'description' => 'required',
         ]);
 
         if (request('permission_type') == 'custom') {
@@ -90,10 +90,10 @@ class RoleController extends Controller
     public function update(int $id): RedirectResponse
     {
         $this->validate(request(), [
-            'name'            => 'required',
+            'name' => 'required',
             'permission_type' => 'required|in:all,custom',
-            'description'     => 'required',
-            'permissions'     => 'required_if:permission_type,custom',
+            'description' => 'required',
+            'permissions' => 'required_if:permission_type,custom',
         ]);
 
         Event::dispatch('settings.role.update.before', $id);
@@ -149,7 +149,7 @@ class RoleController extends Controller
 
                     $response = [
                         'responseCode' => 200,
-                        'message'      => $message,
+                        'message' => $message,
                     ];
 
                     session()->flash('success', $message);

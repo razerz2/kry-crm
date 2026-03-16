@@ -54,13 +54,13 @@ class UserController extends Controller
     public function store(): View|JsonResponse
     {
         $this->validate(request(), [
-            'email'            => 'required|email|unique:users,email',
-            'name'             => 'required',
-            'password'         => 'nullable',
+            'email' => 'required|email|unique:users,email',
+            'name' => 'required',
+            'password' => 'nullable',
             'confirm_password' => 'nullable|required_with:password|same:password',
-            'role_id'          => 'required',
-            'status'           => 'boolean|in:0,1',
-            'view_permission'  => 'string|in:global,group,individual',
+            'role_id' => 'required',
+            'status' => 'boolean|in:0,1',
+            'view_permission' => 'string|in:global,group,individual',
         ]);
 
         $data = request()->all();
@@ -87,7 +87,7 @@ class UserController extends Controller
         Event::dispatch('settings.user.create.after', $admin);
 
         return new JsonResponse([
-            'data'    => $admin,
+            'data' => $admin,
             'message' => trans('admin::app.settings.users.index.create-success'),
         ]);
     }
@@ -100,7 +100,7 @@ class UserController extends Controller
         $admin = $this->userRepository->with(['role', 'groups'])->findOrFail($id);
 
         return new JsonResponse([
-            'data'   => $admin,
+            'data' => $admin,
         ]);
     }
 
@@ -110,13 +110,13 @@ class UserController extends Controller
     public function update(int $id): JsonResponse
     {
         $this->validate(request(), [
-            'email'            => 'required|email|unique:users,email,'.$id,
-            'name'             => 'required|string',
-            'password'         => 'nullable|string|min:6',
+            'email' => 'required|email|unique:users,email,'.$id,
+            'name' => 'required|string',
+            'password' => 'nullable|string|min:6',
             'confirm_password' => 'nullable|required_with:password|same:password',
-            'role_id'          => 'required|integer|exists:roles,id',
-            'status'           => 'nullable|boolean|in:0,1',
-            'view_permission'  => 'required|string|in:global,group,individual',
+            'role_id' => 'required|integer|exists:roles,id',
+            'status' => 'nullable|boolean|in:0,1',
+            'view_permission' => 'required|string|in:global,group,individual',
         ]);
 
         $data = request()->all();
@@ -142,7 +142,7 @@ class UserController extends Controller
         Event::dispatch('settings.user.update.after', $admin);
 
         return new JsonResponse([
-            'data'    => $admin,
+            'data' => $admin,
             'message' => trans('admin::app.settings.users.index.update-success'),
         ]);
     }

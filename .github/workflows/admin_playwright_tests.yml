@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         operating-systems: [ubuntu-latest]
-        php-versions: ['8.3']
+        php-versions: ['8.4']
         node-version: ['22.13.1']
         shard-index: [1,2,3,4,5,6]
         shard-total: [6]
@@ -66,7 +66,7 @@ jobs:
           sed -i "s|^\(DB_DATABASE=\s*\).*$|\1krayin|" .env
           sed -i "s|^\(DB_USERNAME=\s*\).*$|\1root|" .env
           sed -i "s|^\(DB_PASSWORD=\s*\).*$|\1root|" .env
-          sed -i "s|^\(APP_DEBUG=\s*\).*$|\1false|" .env
+          sed -i "s|^\(APP_DEBUG=\s*\).*$|\1true|" .env
           sed -i "s|^\(APP_URL=\s*\).*$|\1http://127.0.0.1:8000|" .env
           cat .env
 

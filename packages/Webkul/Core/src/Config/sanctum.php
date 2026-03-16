@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Middleware\EncryptCookies;
-use App\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 
 return [
 
@@ -62,7 +62,7 @@ return [
 
     'middleware' => [
         'verify_csrf_token' => VerifyCsrfToken::class,
-        'encrypt_cookies'   => EncryptCookies::class,
+        'encrypt_cookies' => EncryptCookies::class,
     ],
 
 ];

@@ -16,10 +16,10 @@ class ActivityFileResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'         => $this->id,
-            'name'       => $this->name,
-            'path'       => $this->path,
-            'url'        => $this->url,
+            'id' => $this->id,
+            'name' => $this->name,
+            'path' => $this->path,
+            'url' => $this->url,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

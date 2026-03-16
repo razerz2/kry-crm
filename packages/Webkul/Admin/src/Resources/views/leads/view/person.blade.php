@@ -46,7 +46,7 @@
                             <span class="dark:text-white">
                                 @if ($lead->person->organization)
                                     @lang('admin::app.leads.view.persons.job-title', [
-                                        'job_title'    => $lead->person->job_title,
+                                        'job_title' => $lead->person->job_title,
                                         'organization' => $lead->person->organization->name
                                     ])
                                 @else

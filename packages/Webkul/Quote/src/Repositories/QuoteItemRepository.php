@@ -43,7 +43,7 @@ class QuoteItemRepository extends Repository
         $product = $this->productRepository->findOrFail($data['product_id']);
 
         $quoteItem = parent::create(array_merge($data, [
-            'sku'  => $product->sku,
+            'sku' => $product->sku,
             'name' => $product->name,
         ]));
 
@@ -60,7 +60,7 @@ class QuoteItemRepository extends Repository
         $product = $this->productRepository->findOrFail($data['product_id']);
 
         $quoteItem = parent::update(array_merge($data, [
-            'sku'  => $product->sku,
+            'sku' => $product->sku,
             'name' => $product->name,
         ]), $id);
 

@@ -149,7 +149,7 @@ class PersonRepository extends Repository
 
         return $organization ?: $this->organizationRepository->create([
             'entity_type' => 'organizations',
-            'name'        => $organizationName,
+            'name' => $organizationName,
         ]);
     }
 

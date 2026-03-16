@@ -2,24 +2,11 @@
 
 namespace Webkul\Activity\Repositories;
 
-use Illuminate\Container\Container;
 use Webkul\Activity\Contracts\Activity;
 use Webkul\Core\Eloquent\Repository;
 
 class ActivityRepository extends Repository
 {
-    /**
-     * Create a new repository instance.
-     *
-     * @return void
-     */
-    public function __construct(
-        protected FileRepository $fileRepository,
-        Container $container
-    ) {
-        parent::__construct($container);
-    }
-
     /**
      * Specify Model class name
      *
@@ -40,9 +27,9 @@ class ActivityRepository extends Repository
         $activity = parent::create($data);
 
         if (isset($data['file'])) {
-            $this->fileRepository->create([
-                'name'        => $data['name'] ?? $data['file']->getClientOriginalName(),
-                'path'        => $data['file']->store('activities/'.$activity->id),
+            app(FileRepository::class)->create([
+                'name' => $data['name'] ?? $data['file']->getClientOriginalName(),
+                'path' => $data['file']->store('activities/'.$activity->id),
                 'activity_id' => $activity->id,
             ]);
         }

@@ -123,7 +123,7 @@ class AttributeController extends Controller
             Event::dispatch('settings.attribute.delete.after', $id);
 
             return response()->json([
-                'status'  => true,
+                'status' => true,
                 'message' => trans('admin::app.settings.attributes.index.delete-success'),
             ], 200);
         } catch (\Exception $exception) {

@@ -133,7 +133,7 @@ class LeadRepository extends Repository
         }
 
         $lead = parent::create(array_merge([
-            'lead_pipeline_id'       => 1,
+            'lead_pipeline_id' => 1,
             'lead_pipeline_stage_id' => 1,
         ], $data));
 
@@ -145,7 +145,7 @@ class LeadRepository extends Repository
             foreach ($data['products'] as $product) {
                 $this->productRepository->create(array_merge($product, [
                     'lead_id' => $lead->id,
-                    'amount'  => $product['price'] * $product['quantity'],
+                    'amount' => $product['price'] * $product['quantity'],
                 ]));
             }
         }

@@ -109,7 +109,7 @@
                                 :custom-attributes="app('Webkul\Attribute\Repositories\AttributeRepository')->findWhere([
                                     ['code', 'NOTIN', ['lead_value', 'lead_type_id', 'lead_source_id', 'expected_close_date', 'user_id', 'lead_pipeline_id', 'lead_pipeline_stage_id']],
                                     'entity_type' => 'leads',
-                                    'quick_add'   => 1
+                                    'quick_add' => 1
                                 ])"
                                 :custom-validations="[
                                     'expected_close_date' => [
@@ -127,7 +127,7 @@
                                         :custom-attributes="app('Webkul\Attribute\Repositories\AttributeRepository')->findWhere([
                                             ['code', 'IN', ['lead_value', 'lead_type_id', 'lead_source_id']],
                                             'entity_type' => 'leads',
-                                            'quick_add'   => 1
+                                            'quick_add' => 1
                                         ])"
                                         :custom-validations="[
                                             'expected_close_date' => [
@@ -144,7 +144,7 @@
                                         :custom-attributes="app('Webkul\Attribute\Repositories\AttributeRepository')->findWhere([
                                             ['code', 'IN', ['expected_close_date', 'user_id']],
                                             'entity_type' => 'leads',
-                                            'quick_add'   => 1
+                                            'quick_add' => 1
                                         ])"
                                         :custom-validations="[
                                             'expected_close_date' => [

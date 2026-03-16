@@ -16,7 +16,7 @@ class ActivityParticipantResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'user'   => $this->when($this->user, new UserResource($this->user)),
+            'user' => $this->when($this->user, new UserResource($this->user)),
             'person' => $this->when($this->person, new PersonResource($this->person)),
         ];
     }

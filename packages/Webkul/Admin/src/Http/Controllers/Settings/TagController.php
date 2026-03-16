@@ -55,7 +55,7 @@ class TagController extends Controller
         Event::dispatch('settings.tag.create.after', $tag);
 
         return new JsonResponse([
-            'data'    => new TagResource($tag),
+            'data' => new TagResource($tag),
             'message' => trans('admin::app.settings.tags.index.create-success'),
         ]);
     }
@@ -91,7 +91,7 @@ class TagController extends Controller
         Event::dispatch('settings.tag.update.after', $tag);
 
         return new JsonResponse([
-            'data'    => new TagResource($tag),
+            'data' => new TagResource($tag),
             'message' => trans('admin::app.settings.tags.index.update-success'),
         ]);
     }

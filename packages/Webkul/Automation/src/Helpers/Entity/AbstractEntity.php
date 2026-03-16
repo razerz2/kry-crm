@@ -64,11 +64,11 @@ abstract class AbstractEntity
             }
 
             $attributes[] = [
-                'id'           => $attribute->code,
-                'type'         => $attribute->type,
-                'name'         => $attribute->name,
-                'lookup_type'  => $attribute->lookup_type,
-                'options'      => $options,
+                'id' => $attribute->code,
+                'type' => $attribute->type,
+                'name' => $attribute->name,
+                'lookup_type' => $attribute->lookup_type,
+                'options' => $options,
             ];
         }
 
@@ -84,7 +84,7 @@ abstract class AbstractEntity
 
         foreach ($this->getAttributes($this->entityType) as $attribute) {
             $menuItems[] = [
-                'text'  => $attribute['name'],
+                'text' => $attribute['name'],
                 'value' => '{%'.$this->entityType.'.'.$attribute['id'].'%}',
             ];
         }
@@ -202,7 +202,7 @@ abstract class AbstractEntity
             }
 
             $content = strtr($content, [
-                '{%'.$this->entityType.'.'.$attribute['id'].'%}'   => $value,
+                '{%'.$this->entityType.'.'.$attribute['id'].'%}' => $value,
                 '{% '.$this->entityType.'.'.$attribute['id'].' %}' => $value,
             ]);
         }
@@ -220,11 +220,11 @@ abstract class AbstractEntity
         $webhook = $this->webhookRepository->findOrFail($webhookId);
 
         $payload = [
-            'method'       => $webhook->method,
+            'method' => $webhook->method,
             'query_params' => $this->replacePlaceholders($entity, json_encode($webhook->query_params)),
-            'end_point'    => $this->replacePlaceholders($entity, $webhook->end_point),
-            'payload'      => $this->replacePlaceholders($entity, json_encode($webhook->payload)),
-            'headers'      => $this->replacePlaceholders($entity, json_encode($webhook->headers)),
+            'end_point' => $this->replacePlaceholders($entity, $webhook->end_point),
+            'payload' => $this->replacePlaceholders($entity, json_encode($webhook->payload)),
+            'headers' => $this->replacePlaceholders($entity, json_encode($webhook->headers)),
         ];
 
         $this->webhookService->triggerWebhook($payload);

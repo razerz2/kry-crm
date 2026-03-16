@@ -352,7 +352,7 @@
                     updateOrCreate(params, {resetForm, setErrors}) {
                         this.isProcessing = true;
 
-                        this.$axios.post(params.id ? `{{ route('admin.settings.tags.update', '') }}/${params.id}` : "{{ route('admin.settings.tags.store') }}", {
+                        this.$axios.post(params.id ? "{{ route('admin.settings.tags.update', ':id') }}".replace(':id', params.id) : "{{ route('admin.settings.tags.store') }}", {
                             ...params,
                             _method: params.id ? 'put' : 'post'
                         },

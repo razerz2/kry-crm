@@ -25,10 +25,10 @@ trait PDFHandler
 
         if (in_array($direction = app()->getLocale(), ['ar', 'he'])) {
             $mPDF = new Mpdf([
-                'margin_left'  => 0,
+                'margin_left' => 0,
                 'margin_right' => 0,
-                'margin_top'   => 0,
-                'margin_bottom'=> 0,
+                'margin_top' => 0,
+                'margin_bottom' => 0,
             ]);
 
             $mPDF->SetDirectionality($direction);

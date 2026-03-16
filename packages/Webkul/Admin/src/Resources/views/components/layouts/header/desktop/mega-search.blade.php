@@ -359,9 +359,9 @@
                     tabs: {
                         leads: {
                             key: 'leads',
-                            title: '@lang('admin::app.components.layouts.header.mega-search.tabs.leads')',
+                            title: "@lang('admin::app.components.layouts.header.mega-search.tabs.leads')",
                             is_active: true,
-                            endpoint: '{{ route('admin.leads.search') }}',
+                            endpoint: "{{ route('admin.leads.search') }}",
                             query_params: [
                                 {
                                     search: 'title',
@@ -380,9 +380,9 @@
 
                         quotes: {
                             key: 'quotes',
-                            title: '@lang('admin::app.components.layouts.header.mega-search.tabs.quotes')',
+                            title: "@lang('admin::app.components.layouts.header.mega-search.tabs.quotes')",
                             is_active: false,
-                            endpoint: '{{ route('admin.quotes.search') }}',
+                            endpoint: "{{ route('admin.quotes.search') }}",
                             query_params: [
                                 {
                                     search: 'subject',
@@ -405,9 +405,9 @@
 
                         products: {
                             key: 'products',
-                            title: '@lang('admin::app.components.layouts.header.mega-search.tabs.products')',
+                            title: "@lang('admin::app.components.layouts.header.mega-search.tabs.products')",
                             is_active: false,
-                            endpoint: '{{ route('admin.products.search') }}',
+                            endpoint: "{{ route('admin.products.search') }}",
                             query_params: [
                                 {
                                     search: 'name',
@@ -426,9 +426,9 @@
 
                         persons: {
                             key: 'persons',
-                            title: '@lang('admin::app.components.layouts.header.mega-search.tabs.persons')',
+                            title: "@lang('admin::app.components.layouts.header.mega-search.tabs.persons')",
                             is_active: false,
-                            endpoint: '{{ route('admin.contacts.persons.search') }}',
+                            endpoint: "{{ route('admin.contacts.persons.search') }}",
                             query_params: [
                                 {
                                     search: 'name',
@@ -451,17 +451,17 @@
 
                         settings: {
                             key: 'settings',
-                            title: '@lang('Settings')',
+                            title: "@lang('Settings')",
                             is_active: false,
-                            endpoint: '{{ route('admin.settings.search') }}',
+                            endpoint: "{{ route('admin.settings.search') }}",
                             query: '',
                         },
 
                         configurations: {
                             key: 'configurations',
-                            title: '@lang('Configurations')',
+                            title: "@lang('Configurations')",
                             is_active: false,
-                            endpoint: '{{ route('admin.configuration.search') }}',
+                            endpoint: "{{ route('admin.configuration.search') }}",
                             query: '',
                         },
                     },

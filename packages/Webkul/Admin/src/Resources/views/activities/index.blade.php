@@ -457,7 +457,7 @@
 
                 data() {
                     return {
-                        viewType: '{{ request('view-type') }}' || 'table',
+                        viewType: "{{ request('view-type') }}" || 'table',
                     };
                 },
 

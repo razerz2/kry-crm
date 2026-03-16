@@ -452,7 +452,7 @@
                      * @return {void}
                      */
                     getEvents() {
-                        this.$axios.get('{{ route('admin.settings.marketing.campaigns.events') }}')
+                        this.$axios.get("{{ route('admin.settings.marketing.campaigns.events') }}")
                             .then(response => this.events = response.data.data)
                             .catch(error => {});
                     },
@@ -463,7 +463,7 @@
                      * @return {void}
                      */
                     getEmailTemplates() {
-                        this.$axios.get('{{ route('admin.settings.marketing.campaigns.email-templates') }}')
+                        this.$axios.get("{{ route('admin.settings.marketing.campaigns.email-templates') }}")
                             .then(response => this.emailTemplates = response.data.data)
                             .catch(error => {});
                     },
@@ -487,8 +487,8 @@
 
                         this.$axios.post(
                             isUpdating
-                            ? `{{ route('admin.settings.marketing.campaigns.update', '') }}/${paramas.id}`
-                            : '{{ route('admin.settings.marketing.campaigns.store') }}',
+                            ? "{{ route('admin.settings.marketing.campaigns.update', ':id') }}".replace(':id', paramas.id)
+                            : "{{ route('admin.settings.marketing.campaigns.store') }}",
                             campaignForm,
                         )
                             .then(response => {
@@ -510,7 +510,7 @@
                      * @param {Object} record
                      */
                     edit(record) {
-                        this.$axios.get(`{{ route('admin.settings.marketing.campaigns.edit', '') }}/${record.id}`)
+                        this.$axios.get("{{ route('admin.settings.marketing.campaigns.edit', ':id') }}".replace(':id', record.id))
                             .then(response => {
                                 this.campaign = response.data.data;
 
