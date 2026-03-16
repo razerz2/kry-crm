@@ -111,6 +111,9 @@ test.describe("quotes management", () => {
         await adminPage.getByRole("listitem").filter({ hasText: Product.name }).click();
 
         await adminPage.getByRole("button", { name: "Save Quote" }).click();
-        await expect(adminPage.locator("#app")).toContainText("Success");
+
+        await expect(
+            adminPage.locator("v-flash-group").getByText("Quote created successfully.")
+        ).toBeVisible();
     });
 });
