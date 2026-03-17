@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         operating-system: [ubuntu-latest]
-        php-versions: ["8.4"]
+        php-versions: ["8.3", "8.2"]
 
     name: PHP ${{ matrix.php-versions }} test on ${{ matrix.operating-system }}
 
@@ -49,7 +49,7 @@ jobs:
           sed -i "s|^\(DB_PASSWORD=\s*\).*$|\1root|" .env
 
       - name: Running Krayin Installer
-        run: php artisan krayin-crm:install --skip-env-check --skip-admin-creation
+        run: php artisan krayin-crm::install --skip-env-check --skip-admin-creation
 
       - name: Running Pest Test
         run: vendor/bin/pest --parallel --colors=always
