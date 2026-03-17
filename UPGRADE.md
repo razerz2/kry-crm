@@ -40,5 +40,3 @@ Krayin CRM v2.2 has been upgraded to Laravel 12, which introduces stricter type 
 - **Config**: `config/app.php` no longer contains `providers` or `aliases` arrays.
 
 - **doctrine/dbal** dependency has been removed (native column modification in Laravel 12).
-
-- **PHPUnit 11** and **Pest 3** are now required for testing.
