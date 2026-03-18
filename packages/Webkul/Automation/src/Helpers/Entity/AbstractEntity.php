@@ -110,7 +110,7 @@ abstract class AbstractEntity
                     break;
 
                 case 'boolean':
-                    $value = $entity->{$attribute['id']} ? __('admin::app.common.yes') : __('admin::app.common.no');
+                    $value = $entity->{$attribute['id']} ? trans('admin::app.common.yes') : trans('admin::app.common.no');
 
                     break;
 
