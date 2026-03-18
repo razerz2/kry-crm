@@ -15,18 +15,17 @@ class CanInstall
      */
     public function handle(Request $request, Closure $next): mixed
     {
-        if (Str::contains($request->getPathInfo(), '/install')) {
-            if ($this->isAlreadyInstalled()) {
-                if($request->ajax()) {
-                    abort(403);
-                } else {
-                    return redirect()->route('admin.dashboard.index');
-                }
-            }
-        } else {
-            if (! $this->isAlreadyInstalled()) {
-                return redirect()->route('installer.index');
-            }
+        $isInstallRoute = Str::contains($request->getPathInfo(), '/install');
+        $isInstalled = $this->isAlreadyInstalled();
+
+        if ($isInstallRoute && $isInstalled) {
+            abort_if($request->ajax(), 403);
+
+            return redirect()->route('admin.dashboard.index');
+        }
+
+        if (! $isInstallRoute && ! $isInstalled) {
+            return redirect()->route('installer.index');
         }
 
         return $next($request);
@@ -37,18 +36,20 @@ class CanInstall
      */
     public function isAlreadyInstalled(): bool
     {
-        if (file_exists(storage_path('installed'))) {
+        $installedPath = storage_path('installed');
+
+        if (file_exists($installedPath)) {
             return true;
         }
 
-        if (app(DatabaseManager::class)->isInstalled()) {
-            touch(storage_path('installed'));
-
-            Event::dispatch('krayin.installed');
-
-            return true;
+        if (! app(DatabaseManager::class)->isInstalled()) {
+            return false;
         }
 
-        return false;
+        touch($installedPath);
+
+        Event::dispatch('krayin.installed');
+
+        return true;
     }
 }
