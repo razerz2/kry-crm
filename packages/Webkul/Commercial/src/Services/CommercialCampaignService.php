@@ -9,12 +9,11 @@ use Webkul\Commercial\Models\CommercialCampaignAudience;
 use Webkul\Commercial\Services\Audience\AudienceFilter;
 use Webkul\Commercial\Services\Audience\AudienceItem;
 use Webkul\Commercial\Services\Audience\CommercialAudienceService;
-use Webkul\Commercial\Services\CommercialCampaignStateGuard;
 
 class CommercialCampaignService
 {
     public function __construct(
-        protected CommercialAudienceService    $audienceService,
+        protected CommercialAudienceService $audienceService,
         protected CommercialCampaignStateGuard $stateGuard,
     ) {}
 
@@ -62,9 +61,9 @@ class CommercialCampaignService
         if ($this->stateGuard->audienceNeedsInvalidation($campaign, $data)) {
             $campaign->audienceMembers()->delete();
             $data['audience_generated_at'] = null;
-            $data['total_audience']        = 0;
-            $data['total_with_email']      = 0;
-            $data['total_with_phone']      = 0;
+            $data['total_audience'] = 0;
+            $data['total_with_email'] = 0;
+            $data['total_with_phone'] = 0;
 
             // If ready, revert to draft so dispatch is blocked until re-freeze
             if ($campaign->status === 'ready') {
@@ -98,7 +97,7 @@ class CommercialCampaignService
         $blocking = array_filter($issues, fn ($k) => $k !== 'campaign.not-ready.is-draft');
 
         if (! empty($blocking)) {
-            throw new \RuntimeException('campaign.mark-ready.issues:' . implode('|', $blocking));
+            throw new \RuntimeException('campaign.mark-ready.issues:'.implode('|', $blocking));
         }
 
         $campaign->update(['status' => 'ready', 'updated_by' => Auth::id()]);
@@ -160,10 +159,10 @@ class CommercialCampaignService
 
         $campaign->update([
             'audience_generated_at' => now(),
-            'total_audience'        => $stats['total'],
-            'total_with_email'      => $stats['with_email'],
-            'total_with_phone'      => $stats['with_phone'],
-            'updated_by'            => Auth::id(),
+            'total_audience' => $stats['total'],
+            'total_with_email' => $stats['with_email'],
+            'total_with_phone' => $stats['with_phone'],
+            'updated_by' => Auth::id(),
         ]);
 
         return $campaign->fresh();
@@ -210,15 +209,15 @@ class CommercialCampaignService
     public function duplicate(CommercialCampaign $campaign): CommercialCampaign
     {
         return CommercialCampaign::create([
-            'name'         => trans('admin::app.commercial.campaigns.duplicate.name-prefix') . ' ' . $campaign->name,
-            'description'  => $campaign->description,
-            'channel'      => $campaign->channel,
-            'subject'      => $campaign->subject,
+            'name' => trans('admin::app.commercial.campaigns.duplicate.name-prefix').' '.$campaign->name,
+            'description' => $campaign->description,
+            'channel' => $campaign->channel,
+            'subject' => $campaign->subject,
             'message_body' => $campaign->message_body,
             'filters_json' => $campaign->filters_json,
-            'status'       => 'draft',
-            'created_by'   => Auth::id(),
-            'updated_by'   => Auth::id(),
+            'status' => 'draft',
+            'created_by' => Auth::id(),
+            'updated_by' => Auth::id(),
         ]);
     }
 
@@ -246,45 +245,45 @@ class CommercialCampaignService
     public function buildAudienceFilter(array $filters): AudienceFilter
     {
         return AudienceFilter::fromArray([
-            'entity_type'                        => $filters['entity_type'] ?? 'both',
-            'crm_product_ids'                    => $filters['crm_product_ids'] ?? [],
-            'commercial_statuses'                => $filters['commercial_statuses'] ?? [],
-            'segment'                            => $filters['segment'] ?? null,
-            'channel'                            => $filters['channel'] ?? null,
-            'only_with_email'                    => $filters['only_with_email'] ?? false,
-            'only_with_phone'                    => $filters['only_with_phone'] ?? false,
+            'entity_type' => $filters['entity_type'] ?? 'both',
+            'crm_product_ids' => $filters['crm_product_ids'] ?? [],
+            'commercial_statuses' => $filters['commercial_statuses'] ?? [],
+            'segment' => $filters['segment'] ?? null,
+            'channel' => $filters['channel'] ?? null,
+            'only_with_email' => $filters['only_with_email'] ?? false,
+            'only_with_phone' => $filters['only_with_phone'] ?? false,
             'only_primary_contact_if_organization' => $filters['only_primary_contact_if_organization'] ?? false,
-            'include_inactive_customer'          => $filters['include_inactive_customer'] ?? true,
-            'include_former_customer'            => $filters['include_former_customer'] ?? true,
-            'search'                             => $filters['search'] ?? null,
+            'include_inactive_customer' => $filters['include_inactive_customer'] ?? true,
+            'include_former_customer' => $filters['include_former_customer'] ?? true,
+            'search' => $filters['search'] ?? null,
         ]);
     }
 
     /**
      * Persist AudienceItem collection as CommercialCampaignAudience rows.
      *
-     * @param Collection<int, AudienceItem> $items
+     * @param  Collection<int, AudienceItem>  $items
      */
     protected function persistAudienceItems(CommercialCampaign $campaign, Collection $items): void
     {
         $rows = $items->map(function (AudienceItem $item) use ($campaign) {
             return [
-                'commercial_campaign_id'     => $campaign->id,
-                'entity_type'                => $item->entityType,
-                'entity_id'                  => $item->entityId,
-                'display_name'               => $item->displayName,
-                'organization_name'          => $item->organizationName,
-                'primary_contact_person_id'  => null,
-                'primary_contact_name'       => null,
-                'email'                      => $item->email,
-                'phone'                      => $item->phone,
-                'available_channels'         => json_encode($item->availableChannels),
-                'crm_products'               => json_encode($item->crmProducts),
-                'commercial_statuses'        => json_encode($item->commercialStatuses),
-                'source_summary'             => $item->sourceSummary,
-                'payload_json'               => null,
-                'created_at'                 => now(),
-                'updated_at'                 => now(),
+                'commercial_campaign_id' => $campaign->id,
+                'entity_type' => $item->entityType,
+                'entity_id' => $item->entityId,
+                'display_name' => $item->displayName,
+                'organization_name' => $item->organizationName,
+                'primary_contact_person_id' => null,
+                'primary_contact_name' => null,
+                'email' => $item->email,
+                'phone' => $item->phone,
+                'available_channels' => json_encode($item->availableChannels),
+                'crm_products' => json_encode($item->crmProducts),
+                'commercial_statuses' => json_encode($item->commercialStatuses),
+                'source_summary' => $item->sourceSummary,
+                'payload_json' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
             ];
         });
 

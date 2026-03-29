@@ -24,9 +24,9 @@ class CommercialLeadSyncService
      *   lost       => lost       (handled by syncLost)
      */
     protected const STAGE_STATUS_MAP = [
-        'new'         => AccountProductStatus::LEAD,
-        'follow-up'   => AccountProductStatus::LEAD,
-        'prospect'    => AccountProductStatus::PROSPECT,
+        'new' => AccountProductStatus::LEAD,
+        'follow-up' => AccountProductStatus::LEAD,
+        'prospect' => AccountProductStatus::PROSPECT,
         'negotiation' => AccountProductStatus::OPPORTUNITY,
     ];
 
@@ -36,13 +36,13 @@ class CommercialLeadSyncService
      * This prevents downgrading a customer to lead/prospect/lost.
      */
     protected const STATUS_HIERARCHY = [
-        'lead'              => 10,
-        'prospect'          => 20,
-        'opportunity'       => 30,
-        'customer'          => 100,
+        'lead' => 10,
+        'prospect' => 20,
+        'opportunity' => 30,
+        'customer' => 100,
         'inactive_customer' => 90,
-        'former_customer'   => 80,
-        'lost'              => 5,
+        'former_customer' => 80,
+        'lost' => 5,
     ];
 
     /**
@@ -61,7 +61,8 @@ class CommercialLeadSyncService
         $entity = $this->resolveCommercialEntity($lead);
 
         if (! $entity) {
-            Log::warning('[CommercialSync] Lead #' . $lead->id . ' won but no entity resolved.');
+            Log::warning('[CommercialSync] Lead #'.$lead->id.' won but no entity resolved.');
+
             return;
         }
 
@@ -105,7 +106,7 @@ class CommercialLeadSyncService
             lead: $lead,
             extra: array_filter([
                 'lost_reason' => $lead->lost_reason,
-                'user_id'     => $lead->user_id,
+                'user_id' => $lead->user_id,
             ])
         );
     }
@@ -178,14 +179,14 @@ class CommercialLeadSyncService
         if ($person->organization_id) {
             return [
                 'type' => OrganizationProxy::modelClass(),
-                'id'   => $person->organization_id,
+                'id' => $person->organization_id,
             ];
         }
 
         // Otherwise, use the person directly
         return [
             'type' => PersonProxy::modelClass(),
-            'id'   => $person->id,
+            'id' => $person->id,
         ];
     }
 
@@ -205,8 +206,8 @@ class CommercialLeadSyncService
         array $extra = []
     ): ?AccountProduct {
         $existing = AccountProduct::where([
-            'entity_type'    => $entityType,
-            'entity_id'      => $entityId,
+            'entity_type' => $entityType,
+            'entity_id' => $entityId,
             'crm_product_id' => $crmProductId,
         ])->first();
 
@@ -217,10 +218,11 @@ class CommercialLeadSyncService
 
             // Check hierarchy — do not downgrade
             if (! $this->canTransition($currentStatusValue, $targetStatus->value)) {
-                Log::info('[CommercialSync] Skipping downgrade: AccountProduct #' . $existing->id
-                    . ' current=' . $currentStatusValue
-                    . ' target=' . $targetStatus->value
-                    . ' lead=#' . $lead->id);
+                Log::info('[CommercialSync] Skipping downgrade: AccountProduct #'.$existing->id
+                    .' current='.$currentStatusValue
+                    .' target='.$targetStatus->value
+                    .' lead=#'.$lead->id);
+
                 return $existing;
             }
 
@@ -259,7 +261,7 @@ class CommercialLeadSyncService
                 newStatus: $targetStatus->value,
                 lead: $lead,
                 source: 'lead_sync',
-                notes: 'Auto-sync from lead #' . $lead->id . ' stage: ' . ($lead->stage?->code ?? 'unknown')
+                notes: 'Auto-sync from lead #'.$lead->id.' stage: '.($lead->stage?->code ?? 'unknown')
             );
 
             return $existing->fresh();
@@ -267,10 +269,10 @@ class CommercialLeadSyncService
 
         // Create new AccountProduct
         $createData = array_merge($extra, [
-            'entity_type'    => $entityType,
-            'entity_id'      => $entityId,
+            'entity_type' => $entityType,
+            'entity_id' => $entityId,
             'crm_product_id' => $crmProductId,
-            'status'         => $targetStatus->value,
+            'status' => $targetStatus->value,
         ]);
 
         if ($targetStatus === AccountProductStatus::CUSTOMER) {
@@ -289,7 +291,7 @@ class CommercialLeadSyncService
             newStatus: $targetStatus->value,
             lead: $lead,
             source: 'lead_sync',
-            notes: 'Created from lead #' . $lead->id . ' stage: ' . ($lead->stage?->code ?? 'unknown')
+            notes: 'Created from lead #'.$lead->id.' stage: '.($lead->stage?->code ?? 'unknown')
         );
 
         return $accountProduct;
@@ -308,12 +310,12 @@ class CommercialLeadSyncService
     ): void {
         AccountProductHistory::create([
             'account_product_id' => $accountProductId,
-            'lead_id'            => $lead->id,
-            'old_status'         => $oldStatus,
-            'new_status'         => $newStatus,
-            'changed_by'         => $lead->user_id,
-            'source'             => $source,
-            'notes'              => $notes,
+            'lead_id' => $lead->id,
+            'old_status' => $oldStatus,
+            'new_status' => $newStatus,
+            'changed_by' => $lead->user_id,
+            'source' => $source,
+            'notes' => $notes,
         ]);
     }
 

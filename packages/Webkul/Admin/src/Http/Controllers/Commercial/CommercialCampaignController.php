@@ -22,9 +22,9 @@ use Webkul\Commercial\Services\Template\TemplateRenderContext;
 class CommercialCampaignController extends Controller
 {
     public function __construct(
-        protected CommercialCampaignService          $campaignService,
-        protected CommercialCampaignDeliveryService  $deliveryService,
-        protected CommercialCampaignMetricsService   $metricsService,
+        protected CommercialCampaignService $campaignService,
+        protected CommercialCampaignDeliveryService $deliveryService,
+        protected CommercialCampaignMetricsService $metricsService,
         protected CommercialCampaignTemplateRenderer $renderer,
     ) {}
 
@@ -56,10 +56,10 @@ class CommercialCampaignController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name'         => 'required|string|max:255',
-            'description'  => 'nullable|string',
-            'channel'      => 'required|in:email,whatsapp,both',
-            'subject'      => 'nullable|string|max:255',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'channel' => 'required|in:email,whatsapp,both',
+            'subject' => 'nullable|string|max:255',
             'message_body' => 'nullable|string',
         ]);
 
@@ -80,15 +80,15 @@ class CommercialCampaignController extends Controller
         $campaign = CommercialCampaign::findOrFail($id);
         $audience = $this->campaignService->getAudience($campaign);
         $products = CrmProduct::where('is_active', true)->orderBy('name')->get();
-        $stats    = $this->deliveryService->getDeliveryStats($campaign);
+        $stats = $this->deliveryService->getDeliveryStats($campaign);
 
         $metrics = null;
         if ($campaign->total_deliveries > 0) {
             $metrics = [
-                'status'    => $stats,
-                'channels'  => $this->metricsService->channelBreakdown($campaign->id),
+                'status' => $stats,
+                'channels' => $this->metricsService->channelBreakdown($campaign->id),
                 'providers' => $this->metricsService->providerBreakdown($campaign->id),
-                'errors'    => $this->metricsService->recentErrors($campaign->id),
+                'errors' => $this->metricsService->recentErrors($campaign->id),
             ];
         }
 
@@ -100,12 +100,12 @@ class CommercialCampaignController extends Controller
      */
     public function edit(int $id): View
     {
-        $campaign        = CommercialCampaign::findOrFail($id);
-        $audience        = $this->campaignService->getAudience($campaign, 50);
-        $products        = CrmProduct::where('is_active', true)->orderBy('name')->get();
-        $stats           = $this->deliveryService->getDeliveryStats($campaign);
+        $campaign = CommercialCampaign::findOrFail($id);
+        $audience = $this->campaignService->getAudience($campaign, 50);
+        $products = CrmProduct::where('is_active', true)->orderBy('name')->get();
+        $stats = $this->deliveryService->getDeliveryStats($campaign);
         $readinessIssues = $this->campaignService->readinessIssues($campaign);
-        $audienceStale   = $this->campaignService->isAudienceStale($campaign);
+        $audienceStale = $this->campaignService->isAudienceStale($campaign);
 
         return view('admin::commercial.campaigns.edit', compact(
             'campaign', 'audience', 'products', 'stats', 'readinessIssues', 'audienceStale'
@@ -120,11 +120,11 @@ class CommercialCampaignController extends Controller
         $campaign = CommercialCampaign::findOrFail($id);
 
         $validated = $request->validate([
-            'name'         => 'required|string|max:255',
-            'description'  => 'nullable|string',
-            'channel'      => 'required|in:email,whatsapp,both',
-            'status'       => 'nullable|in:draft,ready,archived',
-            'subject'      => 'nullable|string|max:255',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'channel' => 'required|in:email,whatsapp,both',
+            'status' => 'nullable|in:draft,ready,archived',
+            'subject' => 'nullable|string|max:255',
             'message_body' => 'nullable|string',
         ]);
 
@@ -141,6 +141,7 @@ class CommercialCampaignController extends Controller
             }
         } catch (\RuntimeException $e) {
             session()->flash('error', $this->translateGuardException($e));
+
             return redirect()->route('admin.commercial.campaigns.show', $campaign->id);
         }
 
@@ -216,6 +217,7 @@ class CommercialCampaignController extends Controller
 
         if ($campaign->isLocked()) {
             session()->flash('error', trans('admin::app.commercial.campaigns.locked-error'));
+
             return redirect()->route('admin.commercial.campaigns.show', $campaign->id);
         }
 
@@ -235,6 +237,7 @@ class CommercialCampaignController extends Controller
 
         if ($campaign->isLocked()) {
             session()->flash('error', trans('admin::app.commercial.campaigns.locked-error'));
+
             return redirect()->route('admin.commercial.campaigns.show', $campaign->id);
         }
 
@@ -349,7 +352,7 @@ class CommercialCampaignController extends Controller
         $campaign = CommercialCampaign::findOrFail($id);
 
         $subject = $request->input('subject', '');
-        $body    = $request->input('message_body', '');
+        $body = $request->input('message_body', '');
 
         $firstMember = $campaign->audienceMembers()->first();
 
@@ -363,9 +366,9 @@ class CommercialCampaignController extends Controller
 
         return response()->json([
             'subject' => $this->renderer->renderSubject($subject, $ctx),
-            'body'    => $this->renderer->renderBody($body, $ctx),
-            'sample'  => $ctx->toVars(),
-            'is_dummy'=> $firstMember === null,
+            'body' => $this->renderer->renderBody($body, $ctx),
+            'sample' => $ctx->toVars(),
+            'is_dummy' => $firstMember === null,
         ]);
     }
 
@@ -376,7 +379,7 @@ class CommercialCampaignController extends Controller
     public function duplicate(int $id): RedirectResponse
     {
         $campaign = CommercialCampaign::findOrFail($id);
-        $copy     = $this->campaignService->duplicate($campaign);
+        $copy = $this->campaignService->duplicate($campaign);
 
         session()->flash('success', trans('admin::app.commercial.campaigns.duplicate.success'));
 
@@ -397,8 +400,8 @@ class CommercialCampaignController extends Controller
         // Structured readiness issues: "campaign.mark-ready.issues:k1|k2|k3"
         if (str_starts_with($raw, 'campaign.mark-ready.issues:')) {
             $issueKeys = explode('|', substr($raw, strlen('campaign.mark-ready.issues:')));
-            $lines     = array_map(
-                fn ($k) => trans('admin::app.commercial.campaigns.guard.' . str_replace(['.', ':'], '-', $k)),
+            $lines = array_map(
+                fn ($k) => trans('admin::app.commercial.campaigns.guard.'.str_replace(['.', ':'], '-', $k)),
                 $issueKeys
             );
 
@@ -408,13 +411,13 @@ class CommercialCampaignController extends Controller
         // Simple keyed message: "campaign.edit-blocked:sending"
         if (str_contains($raw, ':')) {
             [$key, $ctx] = explode(':', $raw, 2);
-            $transKey    = 'admin::app.commercial.campaigns.guard.' . str_replace('.', '-', $key);
+            $transKey = 'admin::app.commercial.campaigns.guard.'.str_replace('.', '-', $key);
 
-            return trans($transKey, ['status' => trans('admin::app.commercial.campaigns.statuses.' . $ctx)]);
+            return trans($transKey, ['status' => trans('admin::app.commercial.campaigns.statuses.'.$ctx)]);
         }
 
         // Plain key without context
-        $transKey = 'admin::app.commercial.campaigns.guard.' . str_replace(['.', ':'], '-', $raw);
+        $transKey = 'admin::app.commercial.campaigns.guard.'.str_replace(['.', ':'], '-', $raw);
         $translated = trans($transKey);
 
         return $translated !== $transKey ? $translated : $raw;
@@ -426,17 +429,17 @@ class CommercialCampaignController extends Controller
     protected function extractFilters(Request $request): array
     {
         return [
-            'entity_type'                        => $request->input('filter_entity_type', 'both'),
-            'crm_product_ids'                    => array_filter(array_map('intval', $request->input('filter_crm_product_ids', []))),
-            'commercial_statuses'                => $request->input('filter_commercial_statuses', []),
-            'segment'                            => $request->input('filter_segment') ?: null,
-            'channel'                            => $request->input('filter_channel') ?: null,
-            'only_with_email'                    => (bool) $request->input('filter_only_with_email', false),
-            'only_with_phone'                    => (bool) $request->input('filter_only_with_phone', false),
+            'entity_type' => $request->input('filter_entity_type', 'both'),
+            'crm_product_ids' => array_filter(array_map('intval', $request->input('filter_crm_product_ids', []))),
+            'commercial_statuses' => $request->input('filter_commercial_statuses', []),
+            'segment' => $request->input('filter_segment') ?: null,
+            'channel' => $request->input('filter_channel') ?: null,
+            'only_with_email' => (bool) $request->input('filter_only_with_email', false),
+            'only_with_phone' => (bool) $request->input('filter_only_with_phone', false),
             'only_primary_contact_if_organization' => (bool) $request->input('filter_only_primary_contact', false),
-            'include_inactive_customer'          => (bool) $request->input('filter_include_inactive_customer', true),
-            'include_former_customer'            => (bool) $request->input('filter_include_former_customer', true),
-            'search'                             => $request->input('filter_search') ?: null,
+            'include_inactive_customer' => (bool) $request->input('filter_include_inactive_customer', true),
+            'include_former_customer' => (bool) $request->input('filter_include_former_customer', true),
+            'search' => $request->input('filter_search') ?: null,
         ];
     }
 }

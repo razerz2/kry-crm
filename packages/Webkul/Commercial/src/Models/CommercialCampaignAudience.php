@@ -28,10 +28,10 @@ class CommercialCampaignAudience extends Model implements CommercialCampaignAudi
     ];
 
     protected $casts = [
-        'available_channels'  => 'array',
-        'crm_products'        => 'array',
+        'available_channels' => 'array',
+        'crm_products' => 'array',
         'commercial_statuses' => 'array',
-        'payload_json'        => 'array',
+        'payload_json' => 'array',
     ];
 
     /**

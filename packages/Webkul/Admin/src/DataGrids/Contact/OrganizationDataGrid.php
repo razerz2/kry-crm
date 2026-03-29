@@ -5,6 +5,7 @@ namespace Webkul\Admin\DataGrids\Contact;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Webkul\Admin\DataGrids\Traits\CommercialDataGridTrait;
+use Webkul\Contact\Models\OrganizationProxy;
 use Webkul\Contact\Repositories\PersonRepository;
 use Webkul\DataGrid\DataGrid;
 
@@ -24,7 +25,7 @@ class OrganizationDataGrid extends DataGrid
      */
     public function __construct(protected PersonRepository $personRepository)
     {
-        $this->entityMorphClass = \Webkul\Contact\Models\OrganizationProxy::modelClass();
+        $this->entityMorphClass = OrganizationProxy::modelClass();
     }
 
     /**
@@ -81,13 +82,13 @@ class OrganizationDataGrid extends DataGrid
         ]);
 
         $this->addColumn([
-            'index'      => 'cnpj',
-            'label'      => 'CNPJ',
-            'type'       => 'string',
+            'index' => 'cnpj',
+            'label' => 'CNPJ',
+            'type' => 'string',
             'searchable' => true,
             'filterable' => true,
-            'sortable'   => false,
-            'closure'    => fn ($row) => $row->cnpj ?? '—',
+            'sortable' => false,
+            'closure' => fn ($row) => $row->cnpj ?? '—',
         ]);
 
         $this->addColumn([
@@ -125,10 +126,10 @@ class OrganizationDataGrid extends DataGrid
     {
         if (bouncer()->hasPermission('contacts.organizations.view')) {
             $this->addAction([
-                'icon'   => 'icon-eye',
-                'title'  => trans('admin::app.contacts.organizations.index.datagrid.view'),
+                'icon' => 'icon-eye',
+                'title' => trans('admin::app.contacts.organizations.index.datagrid.view'),
                 'method' => 'GET',
-                'url'    => fn ($row) => route('admin.contacts.organizations.view', $row->id),
+                'url' => fn ($row) => route('admin.contacts.organizations.view', $row->id),
             ]);
         }
 

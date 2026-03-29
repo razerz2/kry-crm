@@ -20,12 +20,12 @@ class CrmProductSeeder extends Seeder
         DB::table('crm_products')->upsert(
             [
                 [
-                    'name'        => 'AllSync',
-                    'slug'        => 'allsync',
+                    'name' => 'AllSync',
+                    'slug' => 'allsync',
                     'description' => 'Produto principal de sincronização AllSync.',
-                    'is_active'   => 1,
-                    'created_at'  => $now,
-                    'updated_at'  => $now,
+                    'is_active' => 1,
+                    'created_at' => $now,
+                    'updated_at' => $now,
                 ],
             ],
             ['slug'],

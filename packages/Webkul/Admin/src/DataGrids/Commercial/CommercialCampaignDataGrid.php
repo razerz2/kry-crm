@@ -40,58 +40,58 @@ class CommercialCampaignDataGrid extends DataGrid
     public function prepareColumns()
     {
         $this->addColumn([
-            'index'      => 'id',
-            'label'      => trans('admin::app.commercial.campaigns.index.datagrid.id'),
-            'type'       => 'integer',
-            'sortable'   => true,
+            'index' => 'id',
+            'label' => trans('admin::app.commercial.campaigns.index.datagrid.id'),
+            'type' => 'integer',
+            'sortable' => true,
             'searchable' => true,
             'filterable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'name',
-            'label'      => trans('admin::app.commercial.campaigns.index.datagrid.name'),
-            'type'       => 'string',
-            'sortable'   => true,
+            'index' => 'name',
+            'label' => trans('admin::app.commercial.campaigns.index.datagrid.name'),
+            'type' => 'string',
+            'sortable' => true,
             'searchable' => true,
             'filterable' => true,
         ]);
 
         $this->addColumn([
-            'index'    => 'channel',
-            'label'    => trans('admin::app.commercial.campaigns.index.datagrid.channel'),
-            'type'     => 'string',
+            'index' => 'channel',
+            'label' => trans('admin::app.commercial.campaigns.index.datagrid.channel'),
+            'type' => 'string',
             'sortable' => true,
-            'closure'  => fn ($row) => trans('admin::app.commercial.campaigns.channels.' . $row->channel),
+            'closure' => fn ($row) => trans('admin::app.commercial.campaigns.channels.'.$row->channel),
         ]);
 
         $this->addColumn([
-            'index'    => 'status',
-            'label'    => trans('admin::app.commercial.campaigns.index.datagrid.status'),
-            'type'     => 'string',
+            'index' => 'status',
+            'label' => trans('admin::app.commercial.campaigns.index.datagrid.status'),
+            'type' => 'string',
             'sortable' => true,
-            'closure'  => fn ($row) => trans('admin::app.commercial.campaigns.statuses.' . $row->status),
+            'closure' => fn ($row) => trans('admin::app.commercial.campaigns.statuses.'.$row->status),
         ]);
 
         $this->addColumn([
-            'index'    => 'total_audience',
-            'label'    => trans('admin::app.commercial.campaigns.index.datagrid.audience'),
-            'type'     => 'integer',
+            'index' => 'total_audience',
+            'label' => trans('admin::app.commercial.campaigns.index.datagrid.audience'),
+            'type' => 'integer',
             'sortable' => true,
         ]);
 
         $this->addColumn([
-            'index'      => 'created_by_name',
-            'label'      => trans('admin::app.commercial.campaigns.index.datagrid.created-by'),
-            'type'       => 'string',
-            'sortable'   => false,
+            'index' => 'created_by_name',
+            'label' => trans('admin::app.commercial.campaigns.index.datagrid.created-by'),
+            'type' => 'string',
+            'sortable' => false,
         ]);
 
         $this->addColumn([
-            'index'      => 'created_at',
-            'label'      => trans('admin::app.commercial.campaigns.index.datagrid.created-at'),
-            'type'       => 'date_range',
-            'sortable'   => true,
+            'index' => 'created_at',
+            'label' => trans('admin::app.commercial.campaigns.index.datagrid.created-at'),
+            'type' => 'date_range',
+            'sortable' => true,
             'filterable' => true,
         ]);
     }
@@ -103,31 +103,31 @@ class CommercialCampaignDataGrid extends DataGrid
     {
         if (bouncer()->hasPermission('commercial.campaigns.view')) {
             $this->addAction([
-                'index'  => 'view',
-                'icon'   => 'icon-eye',
-                'title'  => trans('admin::app.commercial.campaigns.index.datagrid.view'),
+                'index' => 'view',
+                'icon' => 'icon-eye',
+                'title' => trans('admin::app.commercial.campaigns.index.datagrid.view'),
                 'method' => 'GET',
-                'url'    => fn ($row) => route('admin.commercial.campaigns.show', $row->id),
+                'url' => fn ($row) => route('admin.commercial.campaigns.show', $row->id),
             ]);
         }
 
         if (bouncer()->hasPermission('commercial.campaigns.edit')) {
             $this->addAction([
-                'index'  => 'edit',
-                'icon'   => 'icon-edit',
-                'title'  => trans('admin::app.commercial.campaigns.index.datagrid.edit'),
+                'index' => 'edit',
+                'icon' => 'icon-edit',
+                'title' => trans('admin::app.commercial.campaigns.index.datagrid.edit'),
                 'method' => 'GET',
-                'url'    => fn ($row) => route('admin.commercial.campaigns.edit', $row->id),
+                'url' => fn ($row) => route('admin.commercial.campaigns.edit', $row->id),
             ]);
         }
 
         if (bouncer()->hasPermission('commercial.campaigns.delete')) {
             $this->addAction([
-                'index'  => 'delete',
-                'icon'   => 'icon-delete',
-                'title'  => trans('admin::app.commercial.campaigns.index.datagrid.delete'),
+                'index' => 'delete',
+                'icon' => 'icon-delete',
+                'title' => trans('admin::app.commercial.campaigns.index.datagrid.delete'),
                 'method' => 'DELETE',
-                'url'    => fn ($row) => route('admin.commercial.campaigns.destroy', $row->id),
+                'url' => fn ($row) => route('admin.commercial.campaigns.destroy', $row->id),
             ]);
         }
     }
@@ -139,10 +139,10 @@ class CommercialCampaignDataGrid extends DataGrid
     {
         if (bouncer()->hasPermission('commercial.campaigns.delete')) {
             $this->addMassAction([
-                'icon'   => 'icon-delete',
-                'title'  => trans('admin::app.commercial.campaigns.index.datagrid.delete'),
+                'icon' => 'icon-delete',
+                'title' => trans('admin::app.commercial.campaigns.index.datagrid.delete'),
                 'method' => 'POST',
-                'url'    => route('admin.commercial.campaigns.mass_destroy'),
+                'url' => route('admin.commercial.campaigns.mass_destroy'),
             ]);
         }
     }

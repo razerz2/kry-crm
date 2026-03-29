@@ -37,9 +37,9 @@ class AccountProduct extends Model implements AccountProductContract
      * @var array
      */
     protected $casts = [
-        'status'     => AccountProductStatus::class,
+        'status' => AccountProductStatus::class,
         'started_at' => 'datetime',
-        'ended_at'   => 'datetime',
+        'ended_at' => 'datetime',
     ];
 
     /**

@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Webkul\Commercial\Contracts\CommercialCampaign as CommercialCampaignContract;
-use Webkul\Commercial\Models\CommercialCampaignDeliveryProxy;
 use Webkul\User\Models\UserProxy;
 
 class CommercialCampaign extends Model implements CommercialCampaignContract
@@ -45,21 +44,21 @@ class CommercialCampaign extends Model implements CommercialCampaignContract
     ];
 
     protected $casts = [
-        'filters_json'          => 'array',
+        'filters_json' => 'array',
         'audience_generated_at' => 'datetime',
-        'dispatched_at'         => 'datetime',
-        'sent_at'               => 'datetime',
-        'total_audience'        => 'integer',
-        'total_with_email'      => 'integer',
-        'total_with_phone'      => 'integer',
-        'total_deliveries'      => 'integer',
-        'total_pending'         => 'integer',
-        'total_queued'          => 'integer',
-        'total_sending'         => 'integer',
-        'total_sent'            => 'integer',
-        'total_failed'          => 'integer',
-        'total_skipped'         => 'integer',
-        'total_canceled'        => 'integer',
+        'dispatched_at' => 'datetime',
+        'sent_at' => 'datetime',
+        'total_audience' => 'integer',
+        'total_with_email' => 'integer',
+        'total_with_phone' => 'integer',
+        'total_deliveries' => 'integer',
+        'total_pending' => 'integer',
+        'total_queued' => 'integer',
+        'total_sending' => 'integer',
+        'total_sent' => 'integer',
+        'total_failed' => 'integer',
+        'total_skipped' => 'integer',
+        'total_canceled' => 'integer',
     ];
 
     /**
@@ -86,13 +85,40 @@ class CommercialCampaign extends Model implements CommercialCampaignContract
         return $this->belongsTo(UserProxy::modelClass(), 'updated_by');
     }
 
-    public function isDraft(): bool        { return $this->status === 'draft'; }
-    public function isReady(): bool        { return $this->status === 'ready'; }
-    public function isSending(): bool      { return $this->status === 'sending'; }
-    public function isSent(): bool         { return $this->status === 'sent'; }
-    public function isPartiallySent(): bool{ return $this->status === 'partially_sent'; }
-    public function isFailed(): bool       { return $this->status === 'failed'; }
-    public function isArchived(): bool     { return $this->status === 'archived'; }
+    public function isDraft(): bool
+    {
+        return $this->status === 'draft';
+    }
+
+    public function isReady(): bool
+    {
+        return $this->status === 'ready';
+    }
+
+    public function isSending(): bool
+    {
+        return $this->status === 'sending';
+    }
+
+    public function isSent(): bool
+    {
+        return $this->status === 'sent';
+    }
+
+    public function isPartiallySent(): bool
+    {
+        return $this->status === 'partially_sent';
+    }
+
+    public function isFailed(): bool
+    {
+        return $this->status === 'failed';
+    }
+
+    public function isArchived(): bool
+    {
+        return $this->status === 'archived';
+    }
 
     /**
      * True if the campaign has a frozen audience (at least one member).
@@ -121,7 +147,7 @@ class CommercialCampaign extends Model implements CommercialCampaignContract
     /**
      * Deliveries relationship.
      */
-    public function deliveries(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function deliveries(): HasMany
     {
         return $this->hasMany(CommercialCampaignDeliveryProxy::modelClass(), 'commercial_campaign_id');
     }

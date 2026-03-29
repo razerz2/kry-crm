@@ -49,7 +49,7 @@ trait CommercialDataGridTrait
 
         $queryBuilder
             ->leftJoin('account_products as ap', function ($join) use ($entityMorphClass) {
-                $join->on('ap.entity_id', '=', $this->entityTable . '.id')
+                $join->on('ap.entity_id', '=', $this->entityTable.'.id')
                     ->where('ap.entity_type', '=', $entityMorphClass);
             })
             ->leftJoin('crm_products as cp', 'cp.id', '=', 'ap.crm_product_id');
@@ -61,7 +61,7 @@ trait CommercialDataGridTrait
         );
 
         $groupByColumns = array_merge(
-            [$this->entityTable . '.id'],
+            [$this->entityTable.'.id'],
             $additionalGroupBy
         );
 
@@ -87,68 +87,68 @@ trait CommercialDataGridTrait
     protected function addCommercialColumns(): void
     {
         $this->addColumn([
-            'index'      => 'commercial_product',
-            'label'      => 'Produto',
-            'type'       => 'string',
+            'index' => 'commercial_product',
+            'label' => 'Produto',
+            'type' => 'string',
             'searchable' => false,
             'filterable' => true,
-            'sortable'   => false,
+            'sortable' => false,
             'filterable_type' => 'dropdown',
             'filterable_options' => $this->getProductFilterOptions(),
-            'closure'    => function ($row) {
+            'closure' => function ($row) {
                 if (empty($row->commercial_products)) {
                     return '<span class="text-xs text-gray-400">—</span>';
                 }
 
                 return collect(explode(', ', $row->commercial_products))
-                    ->map(fn ($name) => '<span class="inline-block rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300">' . e(trim($name)) . '</span>')
+                    ->map(fn ($name) => '<span class="inline-block rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300">'.e(trim($name)).'</span>')
                     ->join(' ');
             },
         ]);
 
         $this->addColumn([
-            'index'      => 'commercial_status',
-            'label'      => 'Status Comercial',
-            'type'       => 'string',
+            'index' => 'commercial_status',
+            'label' => 'Status Comercial',
+            'type' => 'string',
             'searchable' => false,
             'filterable' => true,
-            'sortable'   => false,
+            'sortable' => false,
             'filterable_type' => 'dropdown',
             'filterable_options' => $this->getStatusFilterOptions(),
-            'closure'    => function ($row) {
+            'closure' => function ($row) {
                 return $this->renderStatusBadges($row->commercial_status);
             },
         ]);
 
         $this->addColumn([
-            'index'      => 'commercial_links_count',
-            'label'      => 'Vínculos',
-            'type'       => 'string',
+            'index' => 'commercial_links_count',
+            'label' => 'Vínculos',
+            'type' => 'string',
             'searchable' => false,
             'filterable' => false,
-            'sortable'   => true,
-            'closure'    => function ($row) {
+            'sortable' => true,
+            'closure' => function ($row) {
                 $count = (int) $row->commercial_links_count;
 
                 if ($count === 0) {
                     return '<span class="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-400">0</span>';
                 }
 
-                return '<span class="rounded-full bg-brandColor/10 px-2 py-0.5 text-xs font-semibold text-brandColor">' . $count . '</span>';
+                return '<span class="rounded-full bg-brandColor/10 px-2 py-0.5 text-xs font-semibold text-brandColor">'.$count.'</span>';
             },
         ]);
 
         $this->addColumn([
-            'index'      => 'commercial_segment',
-            'label'      => 'Segmento',
-            'type'       => 'string',
+            'index' => 'commercial_segment',
+            'label' => 'Segmento',
+            'type' => 'string',
             'searchable' => false,
             'filterable' => true,
-            'sortable'   => false,
+            'sortable' => false,
             'visibility' => false,
             'filterable_type' => 'dropdown',
             'filterable_options' => $this->getSegmentFilterOptions(),
-            'closure'    => fn ($row) => '',
+            'closure' => fn ($row) => '',
         ]);
     }
 
@@ -196,7 +196,7 @@ trait CommercialDataGridTrait
                         $sub->select(DB::raw(1))
                             ->from('account_products as ap_filter')
                             ->join('crm_products as cp_filter', 'cp_filter.id', '=', 'ap_filter.crm_product_id')
-                            ->whereColumn('ap_filter.entity_id', $entityTable . '.id')
+                            ->whereColumn('ap_filter.entity_id', $entityTable.'.id')
                             ->where('ap_filter.entity_type', $entityMorphClass)
                             ->whereIn('cp_filter.name', $values);
                     });
@@ -208,7 +208,7 @@ trait CommercialDataGridTrait
                     $query->whereExists(function ($sub) use ($values, $entityMorphClass, $entityTable) {
                         $sub->select(DB::raw(1))
                             ->from('account_products as ap_filter')
-                            ->whereColumn('ap_filter.entity_id', $entityTable . '.id')
+                            ->whereColumn('ap_filter.entity_id', $entityTable.'.id')
                             ->where('ap_filter.entity_type', $entityMorphClass)
                             ->whereIn('ap_filter.status', $values);
                     });
@@ -235,7 +235,7 @@ trait CommercialDataGridTrait
                     $this->queryBuilder->whereExists(function ($sub) use ($entityMorphClass, $entityTable) {
                         $sub->select(DB::raw(1))
                             ->from('account_products as ap_seg')
-                            ->whereColumn('ap_seg.entity_id', $entityTable . '.id')
+                            ->whereColumn('ap_seg.entity_id', $entityTable.'.id')
                             ->where('ap_seg.entity_type', $entityMorphClass)
                             ->where('ap_seg.status', 'customer');
                     });
@@ -245,7 +245,7 @@ trait CommercialDataGridTrait
                     $this->queryBuilder->whereNotExists(function ($sub) use ($entityMorphClass, $entityTable) {
                         $sub->select(DB::raw(1))
                             ->from('account_products as ap_seg')
-                            ->whereColumn('ap_seg.entity_id', $entityTable . '.id')
+                            ->whereColumn('ap_seg.entity_id', $entityTable.'.id')
                             ->where('ap_seg.entity_type', $entityMorphClass)
                             ->where('ap_seg.status', 'customer');
                     });
@@ -255,7 +255,7 @@ trait CommercialDataGridTrait
                     $this->queryBuilder->whereExists(function ($sub) use ($entityMorphClass, $entityTable) {
                         $sub->select(DB::raw(1))
                             ->from('account_products as ap_seg')
-                            ->whereColumn('ap_seg.entity_id', $entityTable . '.id')
+                            ->whereColumn('ap_seg.entity_id', $entityTable.'.id')
                             ->where('ap_seg.entity_type', $entityMorphClass);
                     });
                     break;
@@ -264,7 +264,7 @@ trait CommercialDataGridTrait
                     $this->queryBuilder->whereNotExists(function ($sub) use ($entityMorphClass, $entityTable) {
                         $sub->select(DB::raw(1))
                             ->from('account_products as ap_seg')
-                            ->whereColumn('ap_seg.entity_id', $entityTable . '.id')
+                            ->whereColumn('ap_seg.entity_id', $entityTable.'.id')
                             ->where('ap_seg.entity_type', $entityMorphClass);
                     });
                     break;
@@ -324,22 +324,22 @@ trait CommercialDataGridTrait
         }
 
         $statusColors = [
-            'lead'              => 'bg-blue-100 text-blue-700',
-            'prospect'          => 'bg-purple-100 text-purple-700',
-            'opportunity'       => 'bg-yellow-100 text-yellow-700',
-            'customer'          => 'bg-green-100 text-green-700',
+            'lead' => 'bg-blue-100 text-blue-700',
+            'prospect' => 'bg-purple-100 text-purple-700',
+            'opportunity' => 'bg-yellow-100 text-yellow-700',
+            'customer' => 'bg-green-100 text-green-700',
             'inactive_customer' => 'bg-gray-200 text-gray-600',
-            'former_customer'   => 'bg-orange-100 text-orange-600',
-            'lost'              => 'bg-red-100 text-red-600',
+            'former_customer' => 'bg-orange-100 text-orange-600',
+            'lost' => 'bg-red-100 text-red-600',
         ];
 
         return collect(explode(', ', $commercialStatus))
             ->map(function ($status) use ($statusColors) {
                 $status = trim($status);
-                $label  = AccountProductStatus::tryFrom($status)?->label() ?? $status;
-                $color  = $statusColors[$status] ?? 'bg-gray-100 text-gray-500';
+                $label = AccountProductStatus::tryFrom($status)?->label() ?? $status;
+                $color = $statusColors[$status] ?? 'bg-gray-100 text-gray-500';
 
-                return '<span class="inline-block rounded-full px-2 py-0.5 text-xs font-medium ' . $color . '">' . e($label) . '</span>';
+                return '<span class="inline-block rounded-full px-2 py-0.5 text-xs font-medium '.$color.'">'.e($label).'</span>';
             })
             ->join(' ');
     }

@@ -5,6 +5,7 @@ namespace Webkul\Admin\DataGrids\Contact;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Webkul\Admin\DataGrids\Traits\CommercialDataGridTrait;
+use Webkul\Contact\Models\PersonProxy;
 use Webkul\Contact\Repositories\OrganizationRepository;
 use Webkul\DataGrid\DataGrid;
 
@@ -24,7 +25,7 @@ class PersonDataGrid extends DataGrid
      */
     public function __construct(protected OrganizationRepository $organizationRepository)
     {
-        $this->entityMorphClass = \Webkul\Contact\Models\PersonProxy::modelClass();
+        $this->entityMorphClass = PersonProxy::modelClass();
     }
 
     /**

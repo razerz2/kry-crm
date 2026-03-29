@@ -13,7 +13,6 @@ use Webkul\Commercial\Repositories\CommercialCampaignDeliveryRepository;
 use Webkul\Commercial\Services\Sending\CampaignChannelSenderInterface;
 use Webkul\Commercial\Services\Sending\EmailCampaignSender;
 use Webkul\Commercial\Services\Sending\WhatsAppCampaignSender;
-use Webkul\Commercial\Services\CommercialCampaignMetricsService;
 use Webkul\Commercial\Services\Template\CommercialCampaignTemplateRenderer;
 use Webkul\Commercial\Services\Template\TemplateRenderContext;
 
@@ -57,9 +56,9 @@ class CommercialCampaignDeliveryService
         }
 
         $campaign->update([
-            'status'       => 'sending',
-            'dispatched_at'=> now(),
-            'updated_by'   => Auth::id(),
+            'status' => 'sending',
+            'dispatched_at' => now(),
+            'updated_by' => Auth::id(),
         ]);
 
         DispatchCommercialCampaignJob::dispatch($campaign->id)
@@ -80,8 +79,8 @@ class CommercialCampaignDeliveryService
     public function createDeliveries(CommercialCampaign $campaign): int
     {
         $campaignChannel = $campaign->channel;
-        $insertedTotal   = 0;
-        $chunkSize       = (int) config('commercial.campaign.delivery_chunk_size', 200);
+        $insertedTotal = 0;
+        $chunkSize = (int) config('commercial.campaign.delivery_chunk_size', 200);
 
         $campaign->audienceMembers()
             ->chunkById($chunkSize, function ($members) use ($campaign, $campaignChannel, &$insertedTotal) {
@@ -121,36 +120,36 @@ class CommercialCampaignDeliveryService
         string $campaignChannel
     ): array {
         $rows = [];
-        $now  = now()->toDateTimeString();
+        $now = now()->toDateTimeString();
         $base = [
-            'commercial_campaign_id'          => $campaign->id,
+            'commercial_campaign_id' => $campaign->id,
             'commercial_campaign_audience_id' => $member->id,
-            'entity_type'                     => $member->entity_type,
-            'entity_id'                       => $member->entity_id,
-            'recipient_name'                  => $member->display_name,
-            'created_by'                      => $campaign->updated_by,
-            'created_at'                      => $now,
-            'updated_at'                      => $now,
+            'entity_type' => $member->entity_type,
+            'entity_id' => $member->entity_id,
+            'recipient_name' => $member->display_name,
+            'created_by' => $campaign->updated_by,
+            'created_at' => $now,
+            'updated_at' => $now,
         ];
 
         if (in_array($campaignChannel, ['email', 'both'], true)) {
             if ($member->email) {
                 $ctx = TemplateRenderContext::fromAudienceMember($member, $campaign, 'email');
                 $rows[] = array_merge($base, [
-                    'channel'          => 'email',
-                    'provider'         => config('commercial.campaign.email_provider', 'internal_email'),
-                    'recipient_email'  => $member->email,
-                    'subject'          => $this->renderer->renderSubject($campaign->subject ?? '', $ctx),
+                    'channel' => 'email',
+                    'provider' => config('commercial.campaign.email_provider', 'internal_email'),
+                    'recipient_email' => $member->email,
+                    'subject' => $this->renderer->renderSubject($campaign->subject ?? '', $ctx),
                     'rendered_message' => $this->renderer->renderBody($campaign->message_body ?? '', $ctx),
-                    'status'           => 'pending',
+                    'status' => 'pending',
                 ]);
             } else {
                 $rows[] = array_merge($base, [
-                    'channel'          => 'email',
-                    'provider'         => config('commercial.campaign.email_provider', 'internal_email'),
+                    'channel' => 'email',
+                    'provider' => config('commercial.campaign.email_provider', 'internal_email'),
                     'rendered_message' => '',
-                    'status'           => 'skipped',
-                    'failure_reason'   => 'No email address',
+                    'status' => 'skipped',
+                    'failure_reason' => 'No email address',
                 ]);
             }
         }
@@ -159,19 +158,19 @@ class CommercialCampaignDeliveryService
             if ($member->phone) {
                 $ctx = TemplateRenderContext::fromAudienceMember($member, $campaign, 'whatsapp');
                 $rows[] = array_merge($base, [
-                    'channel'          => 'whatsapp',
-                    'provider'         => config('commercial.campaign.whatsapp_provider', 'waha'),
-                    'recipient_phone'  => $member->phone,
+                    'channel' => 'whatsapp',
+                    'provider' => config('commercial.campaign.whatsapp_provider', 'waha'),
+                    'recipient_phone' => $member->phone,
                     'rendered_message' => $this->renderer->renderBody($campaign->message_body ?? '', $ctx),
-                    'status'           => 'pending',
+                    'status' => 'pending',
                 ]);
             } else {
                 $rows[] = array_merge($base, [
-                    'channel'          => 'whatsapp',
-                    'provider'         => config('commercial.campaign.whatsapp_provider', 'waha'),
+                    'channel' => 'whatsapp',
+                    'provider' => config('commercial.campaign.whatsapp_provider', 'waha'),
                     'rendered_message' => '',
-                    'status'           => 'skipped',
-                    'failure_reason'   => 'No phone number',
+                    'status' => 'skipped',
+                    'failure_reason' => 'No phone number',
                 ]);
             }
         }
@@ -200,7 +199,7 @@ class CommercialCampaignDeliveryService
             $sender->send($delivery);
 
             $delivery->update([
-                'status'  => 'sent',
+                'status' => 'sent',
                 'sent_at' => now(),
             ]);
 
@@ -208,12 +207,12 @@ class CommercialCampaignDeliveryService
 
         } catch (\Throwable $e) {
             $delivery->update([
-                'status'         => 'failed',
+                'status' => 'failed',
                 'failure_reason' => mb_substr($e->getMessage(), 0, 500),
-                'failed_at'      => now(),
+                'failed_at' => now(),
             ]);
 
-            $this->log($delivery, 'error', 'Delivery failed: ' . $e->getMessage(), [
+            $this->log($delivery, 'error', 'Delivery failed: '.$e->getMessage(), [
                 'exception' => get_class($e),
             ]);
         }
@@ -246,7 +245,7 @@ class CommercialCampaignDeliveryService
         $finalStatus = $this->metricsService->computeFinalStatus($snapshot);
 
         $campaign->update([
-            'status'  => $finalStatus,
+            'status' => $finalStatus,
             'sent_at' => now(),
         ]);
     }
@@ -290,8 +289,8 @@ class CommercialCampaignDeliveryService
     ): void {
         CommercialCampaignDeliveryLog::create([
             'commercial_campaign_delivery_id' => $delivery->id,
-            'level'        => $level,
-            'message'      => $message,
+            'level' => $level,
+            'message' => $message,
             'context_json' => ! empty($context) ? $context : null,
         ]);
     }
@@ -301,9 +300,9 @@ class CommercialCampaignDeliveryService
     protected function getSender(string $channel): CampaignChannelSenderInterface
     {
         return match ($channel) {
-            'email'    => $this->emailSender,
+            'email' => $this->emailSender,
             'whatsapp' => $this->whatsappSender,
-            default    => throw new \RuntimeException("Unsupported channel: {$channel}"),
+            default => throw new \RuntimeException("Unsupported channel: {$channel}"),
         };
     }
 }

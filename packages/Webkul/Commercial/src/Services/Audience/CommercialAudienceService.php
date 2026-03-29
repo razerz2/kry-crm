@@ -124,13 +124,13 @@ class CommercialAudienceService
         }
 
         return [
-            'total'         => $total,
-            'with_email'    => $withEmail,
-            'with_phone'    => $withPhone,
-            'persons'       => $persons,
+            'total' => $total,
+            'with_email' => $withEmail,
+            'with_phone' => $withPhone,
+            'persons' => $persons,
             'organizations' => $organizations,
-            'by_status'     => $byStatus,
-            'by_product'    => $byProduct,
+            'by_status' => $byStatus,
+            'by_product' => $byProduct,
         ];
     }
 
@@ -163,7 +163,7 @@ class CommercialAudienceService
 
         // Free-text search at DB level for efficiency
         if ($filter->search) {
-            $search = '%' . $filter->search . '%';
+            $search = '%'.$filter->search.'%';
             $query->where(function ($q) use ($search) {
                 $q->where('persons.name', 'like', $search)
                     ->orWhere('persons.emails', 'like', $search)
@@ -239,7 +239,7 @@ class CommercialAudienceService
         $this->applySegmentFilter($query, $orgClass, $filter);
 
         if ($filter->search) {
-            $search = '%' . $filter->search . '%';
+            $search = '%'.$filter->search.'%';
             $query->where('organizations.name', 'like', $search);
         }
 
@@ -298,7 +298,7 @@ class CommercialAudienceService
             $query->whereExists(function ($sub) use ($entityClass, $entityTable, $filter) {
                 $sub->select(DB::raw(1))
                     ->from('account_products')
-                    ->whereColumn('account_products.entity_id', $entityTable . '.id')
+                    ->whereColumn('account_products.entity_id', $entityTable.'.id')
                     ->where('account_products.entity_type', $entityClass)
                     ->whereIn('account_products.crm_product_id', $filter->crmProductIds);
             });
@@ -311,7 +311,7 @@ class CommercialAudienceService
             $query->whereExists(function ($sub) use ($entityClass, $entityTable, $statuses) {
                 $sub->select(DB::raw(1))
                     ->from('account_products')
-                    ->whereColumn('account_products.entity_id', $entityTable . '.id')
+                    ->whereColumn('account_products.entity_id', $entityTable.'.id')
                     ->where('account_products.entity_type', $entityClass)
                     ->whereIn('account_products.status', $statuses);
             });
@@ -334,7 +334,7 @@ class CommercialAudienceService
                 $query->whereExists(function ($sub) use ($entityClass, $entityTable) {
                     $sub->select(DB::raw(1))
                         ->from('account_products')
-                        ->whereColumn('account_products.entity_id', $entityTable . '.id')
+                        ->whereColumn('account_products.entity_id', $entityTable.'.id')
                         ->where('account_products.entity_type', $entityClass)
                         ->where('account_products.status', AccountProductStatus::CUSTOMER->value);
                 });
@@ -344,7 +344,7 @@ class CommercialAudienceService
                 $query->whereNotExists(function ($sub) use ($entityClass, $entityTable) {
                     $sub->select(DB::raw(1))
                         ->from('account_products')
-                        ->whereColumn('account_products.entity_id', $entityTable . '.id')
+                        ->whereColumn('account_products.entity_id', $entityTable.'.id')
                         ->where('account_products.entity_type', $entityClass)
                         ->where('account_products.status', AccountProductStatus::CUSTOMER->value);
                 });
@@ -354,7 +354,7 @@ class CommercialAudienceService
                 $query->whereExists(function ($sub) use ($entityClass, $entityTable) {
                     $sub->select(DB::raw(1))
                         ->from('account_products')
-                        ->whereColumn('account_products.entity_id', $entityTable . '.id')
+                        ->whereColumn('account_products.entity_id', $entityTable.'.id')
                         ->where('account_products.entity_type', $entityClass);
                 });
                 break;
@@ -363,7 +363,7 @@ class CommercialAudienceService
                 $query->whereNotExists(function ($sub) use ($entityClass, $entityTable) {
                     $sub->select(DB::raw(1))
                         ->from('account_products')
-                        ->whereColumn('account_products.entity_id', $entityTable . '.id')
+                        ->whereColumn('account_products.entity_id', $entityTable.'.id')
                         ->where('account_products.entity_type', $entityClass);
                 });
                 break;
@@ -411,7 +411,7 @@ class CommercialAudienceService
             }
 
             $statusLabel = $this->statusLabel($row->status);
-            $map[$eid]['summary_parts'][] = $row->product_name . ': ' . $statusLabel;
+            $map[$eid]['summary_parts'][] = $row->product_name.': '.$statusLabel;
         }
 
         // Build summary strings

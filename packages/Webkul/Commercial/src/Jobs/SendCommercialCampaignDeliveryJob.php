@@ -41,6 +41,7 @@ class SendCommercialCampaignDeliveryJob implements ShouldQueue
 
         if (! $delivery) {
             Log::warning("[SendCommercialCampaignDeliveryJob] Delivery #{$this->deliveryId} not found.");
+
             return;
         }
 
@@ -80,9 +81,9 @@ class SendCommercialCampaignDeliveryJob implements ShouldQueue
         $delivery = CommercialCampaignDelivery::find($this->deliveryId);
         if ($delivery && ! $delivery->isFinished()) {
             $delivery->update([
-                'status'         => 'failed',
-                'failure_reason' => mb_substr('Queue retries exhausted: ' . $exception->getMessage(), 0, 500),
-                'failed_at'      => now(),
+                'status' => 'failed',
+                'failure_reason' => mb_substr('Queue retries exhausted: '.$exception->getMessage(), 0, 500),
+                'failed_at' => now(),
             ]);
 
             // Re-check campaign finalization

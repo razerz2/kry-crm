@@ -127,7 +127,7 @@ class CommercialCampaignStateGuard
 
         // filters_json change — deep compare to avoid noise
         if (isset($incomingData['filters_json'])) {
-            $currentFilters  = $campaign->filters_json ?? [];
+            $currentFilters = $campaign->filters_json ?? [];
             $incomingFilters = $incomingData['filters_json'];
 
             if ($this->filtersChanged($currentFilters, $incomingFilters)) {
@@ -185,7 +185,7 @@ class CommercialCampaignStateGuard
      * Returns an array of issues that prevent the campaign from being dispatched.
      * Empty array = fully ready.
      *
-     * @return string[]  list of translatable issue keys
+     * @return string[] list of translatable issue keys
      */
     public function readinessIssues(CommercialCampaign $campaign): array
     {

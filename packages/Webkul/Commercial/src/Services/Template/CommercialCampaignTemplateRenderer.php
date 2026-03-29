@@ -9,17 +9,17 @@ class CommercialCampaignTemplateRenderer
      * Used to generate the UI reference panel.
      */
     public const VARIABLES = [
-        'name'                => 'Nome completo do destinatário',
-        'first_name'          => 'Primeiro nome do destinatário',
-        'organization'        => 'Empresa/organização do destinatário',
-        'email'               => 'E-mail do destinatário',
-        'phone'               => 'Telefone do destinatário',
-        'entity_type'         => 'Tipo: person ou organization',
-        'products'            => 'Produtos associados (separados por vírgula)',
+        'name' => 'Nome completo do destinatário',
+        'first_name' => 'Primeiro nome do destinatário',
+        'organization' => 'Empresa/organização do destinatário',
+        'email' => 'E-mail do destinatário',
+        'phone' => 'Telefone do destinatário',
+        'entity_type' => 'Tipo: person ou organization',
+        'products' => 'Produtos associados (separados por vírgula)',
         'commercial_statuses' => 'Status comerciais (separados por vírgula)',
-        'channel'             => 'Canal de envio: email ou whatsapp',
-        'campaign.name'       => 'Nome da campanha',
-        'campaign.channel'    => 'Canal da campanha',
+        'channel' => 'Canal de envio: email ou whatsapp',
+        'campaign.name' => 'Nome da campanha',
+        'campaign.channel' => 'Canal da campanha',
     ];
 
     /**

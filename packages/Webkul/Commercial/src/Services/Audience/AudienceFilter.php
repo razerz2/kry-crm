@@ -7,24 +7,31 @@ class AudienceFilter
     /**
      * Supported entity type constants.
      */
-    public const ENTITY_PERSON       = 'person';
+    public const ENTITY_PERSON = 'person';
+
     public const ENTITY_ORGANIZATION = 'organization';
-    public const ENTITY_BOTH         = 'both';
+
+    public const ENTITY_BOTH = 'both';
 
     /**
      * Supported segment constants.
      */
-    public const SEGMENT_CUSTOMER_ANY  = 'customer_any';
-    public const SEGMENT_NON_CUSTOMER  = 'non_customer';
-    public const SEGMENT_HAS_LINK      = 'has_link';
-    public const SEGMENT_NO_LINK       = 'no_link';
+    public const SEGMENT_CUSTOMER_ANY = 'customer_any';
+
+    public const SEGMENT_NON_CUSTOMER = 'non_customer';
+
+    public const SEGMENT_HAS_LINK = 'has_link';
+
+    public const SEGMENT_NO_LINK = 'no_link';
 
     /**
      * Supported channel constants.
      */
-    public const CHANNEL_EMAIL    = 'email';
+    public const CHANNEL_EMAIL = 'email';
+
     public const CHANNEL_WHATSAPP = 'whatsapp';
-    public const CHANNEL_BOTH     = 'both';
+
+    public const CHANNEL_BOTH = 'both';
 
     public function __construct(
         /**

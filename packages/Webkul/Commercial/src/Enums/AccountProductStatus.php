@@ -17,14 +17,14 @@ enum AccountProductStatus: string
      */
     public function label(): string
     {
-        return match($this) {
-            self::LEAD             => 'Lead',
-            self::PROSPECT         => 'Prospect',
-            self::OPPORTUNITY      => 'Oportunidade',
-            self::CUSTOMER         => 'Cliente',
+        return match ($this) {
+            self::LEAD => 'Lead',
+            self::PROSPECT => 'Prospect',
+            self::OPPORTUNITY => 'Oportunidade',
+            self::CUSTOMER => 'Cliente',
             self::INACTIVE_CUSTOMER => 'Cliente Inativo',
-            self::FORMER_CUSTOMER  => 'Ex-Cliente',
-            self::LOST             => 'Perdido',
+            self::FORMER_CUSTOMER => 'Ex-Cliente',
+            self::LOST => 'Perdido',
         };
     }
 

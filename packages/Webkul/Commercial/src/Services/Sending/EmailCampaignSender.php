@@ -14,11 +14,11 @@ class EmailCampaignSender implements CampaignChannelSenderInterface
         }
 
         $subject = $delivery->subject ?: 'Mensagem';
-        $body    = $delivery->rendered_message ?: '';
+        $body = $delivery->rendered_message ?: '';
 
         Mail::raw($body, function ($message) use ($delivery, $subject) {
             $message->to($delivery->recipient_email, $delivery->recipient_name ?? '')
-                    ->subject($subject);
+                ->subject($subject);
         });
 
         return true;

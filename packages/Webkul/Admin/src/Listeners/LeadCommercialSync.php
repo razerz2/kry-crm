@@ -43,7 +43,7 @@ class LeadCommercialSync
         $stageCode = $lead->stage->code;
 
         match ($stageCode) {
-            'won'  => $this->syncService->syncWon($lead),
+            'won' => $this->syncService->syncWon($lead),
             'lost' => $this->syncService->syncLost($lead),
             default => $this->syncService->syncIntermediateStage($lead),
         };
@@ -77,7 +77,7 @@ class LeadCommercialSync
 
         // On create, sync for won/lost or intermediate stages
         match ($stageCode) {
-            'won'  => $this->syncService->syncWon($lead),
+            'won' => $this->syncService->syncWon($lead),
             'lost' => $this->syncService->syncLost($lead),
             default => $this->syncService->syncIntermediateStage($lead),
         };

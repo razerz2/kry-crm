@@ -39,7 +39,7 @@ class CommercialServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(CommercialAudienceService::class, function () {
-            return new CommercialAudienceService();
+            return new CommercialAudienceService;
         });
 
         // StateGuard is stateless

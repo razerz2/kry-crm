@@ -33,18 +33,18 @@ class CommercialCampaignMetricsService
         foreach (self::STATUSES as $s) {
             $snapshot[$s] = (int) ($rows[$s] ?? 0);
         }
-        $snapshot['total']       = array_sum(array_intersect_key($snapshot, array_flip(self::STATUSES)));
+        $snapshot['total'] = array_sum(array_intersect_key($snapshot, array_flip(self::STATUSES)));
         $snapshot['in_progress'] = $snapshot['pending'] + $snapshot['queued'] + $snapshot['sending'];
 
         $campaign->update([
             'total_deliveries' => $snapshot['total'],
-            'total_pending'    => $snapshot['pending'],
-            'total_queued'     => $snapshot['queued'],
-            'total_sending'    => $snapshot['sending'],
-            'total_sent'       => $snapshot['sent'],
-            'total_failed'     => $snapshot['failed'],
-            'total_skipped'    => $snapshot['skipped'],
-            'total_canceled'   => $snapshot['canceled'],
+            'total_pending' => $snapshot['pending'],
+            'total_queued' => $snapshot['queued'],
+            'total_sending' => $snapshot['sending'],
+            'total_sent' => $snapshot['sent'],
+            'total_failed' => $snapshot['failed'],
+            'total_skipped' => $snapshot['skipped'],
+            'total_canceled' => $snapshot['canceled'],
         ]);
 
         return $snapshot;
@@ -63,7 +63,7 @@ class CommercialCampaignMetricsService
      */
     public function computeFinalStatus(array $snapshot): string
     {
-        $sent   = $snapshot['sent'];
+        $sent = $snapshot['sent'];
         $failed = $snapshot['failed'];
 
         if ($sent > 0 && $failed === 0) {

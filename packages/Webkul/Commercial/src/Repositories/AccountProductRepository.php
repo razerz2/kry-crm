@@ -34,10 +34,10 @@ class AccountProductRepository extends Repository
         int $entityId,
         int $crmProductId,
         AccountProductStatus $status = AccountProductStatus::LEAD
-    ): \Webkul\Commercial\Contracts\AccountProduct {
+    ): AccountProduct {
         $record = $this->findOneWhere([
-            'entity_type'    => $entityType,
-            'entity_id'      => $entityId,
+            'entity_type' => $entityType,
+            'entity_id' => $entityId,
             'crm_product_id' => $crmProductId,
         ]);
 
@@ -46,10 +46,10 @@ class AccountProductRepository extends Repository
         }
 
         return $this->create([
-            'entity_type'    => $entityType,
-            'entity_id'      => $entityId,
+            'entity_type' => $entityType,
+            'entity_id' => $entityId,
             'crm_product_id' => $crmProductId,
-            'status'         => $status->value,
+            'status' => $status->value,
         ]);
     }
 
@@ -60,7 +60,7 @@ class AccountProductRepository extends Repository
         int $id,
         AccountProductStatus $newStatus,
         array $extra = []
-    ): \Webkul\Commercial\Contracts\AccountProduct {
+    ): AccountProduct {
         $data = array_merge(['status' => $newStatus->value], $extra);
 
         if ($newStatus === AccountProductStatus::CUSTOMER && empty($extra['started_at'])) {

@@ -29,8 +29,8 @@ class WhatsAppCampaignSender implements CampaignChannelSenderInterface
         Log::channel('stack')->info('[WhatsApp Stub] Would send campaign delivery', [
             'delivery_id' => $delivery->id,
             'campaign_id' => $delivery->commercial_campaign_id,
-            'provider'    => $delivery->provider,
-            'phone'       => $delivery->recipient_phone,
+            'provider' => $delivery->provider,
+            'phone' => $delivery->recipient_phone,
         ]);
 
         // TODO: when providers are integrated, replace this with real dispatch:
@@ -42,7 +42,7 @@ class WhatsAppCampaignSender implements CampaignChannelSenderInterface
         // };
 
         throw new \RuntimeException(
-            'WhatsApp provider not yet configured. Provider: ' . ($delivery->provider ?? 'none')
+            'WhatsApp provider not yet configured. Provider: '.($delivery->provider ?? 'none')
         );
     }
 

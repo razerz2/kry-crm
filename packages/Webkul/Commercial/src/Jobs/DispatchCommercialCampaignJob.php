@@ -38,11 +38,13 @@ class DispatchCommercialCampaignJob implements ShouldQueue
 
         if (! $campaign) {
             Log::warning("[DispatchCommercialCampaignJob] Campaign #{$this->campaignId} not found.");
+
             return;
         }
 
         if ($campaign->status !== 'sending') {
             Log::info("[DispatchCommercialCampaignJob] Campaign #{$this->campaignId} is not in 'sending' state ({$campaign->status}). Aborting.");
+
             return;
         }
 

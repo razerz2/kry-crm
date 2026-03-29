@@ -84,16 +84,16 @@ class AudienceItem
     public function toArray(): array
     {
         return [
-            'entity_type'         => $this->entityLabel,
-            'entity_id'           => $this->entityId,
-            'display_name'        => $this->displayName,
-            'organization_name'   => $this->organizationName,
-            'email'               => $this->email,
-            'phone'               => $this->phone,
-            'crm_products'        => $this->crmProducts,
+            'entity_type' => $this->entityLabel,
+            'entity_id' => $this->entityId,
+            'display_name' => $this->displayName,
+            'organization_name' => $this->organizationName,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'crm_products' => $this->crmProducts,
             'commercial_statuses' => $this->commercialStatuses,
-            'available_channels'  => $this->availableChannels,
-            'source_summary'      => $this->sourceSummary,
+            'available_channels' => $this->availableChannels,
+            'source_summary' => $this->sourceSummary,
         ];
     }
 }

@@ -35,7 +35,7 @@ class CommercialCampaignDelivery extends Model implements CommercialCampaignDeli
 
     protected $casts = [
         'queued_at' => 'datetime',
-        'sent_at'   => 'datetime',
+        'sent_at' => 'datetime',
         'failed_at' => 'datetime',
     ];
 
@@ -61,13 +61,40 @@ class CommercialCampaignDelivery extends Model implements CommercialCampaignDeli
 
     /* ── Status helpers ─────────────────────────────────────────── */
 
-    public function isPending(): bool   { return $this->status === 'pending'; }
-    public function isQueued(): bool    { return $this->status === 'queued'; }
-    public function isSending(): bool   { return $this->status === 'sending'; }
-    public function isSent(): bool      { return $this->status === 'sent'; }
-    public function isFailed(): bool    { return $this->status === 'failed'; }
-    public function isSkipped(): bool   { return $this->status === 'skipped'; }
-    public function isCanceled(): bool  { return $this->status === 'canceled'; }
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
+
+    public function isQueued(): bool
+    {
+        return $this->status === 'queued';
+    }
+
+    public function isSending(): bool
+    {
+        return $this->status === 'sending';
+    }
+
+    public function isSent(): bool
+    {
+        return $this->status === 'sent';
+    }
+
+    public function isFailed(): bool
+    {
+        return $this->status === 'failed';
+    }
+
+    public function isSkipped(): bool
+    {
+        return $this->status === 'skipped';
+    }
+
+    public function isCanceled(): bool
+    {
+        return $this->status === 'canceled';
+    }
 
     public function isFinished(): bool
     {
