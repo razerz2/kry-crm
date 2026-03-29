@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('account_product_histories', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('account_product_id');
+            $table->unsignedInteger('account_product_id');
             $table->unsignedInteger('lead_id')->nullable();
             $table->string('old_status')->nullable();
             $table->string('new_status');
