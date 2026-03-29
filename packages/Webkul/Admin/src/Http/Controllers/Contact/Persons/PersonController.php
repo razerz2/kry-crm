@@ -14,6 +14,7 @@ use Webkul\Admin\Http\Controllers\Controller;
 use Webkul\Admin\Http\Requests\AttributeForm;
 use Webkul\Admin\Http\Requests\MassDestroyRequest;
 use Webkul\Admin\Http\Resources\PersonResource;
+use Webkul\Commercial\Repositories\CrmProductRepository;
 use Webkul\Contact\Repositories\PersonRepository;
 
 class PersonController extends Controller
@@ -23,8 +24,10 @@ class PersonController extends Controller
      *
      * @return void
      */
-    public function __construct(protected PersonRepository $personRepository)
-    {
+    public function __construct(
+        protected PersonRepository $personRepository,
+        protected CrmProductRepository $crmProductRepository
+    ) {
         request()->request->add(['entity_type' => 'persons']);
     }
 
@@ -78,7 +81,9 @@ class PersonController extends Controller
     {
         $person = $this->personRepository->findOrFail($id);
 
-        return view('admin::contacts.persons.view', compact('person'));
+        $crmProducts = $this->crmProductRepository->findWhere(['is_active' => true]);
+
+        return view('admin::contacts.persons.view', compact('person', 'crmProducts'));
     }
 
     /**

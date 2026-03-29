@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Webkul\Admin\Http\Controllers\Contact\AccountProductController;
 use Webkul\Admin\Http\Controllers\Contact\OrganizationController;
 use Webkul\Admin\Http\Controllers\Contact\Persons\ActivityController;
 use Webkul\Admin\Http\Controllers\Contact\Persons\PersonController;
@@ -56,6 +57,8 @@ Route::prefix('contacts')->group(function () {
 
         Route::post('create', 'store')->name('admin.contacts.organizations.store');
 
+        Route::get('view/{id}', 'show')->name('admin.contacts.organizations.view');
+
         Route::get('edit/{id?}', 'edit')->name('admin.contacts.organizations.edit');
 
         Route::put('edit/{id}', 'update')->name('admin.contacts.organizations.update');
@@ -63,5 +66,14 @@ Route::prefix('contacts')->group(function () {
         Route::delete('{id}', 'destroy')->name('admin.contacts.organizations.delete');
 
         Route::put('mass-destroy', 'massDestroy')->name('admin.contacts.organizations.mass_delete');
+    });
+
+    /**
+     * Account Products (commercial relationships).
+     */
+    Route::controller(AccountProductController::class)->prefix('account-products')->group(function () {
+        Route::post('', 'store')->name('admin.contacts.account_products.store');
+
+        Route::delete('{id}', 'destroy')->name('admin.contacts.account_products.destroy');
     });
 });

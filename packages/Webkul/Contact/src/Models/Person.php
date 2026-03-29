@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Webkul\Activity\Models\ActivityProxy;
 use Webkul\Activity\Traits\LogsActivity;
 use Webkul\Attribute\Traits\CustomAttribute;
+use Webkul\Commercial\Models\AccountProductProxy;
 use Webkul\Contact\Contracts\Person as PersonContract;
 use Webkul\Contact\Database\Factories\PersonFactory;
 use Webkul\Lead\Models\LeadProxy;
@@ -54,6 +56,7 @@ class Person extends Model implements PersonContract
         'emails',
         'contact_numbers',
         'job_title',
+        'cpf',
         'user_id',
         'organization_id',
         'unique_id',
@@ -97,6 +100,23 @@ class Person extends Model implements PersonContract
     public function leads(): HasMany
     {
         return $this->hasMany(LeadProxy::modelClass(), 'person_id');
+    }
+
+    /**
+     * Get all commercial relationships with CRM products.
+     */
+    public function accountProducts(): MorphMany
+    {
+        return $this->morphMany(AccountProductProxy::modelClass(), 'entity');
+    }
+
+    /**
+     * Get only active customer relationships with CRM products.
+     */
+    public function activeProducts(): MorphMany
+    {
+        return $this->morphMany(AccountProductProxy::modelClass(), 'entity')
+            ->where('status', 'customer');
     }
 
     /**

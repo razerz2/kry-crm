@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Webkul\Activity\Models\ActivityProxy;
 use Webkul\Activity\Traits\LogsActivity;
 use Webkul\Attribute\Traits\CustomAttribute;
+use Webkul\Commercial\Models\CrmProductProxy;
 use Webkul\Contact\Models\PersonProxy;
 use Webkul\Email\Models\EmailProxy;
 use Webkul\Lead\Contracts\Lead as LeadContract;
@@ -40,6 +41,7 @@ class Lead extends Model implements LeadContract
         'lead_type_id',
         'lead_pipeline_id',
         'lead_pipeline_stage_id',
+        'crm_product_id',
     ];
 
     /**
@@ -107,6 +109,14 @@ class Lead extends Model implements LeadContract
     public function stage(): BelongsTo
     {
         return $this->belongsTo(StageProxy::modelClass(), 'lead_pipeline_stage_id');
+    }
+
+    /**
+     * Get the CRM product (SaaS product) associated with this lead.
+     */
+    public function crmProduct(): BelongsTo
+    {
+        return $this->belongsTo(CrmProductProxy::modelClass());
     }
 
     /**

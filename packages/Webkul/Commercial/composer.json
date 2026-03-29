@@ -1,0 +1,28 @@
+{
+    "name": "krayin/laravel-commercial",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Krayter Team"
+        }
+    ],
+    "require": {
+        "krayin/laravel-contact": "^1.0",
+        "krayin/laravel-core": "^1.0",
+        "krayin/laravel-user": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Webkul\\Commercial\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Webkul\\Commercial\\Providers\\CommercialServiceProvider"
+            ],
+            "aliases": {}
+        }
+    },
+    "minimum-stability": "dev"
+}

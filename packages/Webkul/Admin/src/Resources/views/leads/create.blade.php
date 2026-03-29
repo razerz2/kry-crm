@@ -170,6 +170,33 @@
                             </div>
 
                             {!! view_render_event('admin.leads.create.details.attributes.after') !!}
+
+                            <!-- CRM Product (SaaS) -->
+                            @php
+                                $crmProducts = \Webkul\Commercial\Models\CrmProduct::where('is_active', true)->orderBy('name')->get();
+                            @endphp
+
+                            @if($crmProducts->isNotEmpty())
+                                <div class="mb-4">
+                                    <label
+                                        class="mb-1.5 flex items-center gap-1 text-xs font-medium text-gray-800 dark:text-white"
+                                        for="crm_product_id"
+                                    >
+                                        @lang('admin::app.leads.common.crm-product')
+                                    </label>
+
+                                    <select
+                                        name="crm_product_id"
+                                        id="crm_product_id"
+                                        class="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-600 transition-all hover:border-gray-400 focus:border-gray-400 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-400 dark:focus:border-gray-400"
+                                    >
+                                        <option value="">@lang('admin::app.leads.common.none')</option>
+                                        @foreach($crmProducts as $crmProduct)
+                                            <option value="{{ $crmProduct->id }}">{{ $crmProduct->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endif
                         </div>
                     </div>
 

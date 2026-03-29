@@ -10,6 +10,7 @@ use Webkul\Admin\DataGrids\Contact\OrganizationDataGrid;
 use Webkul\Admin\Http\Controllers\Controller;
 use Webkul\Admin\Http\Requests\AttributeForm;
 use Webkul\Admin\Http\Requests\MassDestroyRequest;
+use Webkul\Commercial\Repositories\CrmProductRepository;
 use Webkul\Contact\Repositories\OrganizationRepository;
 
 class OrganizationController extends Controller
@@ -19,8 +20,10 @@ class OrganizationController extends Controller
      *
      * @return void
      */
-    public function __construct(protected OrganizationRepository $organizationRepository)
-    {
+    public function __construct(
+        protected OrganizationRepository $organizationRepository,
+        protected CrmProductRepository $crmProductRepository
+    ) {
         request()->request->add(['entity_type' => 'organizations']);
     }
 
@@ -58,6 +61,18 @@ class OrganizationController extends Controller
         session()->flash('success', trans('admin::app.contacts.organizations.index.create-success'));
 
         return redirect()->route('admin.contacts.organizations.index');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(int $id): View
+    {
+        $organization = $this->organizationRepository->findOrFail($id);
+
+        $crmProducts = $this->crmProductRepository->findWhere(['is_active' => true]);
+
+        return view('admin::contacts.organizations.view', compact('organization', 'crmProducts'));
     }
 
     /**

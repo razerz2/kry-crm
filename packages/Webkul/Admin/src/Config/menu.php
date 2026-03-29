@@ -133,7 +133,7 @@ return [
         'key' => 'settings',
         'name' => 'admin::app.layouts.settings',
         'route' => 'admin.settings.index',
-        'sort' => 8,
+        'sort' => 9,
         'icon-class' => 'icon-setting',
     ], [
         'key' => 'settings.user',
@@ -278,13 +278,30 @@ return [
     ],
 
     /**
+     * Commercial Campaigns.
+     */
+    [
+        'key' => 'commercial',
+        'name' => 'admin::app.layouts.commercial',
+        'route' => 'admin.commercial.campaigns.index',
+        'sort' => 8,
+        'icon-class' => 'icon-note',
+    ], [
+        'key' => 'commercial.campaigns',
+        'name' => 'admin::app.layouts.commercial-campaigns',
+        'route' => 'admin.commercial.campaigns.index',
+        'sort' => 1,
+        'icon-class' => '',
+    ],
+
+    /**
      * Configuration.
      */
     [
         'key' => 'configuration',
         'name' => 'admin::app.layouts.configuration',
         'route' => 'admin.configuration.index',
-        'sort' => 9,
+        'sort' => 10,
         'icon-class' => 'icon-configuration',
     ],
 ];

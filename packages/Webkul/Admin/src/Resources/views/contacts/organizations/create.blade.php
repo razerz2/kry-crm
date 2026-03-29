@@ -64,6 +64,53 @@
                     ]"
                 />
 
+                {{-- Campos fiscais/comerciais --}}
+                <x-admin::form.control-group>
+                    <x-admin::form.control-group.label>
+                        CNPJ
+                    </x-admin::form.control-group.label>
+
+                    <x-admin::form.control-group.control
+                        type="text"
+                        name="cnpj"
+                        :value="old('cnpj')"
+                        placeholder="00.000.000/0000-00"
+                        maxlength="18"
+                    />
+
+                    <x-admin::form.control-group.error control-name="cnpj" />
+                </x-admin::form.control-group>
+
+                <x-admin::form.control-group>
+                    <x-admin::form.control-group.label>
+                        Razão Social
+                    </x-admin::form.control-group.label>
+
+                    <x-admin::form.control-group.control
+                        type="text"
+                        name="legal_name"
+                        :value="old('legal_name')"
+                        placeholder="Razão social conforme CNPJ"
+                    />
+
+                    <x-admin::form.control-group.error control-name="legal_name" />
+                </x-admin::form.control-group>
+
+                <x-admin::form.control-group>
+                    <x-admin::form.control-group.label>
+                        Nome Fantasia
+                    </x-admin::form.control-group.label>
+
+                    <x-admin::form.control-group.control
+                        type="text"
+                        name="trade_name"
+                        :value="old('trade_name')"
+                        placeholder="Nome fantasia"
+                    />
+
+                    <x-admin::form.control-group.error control-name="trade_name" />
+                </x-admin::form.control-group>
+
                 {!! view_render_event('admin.contacts.organizations.edit.form_controls.after') !!}
             </div>
         </div>

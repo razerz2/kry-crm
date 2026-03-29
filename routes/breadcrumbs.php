@@ -122,6 +122,12 @@ Breadcrumbs::for('contacts.organizations.create', function (BreadcrumbTrail $tra
     $trail->push(trans('admin::app.contacts.organizations.create.title'), route('admin.contacts.organizations.create'));
 });
 
+// Dashboard > Contacts > Organizations > View
+Breadcrumbs::for('contacts.organizations.view', function (BreadcrumbTrail $trail, $organization) {
+    $trail->parent('contacts.organizations');
+    $trail->push($organization->name, route('admin.contacts.organizations.view', $organization->id));
+});
+
 // Dashboard > Contacts > Organizations > Edit
 Breadcrumbs::for('contacts.organizations.edit', function (BreadcrumbTrail $trail, $organization) {
     $trail->parent('contacts.organizations');

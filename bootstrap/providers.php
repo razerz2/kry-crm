@@ -8,6 +8,7 @@ use Webkul\Activity\Providers\ActivityServiceProvider;
 use Webkul\Admin\Providers\AdminServiceProvider;
 use Webkul\Attribute\Providers\AttributeServiceProvider;
 use Webkul\Automation\Providers\WorkflowServiceProvider;
+use Webkul\Commercial\Providers\CommercialServiceProvider;
 use Webkul\Contact\Providers\ContactServiceProvider;
 use Webkul\Core\Providers\CoreServiceProvider;
 use Webkul\DataGrid\Providers\DataGridServiceProvider;
@@ -45,6 +46,7 @@ return [
     AttributeServiceProvider::class,
     WorkflowServiceProvider::class,
     ContactServiceProvider::class,
+    CommercialServiceProvider::class,
     CoreServiceProvider::class,
     DataGridServiceProvider::class,
     DataTransferServiceProvider::class,

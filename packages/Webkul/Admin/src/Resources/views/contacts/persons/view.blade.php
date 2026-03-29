@@ -81,8 +81,25 @@
             <!-- Person Attributes -->
             @include ('admin::contacts.persons.view.attributes')
 
+            <!-- CPF -->
+            @if ($person->cpf)
+                <div class="flex w-full flex-col gap-2 border-b border-gray-200 p-4 dark:border-gray-800">
+                    <div class="grid grid-cols-[1fr_2fr] items-center gap-1">
+                        <div class="label dark:text-white">CPF</div>
+                        <div class="font-medium dark:text-white">{{ $person->cpf }}</div>
+                    </div>
+                </div>
+            @endif
+
             <!-- Contact Organization -->
             @include ('admin::contacts.persons.view.organization')
+
+            <!-- Relacionamento Comercial -->
+            @include('admin::contacts.common.account-products', [
+                'entity'     => $person,
+                'entityType' => 'persons',
+                'crmProducts' => $crmProducts,
+            ])
         </div>
 
         {!! view_render_event('admin.contact.persons.view.left.after', ['person' => $person]) !!}

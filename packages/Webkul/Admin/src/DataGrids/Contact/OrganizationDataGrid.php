@@ -4,38 +4,58 @@ namespace Webkul\Admin\DataGrids\Contact;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
+use Webkul\Admin\DataGrids\Traits\CommercialDataGridTrait;
 use Webkul\Contact\Repositories\PersonRepository;
 use Webkul\DataGrid\DataGrid;
 
 class OrganizationDataGrid extends DataGrid
 {
+    use CommercialDataGridTrait;
+
+    /**
+     * Primary table for this DataGrid.
+     */
+    protected string $entityTable = 'organizations';
+
     /**
      * Create datagrid instance.
      *
      * @return void
      */
-    public function __construct(protected PersonRepository $personRepository) {}
+    public function __construct(protected PersonRepository $personRepository)
+    {
+        $this->entityMorphClass = \Webkul\Contact\Models\OrganizationProxy::modelClass();
+    }
 
     /**
      * Prepare query builder.
      */
     public function prepareQueryBuilder(): Builder
     {
-        return DB::table('organizations')
+        $queryBuilder = DB::table('organizations')
             ->addSelect(
                 'organizations.id',
                 'organizations.name',
+                'organizations.cnpj',
                 'organizations.address',
                 'organizations.created_at'
             );
+
+        $this->applyCommercialJoins($queryBuilder, [
+            'organizations.name',
+            'organizations.cnpj',
+            'organizations.address',
+            'organizations.created_at',
+        ]);
 
         if ($userIds = bouncer()->getAuthorizedUserIds()) {
             $queryBuilder->whereIn('organizations.user_id', $userIds);
         }
 
         $this->addFilter('id', 'organizations.id');
+        $this->addFilter('name', 'organizations.name');
 
-        $this->addFilter('organization', 'organizations.name');
+        return $queryBuilder;
     }
 
     /**
@@ -61,6 +81,16 @@ class OrganizationDataGrid extends DataGrid
         ]);
 
         $this->addColumn([
+            'index'      => 'cnpj',
+            'label'      => 'CNPJ',
+            'type'       => 'string',
+            'searchable' => true,
+            'filterable' => true,
+            'sortable'   => false,
+            'closure'    => fn ($row) => $row->cnpj ?? '—',
+        ]);
+
+        $this->addColumn([
             'index' => 'persons_count',
             'label' => trans('admin::app.contacts.organizations.index.datagrid.persons-count'),
             'type' => 'string',
@@ -73,6 +103,8 @@ class OrganizationDataGrid extends DataGrid
                 return $personsCount;
             },
         ]);
+
+        $this->addCommercialColumns();
 
         $this->addColumn([
             'index' => 'created_at',
@@ -91,6 +123,15 @@ class OrganizationDataGrid extends DataGrid
      */
     public function prepareActions(): void
     {
+        if (bouncer()->hasPermission('contacts.organizations.view')) {
+            $this->addAction([
+                'icon'   => 'icon-eye',
+                'title'  => trans('admin::app.contacts.organizations.index.datagrid.view'),
+                'method' => 'GET',
+                'url'    => fn ($row) => route('admin.contacts.organizations.view', $row->id),
+            ]);
+        }
+
         if (bouncer()->hasPermission('contacts.organizations.edit')) {
             $this->addAction([
                 'icon' => 'icon-edit',

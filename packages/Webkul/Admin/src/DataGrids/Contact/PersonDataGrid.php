@@ -4,17 +4,28 @@ namespace Webkul\Admin\DataGrids\Contact;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
+use Webkul\Admin\DataGrids\Traits\CommercialDataGridTrait;
 use Webkul\Contact\Repositories\OrganizationRepository;
 use Webkul\DataGrid\DataGrid;
 
 class PersonDataGrid extends DataGrid
 {
+    use CommercialDataGridTrait;
+
+    /**
+     * Primary table for this DataGrid.
+     */
+    protected string $entityTable = 'persons';
+
     /**
      * Create a new class instance.
      *
      * @return void
      */
-    public function __construct(protected OrganizationRepository $organizationRepository) {}
+    public function __construct(protected OrganizationRepository $organizationRepository)
+    {
+        $this->entityMorphClass = \Webkul\Contact\Models\PersonProxy::modelClass();
+    }
 
     /**
      * Prepare query builder.
@@ -31,6 +42,14 @@ class PersonDataGrid extends DataGrid
                 'organizations.id as organization_id'
             )
             ->leftJoin('organizations', 'persons.organization_id', '=', 'organizations.id');
+
+        $this->applyCommercialJoins($queryBuilder, [
+            'persons.name',
+            'persons.emails',
+            'persons.contact_numbers',
+            'organizations.name',
+            'organizations.id',
+        ]);
 
         if ($userIds = bouncer()->getAuthorizedUserIds()) {
             $queryBuilder->whereIn('persons.user_id', $userIds);
@@ -102,6 +121,8 @@ class PersonDataGrid extends DataGrid
                 ],
             ],
         ]);
+
+        $this->addCommercialColumns();
     }
 
     /**

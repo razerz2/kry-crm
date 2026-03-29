@@ -64,6 +64,23 @@
                     ]"
                 />
 
+                {{-- CPF --}}
+                <x-admin::form.control-group>
+                    <x-admin::form.control-group.label>
+                        CPF
+                    </x-admin::form.control-group.label>
+
+                    <x-admin::form.control-group.control
+                        type="text"
+                        name="cpf"
+                        :value="old('cpf')"
+                        placeholder="000.000.000-00"
+                        maxlength="14"
+                    />
+
+                    <x-admin::form.control-group.error control-name="cpf" />
+                </x-admin::form.control-group>
+
                 <v-organization></v-organization>
 
                 {!! view_render_event('admin.persons.create.form_controls.after') !!}

@@ -162,6 +162,11 @@ return [
         'route' => 'admin.contacts.organizations.index',
         'sort' => 2,
     ], [
+        'key' => 'contacts.organizations.view',
+        'name' => 'admin::app.acl.view',
+        'route' => 'admin.contacts.organizations.view',
+        'sort' => 0,
+    ], [
         'key' => 'contacts.organizations.create',
         'name' => 'admin::app.acl.create',
         'route' => ['admin.contacts.organizations.create', 'admin.contacts.organizations.store'],
@@ -541,6 +546,60 @@ return [
         'name' => 'admin::app.acl.delete',
         'route' => ['admin.settings.tags.delete', 'admin.settings.tags.mass_delete', 'admin.leads.tags.detach'],
         'sort' => 2,
+    ], [
+        'key' => 'commercial',
+        'name' => 'admin::app.acl.commercial',
+        'route' => 'admin.commercial.campaigns.index',
+        'sort' => 10,
+    ], [
+        'key' => 'commercial.campaigns',
+        'name' => 'admin::app.acl.commercial-campaigns',
+        'route' => 'admin.commercial.campaigns.index',
+        'sort' => 1,
+    ], [
+        'key' => 'commercial.campaigns.view',
+        'name' => 'admin::app.acl.view',
+        'route' => [
+            'admin.commercial.campaigns.show',
+            'admin.commercial.campaigns.delivery_show',
+            'admin.commercial.campaigns.recalculate_metrics',
+        ],
+        'sort' => 1,
+    ], [
+        'key' => 'commercial.campaigns.create',
+        'name' => 'admin::app.acl.create',
+        'route' => [
+            'admin.commercial.campaigns.create',
+            'admin.commercial.campaigns.store',
+            'admin.commercial.campaigns.duplicate',
+        ],
+        'sort' => 2,
+    ], [
+        'key' => 'commercial.campaigns.edit',
+        'name' => 'admin::app.acl.edit',
+        'route' => [
+            'admin.commercial.campaigns.edit',
+            'admin.commercial.campaigns.update',
+            'admin.commercial.campaigns.freeze_audience',
+            'admin.commercial.campaigns.recalculate_audience',
+            'admin.commercial.campaigns.preview_template',
+        ],
+        'sort' => 3,
+    ], [
+        'key' => 'commercial.campaigns.delete',
+        'name' => 'admin::app.acl.delete',
+        'route' => ['admin.commercial.campaigns.destroy', 'admin.commercial.campaigns.mass_destroy'],
+        'sort' => 4,
+    ], [
+        'key' => 'commercial.campaigns.dispatch',
+        'name' => 'admin::app.acl.dispatch',
+        'route' => [
+            'admin.commercial.campaigns.dispatch',
+            'admin.commercial.campaigns.mark_ready',
+            'admin.commercial.campaigns.mark_draft',
+            'admin.commercial.campaigns.deliveries',
+        ],
+        'sort' => 5,
     ], [
         'key' => 'configuration',
         'name' => 'admin::app.acl.configuration',
