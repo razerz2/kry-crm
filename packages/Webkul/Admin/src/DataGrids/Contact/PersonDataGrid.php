@@ -3,6 +3,7 @@
 namespace Webkul\Admin\DataGrids\Contact;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Webkul\Admin\DataGrids\Traits\CommercialDataGridTrait;
 use Webkul\Contact\Models\PersonProxy;
@@ -93,7 +94,7 @@ class PersonDataGrid extends DataGrid
             'sortable' => false,
             'filterable' => true,
             'searchable' => true,
-            'closure' => fn ($row) => collect(json_decode($row->emails, true) ?? [])->pluck('value')->join(', '),
+            'closure' => fn ($row) => $this->extractContactValues($row->emails)->join(', '),
         ]);
 
         $this->addColumn([
@@ -103,7 +104,7 @@ class PersonDataGrid extends DataGrid
             'sortable' => true,
             'filterable' => true,
             'searchable' => true,
-            'closure' => fn ($row) => collect(json_decode($row->contact_numbers, true) ?? [])->pluck('value')->join(', '),
+            'closure' => fn ($row) => $this->extractContactValues($row->contact_numbers)->join(', '),
         ]);
 
         $this->addColumn([
@@ -178,5 +179,33 @@ class PersonDataGrid extends DataGrid
                 'url' => route('admin.contacts.persons.mass_delete'),
             ]);
         }
+    }
+
+    /**
+     * Normalize JSON contact entries to a flat value list.
+     */
+    protected function extractContactValues(mixed $rawEntries): Collection
+    {
+        if (is_string($rawEntries)) {
+            $rawEntries = json_decode($rawEntries, true);
+        }
+
+        if (! is_array($rawEntries)) {
+            return collect();
+        }
+
+        return collect($rawEntries)
+            ->map(function ($entry) {
+                if (is_string($entry)) {
+                    return trim($entry);
+                }
+
+                if (is_array($entry)) {
+                    return trim((string) ($entry['value'] ?? ''));
+                }
+
+                return null;
+            })
+            ->filter();
     }
 }

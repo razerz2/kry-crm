@@ -1,6 +1,6 @@
 import { test, expect } from "../setup";
 import fs from "fs";
-import { generateName, getRandomDateTime, generateDescription, generateDate, generateEmail, generatePhoneNumber,generateEmailSubject } from '../utils/faker';
+import { generateName, getRandomDateTime, generateDescription, generateDate, generateEmail, generatePhoneNumber } from '../utils/faker';
 
 async function generateLead(adminPage) {
     /**
@@ -121,29 +121,6 @@ test.describe("lead management", () => {
        await expect(adminPage.getByText('Success', { exact: true })).toBeVisible();
        await expect(adminPage.locator('#app')).toContainText('Lead deleted successfully.');
       });
-
-    test("should sent a mail", async ({ adminPage }) => {
-       /**
-        * Create a new lead.
-        */
-       const lead = await generateLead(adminPage);
-
-       /**
-        * fill mail detail.
-        */
-       await openLeadByTitle(adminPage, lead.leadTitle);
-       await adminPage.getByRole('button', { name: ' Mail' }).click();
-       await adminPage.fill('input[name="temp-reply_to"]', generateEmail());
-       await adminPage.fill('input[name="subject"]', generateEmailSubject());
-       await adminPage.fill('textarea[name="reply"]', generateDescription());
-   
-       /**
-        * Sending mail and closing the modal.
-        */
-       await adminPage.getByRole('button', { name: 'Send' }).click();
-   
-       await expect(adminPage.getByText('Email sent successfully.')).toBeVisible();
-   });
 
    test("should able to upload file in  lead", async ({ adminPage }) => {
     /**

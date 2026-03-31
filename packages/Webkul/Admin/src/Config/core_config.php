@@ -87,42 +87,6 @@ return [
                 'default' => 'Quotes',
                 'validation' => 'max:20',
             ], [
-                'name' => 'mail.mail',
-                'title' => 'admin::app.configuration.index.general.settings.menu.mail',
-                'type' => 'text',
-                'default' => 'Mail',
-                'validation' => 'max:20',
-            ], [
-                'name' => 'mail.inbox',
-                'title' => 'admin::app.configuration.index.general.settings.menu.inbox',
-                'type' => 'text',
-                'default' => 'Inbox',
-                'validation' => 'max:20',
-            ], [
-                'name' => 'mail.draft',
-                'title' => 'admin::app.configuration.index.general.settings.menu.draft',
-                'type' => 'text',
-                'default' => 'Draft',
-                'validation' => 'max:20',
-            ], [
-                'name' => 'mail.outbox',
-                'title' => 'admin::app.configuration.index.general.settings.menu.outbox',
-                'type' => 'text',
-                'default' => 'Outbox',
-                'validation' => 'max:20',
-            ], [
-                'name' => 'mail.sent',
-                'title' => 'admin::app.configuration.index.general.settings.menu.sent',
-                'type' => 'text',
-                'default' => 'Sent',
-                'validation' => 'max:20',
-            ], [
-                'name' => 'mail.trash',
-                'title' => 'admin::app.configuration.index.general.settings.menu.trash',
-                'type' => 'text',
-                'default' => 'Trash',
-                'validation' => 'max:20',
-            ], [
                 'name' => 'activities',
                 'title' => 'admin::app.configuration.index.general.settings.menu.activities',
                 'type' => 'text',
@@ -253,62 +217,4 @@ return [
         ],
     ],
 
-    /**
-     * Email.
-     */
-    [
-        'key' => 'email',
-        'name' => 'admin::app.configuration.index.email.title',
-        'info' => 'admin::app.configuration.index.email.info',
-        'sort' => 2,
-    ], [
-        'key' => 'email.imap',
-        'name' => 'admin::app.configuration.index.email.imap.title',
-        'info' => 'admin::app.configuration.index.email.imap.info',
-        'icon' => 'icon-setting',
-        'sort' => 1,
-    ], [
-        'key' => 'email.imap.account',
-        'name' => 'admin::app.configuration.index.email.imap.account.title',
-        'info' => 'admin::app.configuration.index.email.imap.account.title-info',
-        'sort' => 1,
-        'fields' => [
-            [
-                'name' => 'host',
-                'title' => 'admin::app.configuration.index.email.imap.account.host',
-                'type' => 'text',
-                'default' => config('imap.accounts.default.host'),
-            ],
-            [
-                'name' => 'port',
-                'title' => 'admin::app.configuration.index.email.imap.account.port',
-                'type' => 'text',
-                'default' => config('imap.accounts.default.port'),
-            ],
-            [
-                'name' => 'encryption',
-                'title' => 'admin::app.configuration.index.email.imap.account.encryption',
-                'type' => 'text',
-                'default' => config('imap.accounts.default.encryption'),
-            ],
-            [
-                'name' => 'validate_cert',
-                'title' => 'admin::app.configuration.index.email.imap.account.validate-cert',
-                'type' => 'boolean',
-                'default' => config('imap.accounts.default.validate_cert'),
-            ],
-            [
-                'name' => 'username',
-                'title' => 'admin::app.configuration.index.email.imap.account.username',
-                'type' => 'text',
-                'default' => config('imap.accounts.default.username'),
-            ],
-            [
-                'name' => 'password',
-                'title' => 'admin::app.configuration.index.email.imap.account.password',
-                'type' => 'password',
-                'default' => config('imap.accounts.default.password'),
-            ],
-        ],
-    ],
 ];

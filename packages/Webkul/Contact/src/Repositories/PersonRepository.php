@@ -63,7 +63,7 @@ class PersonRepository extends Repository
             $data['organization_id'] = $organization->id;
         }
 
-        if (isset($data['user_id'])) {
+        if (array_key_exists('user_id', $data)) {
             $data['user_id'] = $data['user_id'] ?: null;
         }
 
@@ -83,9 +83,13 @@ class PersonRepository extends Repository
      */
     public function update(array $data, $id, $attributes = [])
     {
-        $data = $this->sanitizeRequestedPersonData($data);
+        $existingPerson = $this->findOrFail($id);
 
-        $data['user_id'] = empty($data['user_id']) ? null : $data['user_id'];
+        $data = $this->sanitizeRequestedPersonData($data, $existingPerson);
+
+        if (array_key_exists('user_id', $data)) {
+            $data['user_id'] = empty($data['user_id']) ? null : $data['user_id'];
+        }
 
         if (! empty($data['organization_name'])) {
             $organization = $this->fetchOrCreateOrganizationByName($data['organization_name']);
@@ -156,8 +160,16 @@ class PersonRepository extends Repository
     /**
      * Sanitize requested person data and return the clean array.
      */
-    private function sanitizeRequestedPersonData(array $data): array
+    private function sanitizeRequestedPersonData(array $data, ?Person $existingPerson = null): array
     {
+        if (array_key_exists('emails', $data)) {
+            $data['emails'] = $this->sanitizeContactEntries($data['emails']);
+        }
+
+        if (array_key_exists('contact_numbers', $data)) {
+            $data['contact_numbers'] = $this->sanitizeContactEntries($data['contact_numbers']);
+        }
+
         if (
             array_key_exists('organization_id', $data)
             && empty($data['organization_id'])
@@ -165,20 +177,76 @@ class PersonRepository extends Repository
             $data['organization_id'] = null;
         }
 
+        $resolvedUserId = array_key_exists('user_id', $data)
+            ? $data['user_id']
+            : $existingPerson?->user_id;
+
+        $resolvedOrganizationId = array_key_exists('organization_id', $data)
+            ? $data['organization_id']
+            : $existingPerson?->organization_id;
+
+        $resolvedEmails = array_key_exists('emails', $data)
+            ? $data['emails']
+            : $this->sanitizeContactEntries($existingPerson?->emails);
+
+        $resolvedContactNumbers = array_key_exists('contact_numbers', $data)
+            ? $data['contact_numbers']
+            : $this->sanitizeContactEntries($existingPerson?->contact_numbers);
+
         $uniqueIdParts = array_filter([
-            $data['user_id'] ?? null,
-            $data['organization_id'] ?? null,
-            $data['emails'][0]['value'] ?? null,
+            $resolvedUserId,
+            $resolvedOrganizationId,
+            $resolvedEmails[0]['value'] ?? null,
         ]);
 
         $data['unique_id'] = implode('|', $uniqueIdParts);
 
-        if (isset($data['contact_numbers'])) {
-            $data['contact_numbers'] = collect($data['contact_numbers'])->filter(fn ($number) => ! is_null($number['value']))->toArray();
-
-            $data['unique_id'] .= '|'.$data['contact_numbers'][0]['value'];
+        if (! empty($resolvedContactNumbers)) {
+            $data['unique_id'] .= '|'.$resolvedContactNumbers[0]['value'];
         }
 
         return $data;
+    }
+
+    /**
+     * Normalize email/phone entries to [{value, label}] format.
+     */
+    private function sanitizeContactEntries(mixed $entries): array
+    {
+        if (! is_array($entries)) {
+            return [];
+        }
+
+        return collect($entries)
+            ->map(function ($entry) {
+                if (is_string($entry)) {
+                    $value = trim($entry);
+
+                    return $value === ''
+                        ? null
+                        : [
+                            'value' => $value,
+                            'label' => 'work',
+                        ];
+                }
+
+                if (! is_array($entry)) {
+                    return null;
+                }
+
+                $value = trim((string) ($entry['value'] ?? ''));
+
+                if ($value === '') {
+                    return null;
+                }
+
+                return [
+                    'value' => $value,
+                    'label' => $entry['label'] ?? 'work',
+                ];
+            })
+            ->filter()
+            ->values()
+            ->all();
     }
 }

@@ -4,6 +4,7 @@ namespace Webkul\Admin\DataGrids\Traits;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Webkul\Commercial\Enums\AccountProductStatus;
 
 /**
@@ -33,9 +34,9 @@ trait CommercialDataGridTrait
     protected string $entityMorphClass;
 
     /**
-     * The primary table name ('persons' or 'organizations').
+     * Cache the commercial schema availability lookup for this request lifecycle.
      */
-    protected string $entityTable;
+    protected ?bool $commercialSchemaReady = null;
 
     /**
      * Apply commercial LEFT JOINs and aggregate SELECT columns to the query builder.
@@ -45,6 +46,10 @@ trait CommercialDataGridTrait
      */
     protected function applyCommercialJoins(Builder $queryBuilder, array $additionalGroupBy = []): Builder
     {
+        if (! $this->isCommercialSchemaReady()) {
+            return $queryBuilder;
+        }
+
         $entityMorphClass = addslashes($this->entityMorphClass);
 
         $queryBuilder
@@ -86,6 +91,10 @@ trait CommercialDataGridTrait
      */
     protected function addCommercialColumns(): void
     {
+        if (! $this->isCommercialSchemaReady()) {
+            return;
+        }
+
         $this->addColumn([
             'index' => 'commercial_product',
             'label' => 'Produto',
@@ -172,6 +181,10 @@ trait CommercialDataGridTrait
         // Let the parent handle all standard filters
         parent::processRequestedFilters($requestedFilters);
 
+        if (! $this->isCommercialSchemaReady()) {
+            return $this->queryBuilder;
+        }
+
         // Now apply commercial filters via EXISTS subqueries
         foreach ($commercialFilters as $filterKey => $filterValues) {
             $this->applyCommercialFilter($filterKey, $filterValues);
@@ -185,6 +198,10 @@ trait CommercialDataGridTrait
      */
     protected function applyCommercialFilter(string $filterKey, mixed $filterValues): void
     {
+        if (! $this->isCommercialSchemaReady()) {
+            return;
+        }
+
         $values = is_array($filterValues) ? $filterValues : [$filterValues];
         $entityMorphClass = $this->entityMorphClass;
         $entityTable = $this->entityTable;
@@ -226,6 +243,10 @@ trait CommercialDataGridTrait
      */
     protected function applySegmentFilter(array $values): void
     {
+        if (! $this->isCommercialSchemaReady()) {
+            return;
+        }
+
         $entityMorphClass = $this->entityMorphClass;
         $entityTable = $this->entityTable;
 
@@ -277,6 +298,10 @@ trait CommercialDataGridTrait
      */
     protected function getProductFilterOptions(): array
     {
+        if (! $this->isCommercialSchemaReady()) {
+            return [];
+        }
+
         return DB::table('crm_products')
             ->where('is_active', true)
             ->orderBy('name')
@@ -342,5 +367,33 @@ trait CommercialDataGridTrait
                 return '<span class="inline-block rounded-full px-2 py-0.5 text-xs font-medium '.$color.'">'.e($label).'</span>';
             })
             ->join(' ');
+    }
+
+    /**
+     * Determine if all required commercial tables/columns are available.
+     */
+    protected function isCommercialSchemaReady(): bool
+    {
+        if ($this->commercialSchemaReady !== null) {
+            return $this->commercialSchemaReady;
+        }
+
+        if (! Schema::hasTable('account_products') || ! Schema::hasTable('crm_products')) {
+            return $this->commercialSchemaReady = false;
+        }
+
+        foreach (['id', 'entity_id', 'entity_type', 'crm_product_id', 'status'] as $column) {
+            if (! Schema::hasColumn('account_products', $column)) {
+                return $this->commercialSchemaReady = false;
+            }
+        }
+
+        foreach (['id', 'name', 'is_active'] as $column) {
+            if (! Schema::hasColumn('crm_products', $column)) {
+                return $this->commercialSchemaReady = false;
+            }
+        }
+
+        return $this->commercialSchemaReady = true;
     }
 }

@@ -203,9 +203,23 @@ class Core
      */
     public function currencySymbol($code)
     {
-        $formatter = new \NumberFormatter(app()->getLocale().'@currency='.$code, \NumberFormatter::CURRENCY);
+        $code = strtoupper((string) ($code ?: config('app.currency')));
 
-        return $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);
+        if (class_exists(\NumberFormatter::class)) {
+            try {
+                $formatter = new \NumberFormatter(app()->getLocale().'@currency='.$code, \NumberFormatter::CURRENCY);
+
+                $symbol = $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);
+
+                if (is_string($symbol) && $symbol !== '') {
+                    return $symbol;
+                }
+            } catch (\Throwable $exception) {
+                // Fallback handled below when intl data/locale is unavailable.
+            }
+        }
+
+        return $this->fallbackCurrencySymbol($code);
     }
 
     /**
@@ -221,9 +235,135 @@ class Core
             $price = 0;
         }
 
-        $formatter = new \NumberFormatter(app()->getLocale(), \NumberFormatter::CURRENCY);
+        $currencyCode = strtoupper((string) config('app.currency', 'USD'));
 
-        return $formatter->formatCurrency($price, config('app.currency'));
+        if (class_exists(\NumberFormatter::class)) {
+            try {
+                $formatter = new \NumberFormatter(app()->getLocale(), \NumberFormatter::CURRENCY);
+
+                $formatted = $formatter->formatCurrency((float) $price, $currencyCode);
+
+                if ($formatted !== false) {
+                    return $formatted;
+                }
+            } catch (\Throwable $exception) {
+                // Fallback handled below when intl data/locale is unavailable.
+            }
+        }
+
+        return $this->fallbackCurrencySymbol($currencyCode).' '.number_format((float) $price, 2, '.', ',');
+    }
+
+    /**
+     * Resolve a safe currency symbol when intl extension is unavailable.
+     */
+    protected function fallbackCurrencySymbol(string $code): string
+    {
+        $configuredSymbol = $this->configuredCurrencySymbol($code);
+
+        if ($configuredSymbol !== null) {
+            return $configuredSymbol;
+        }
+
+        return match ($code) {
+            'AED' => 'AED',
+            'ARS' => '$',
+            'AUD' => '$',
+            'BDT' => 'BDT',
+            'BRL' => 'R$',
+            'CAD' => '$',
+            'CHF' => 'CHF',
+            'CLP' => '$',
+            'CNY' => 'CNY',
+            'COP' => '$',
+            'CZK' => 'CZK',
+            'DKK' => 'kr',
+            'DZD' => 'DZD',
+            'EGP' => 'EGP',
+            'EUR' => 'EUR',
+            'FJD' => '$',
+            'GBP' => 'GBP',
+            'HKD' => '$',
+            'HUF' => 'Ft',
+            'IDR' => 'Rp',
+            'ILS' => 'ILS',
+            'INR' => 'INR',
+            'JOD' => 'JD',
+            'JPY' => 'JPY',
+            'KRW' => 'KRW',
+            'KWD' => 'KD',
+            'KZT' => 'KZT',
+            'LBP' => 'LBP',
+            'LKR' => 'Rs',
+            'LYD' => 'LYD',
+            'MAD' => 'MAD',
+            'MUR' => 'MUR',
+            'MXN' => '$',
+            'MYR' => 'RM',
+            'NGN' => 'NGN',
+            'NOK' => 'kr',
+            'NPR' => 'NPR',
+            'NZD' => '$',
+            'OMR' => 'OMR',
+            'PAB' => 'B/.',
+            'PEN' => 'S/',
+            'PHP' => 'PHP',
+            'PKR' => 'PKR',
+            'PLN' => 'PLN',
+            'PYG' => 'PYG',
+            'QAR' => 'QAR',
+            'RON' => 'lei',
+            'RUB' => 'RUB',
+            'SAR' => 'SAR',
+            'SEK' => 'kr',
+            'SGD' => '$',
+            'THB' => 'THB',
+            'TND' => 'DT',
+            'TRY' => 'TRY',
+            'TWD' => 'NT$',
+            'UAH' => 'UAH',
+            'USD' => '$',
+            'UZS' => 'UZS',
+            'VEF' => 'Bs',
+            'VND' => 'VND',
+            'XAF' => 'FCFA',
+            'XOF' => 'CFA',
+            'ZAR' => 'R',
+            'ZMW' => 'ZK',
+            default => $code,
+        };
+    }
+
+    /**
+     * Return custom configured symbol when available.
+     */
+    protected function configuredCurrencySymbol(string $code): ?string
+    {
+        $code = strtoupper($code);
+
+        $configuredSymbols = config('app.currency_symbols');
+
+        if (
+            is_array($configuredSymbols)
+            && isset($configuredSymbols[$code])
+            && is_string($configuredSymbols[$code])
+            && trim($configuredSymbols[$code]) !== ''
+        ) {
+            return trim($configuredSymbols[$code]);
+        }
+
+        $appCurrencyCode = strtoupper((string) config('app.currency'));
+        $appCurrencySymbol = config('app.currency_symbol');
+
+        if (
+            $appCurrencyCode === $code
+            && is_string($appCurrencySymbol)
+            && trim($appCurrencySymbol) !== ''
+        ) {
+            return trim($appCurrencySymbol);
+        }
+
+        return null;
     }
 
     /**

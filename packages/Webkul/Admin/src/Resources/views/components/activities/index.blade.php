@@ -202,22 +202,31 @@
                                             class="flex flex-wrap gap-2"
                                             v-if="activity.files.length"
                                         >
-                                            <a
-                                                :href="
-                                                    activity.type == 'email'
-                                                    ? `{{ route('admin.mail.attachment_download', 'replaceID') }}`.replace('replaceID', file.id)
-                                                    : `{{ route('admin.activities.file_download', 'replaceID') }}`.replace('replaceID', file.id)
-                                                "
-                                                class="flex cursor-pointer items-center gap-1 rounded-md p-1.5"
-                                                target="_blank"
-                                                v-for="(file, index) in activity.files"
-                                            >
-                                                <span class="icon-attached-file text-xl"></span>
+                                            <template v-for="(file, index) in activity.files">
+                                                <a
+                                                    v-if="activity.type != 'email'"
+                                                    :href="`{{ route('admin.activities.file_download', 'replaceID') }}`.replace('replaceID', file.id)"
+                                                    class="flex cursor-pointer items-center gap-1 rounded-md p-1.5"
+                                                    target="_blank"
+                                                >
+                                                    <span class="icon-attached-file text-xl"></span>
 
-                                                <span class="font-medium text-brandColor">
-                                                    @{{ file.name }}
+                                                    <span class="font-medium text-brandColor">
+                                                        @{{ file.name }}
+                                                    </span>
+                                                </a>
+
+                                                <span
+                                                    v-else
+                                                    class="flex items-center gap-1 rounded-md p-1.5"
+                                                >
+                                                    <span class="icon-attached-file text-xl"></span>
+
+                                                    <span class="font-medium text-gray-600 dark:text-gray-300">
+                                                        @{{ file.name }}
+                                                    </span>
                                                 </span>
-                                            </a>
+                                            </template>
                                         </div>
 
                                         {!! view_render_event('admin.components.activities.content.activity.item.attachments.after') !!}
@@ -237,7 +246,7 @@
                                     {!! view_render_event('admin.components.activities.content.activity.item.more_actions.before') !!}
 
                                     <!-- Activity More Options -->
-                                    <template v-if="activity.type != 'system'">
+                                    <template v-if="! ['system', 'email'].includes(activity.type)">
                                         {!! view_render_event('admin.components.activities.content.activity.item.more_actions.dropdown.after') !!}
 
                                         <x-admin::dropdown position="bottom-{{ in_array(app()->getLocale(), ['fa', 'ar']) ? 'left' : 'right' }}">
@@ -260,66 +269,40 @@
                                             <x-slot:menu class="!min-w-40">
                                                 {!! view_render_event('admin.components.activities.content.activity.item.more_actions.dropdown.menu_item.before') !!}
 
-                                                <template v-if="activity.type != 'email'">
-                                                    @if (bouncer()->hasPermission('activities.edit'))
-                                                        <x-admin::dropdown.menu.item
-                                                            v-if="! activity.is_done && ['call', 'meeting', 'lunch'].includes(activity.type)"
-                                                            @click="markAsDone(activity)"
-                                                        >
-                                                            <div class="flex items-center gap-2">
-                                                                <span class="icon-tick text-2xl"></span>
-
-                                                                @lang('admin::app.components.activities.index.mark-as-done')
-                                                            </div>
-                                                        </x-admin::dropdown.menu.item>
-
-                                                        <x-admin::dropdown.menu.item v-if="['call', 'meeting', 'lunch'].includes(activity.type)">
-                                                            <a
-                                                                class="flex items-center gap-2"
-                                                                :href="'{{ route('admin.activities.edit', 'replaceId') }}'.replace('replaceId', activity.id)"
-                                                                target="_blank"
-                                                            >
-                                                                <span class="icon-edit text-2xl"></span>
-
-                                                                @lang('admin::app.components.activities.index.edit')
-                                                            </a>
-                                                        </x-admin::dropdown.menu.item>
-                                                    @endif
-
-                                                    @if (bouncer()->hasPermission('activities.delete'))
-                                                        <x-admin::dropdown.menu.item @click="remove(activity)">
-                                                            <div class="flex items-center gap-2">
-                                                                <span class="icon-delete text-2xl"></span>
-
-                                                                @lang('admin::app.components.activities.index.delete')
-                                                            </div>
-                                                        </x-admin::dropdown.menu.item>
-                                                    @endif
-                                                </template>
-
-                                                <template v-else>
-                                                    @if (bouncer()->hasPermission('mail.view'))
-                                                        <x-admin::dropdown.menu.item>
-                                                            <a
-                                                                :href="'{{ route('admin.mail.view', ['route' => 'replaceFolder', 'id' => 'replaceMailId']) }}'.replace('replaceFolder', activity.additional.folders[0]).replace('replaceMailId', activity.id)"
-                                                                class="flex items-center gap-2"
-                                                                target="_blank"
-                                                            >
-                                                                <span class="icon-eye text-2xl"></span>
-
-                                                                @lang('admin::app.components.activities.index.view')
-                                                            </a>
-                                                        </x-admin::dropdown.menu.item>
-                                                    @endif
-
-                                                    <x-admin::dropdown.menu.item @click="unlinkEmail(activity)">
+                                                @if (bouncer()->hasPermission('activities.edit'))
+                                                    <x-admin::dropdown.menu.item
+                                                        v-if="! activity.is_done && ['call', 'meeting', 'lunch'].includes(activity.type)"
+                                                        @click="markAsDone(activity)"
+                                                    >
                                                         <div class="flex items-center gap-2">
-                                                            <span class="icon-attachment text-2xl"></span>
+                                                            <span class="icon-tick text-2xl"></span>
 
-                                                            @lang('admin::app.components.activities.index.unlink')
+                                                            @lang('admin::app.components.activities.index.mark-as-done')
                                                         </div>
                                                     </x-admin::dropdown.menu.item>
-                                                </template>
+
+                                                    <x-admin::dropdown.menu.item v-if="['call', 'meeting', 'lunch'].includes(activity.type)">
+                                                        <a
+                                                            class="flex items-center gap-2"
+                                                            :href="'{{ route('admin.activities.edit', 'replaceId') }}'.replace('replaceId', activity.id)"
+                                                            target="_blank"
+                                                        >
+                                                            <span class="icon-edit text-2xl"></span>
+
+                                                            @lang('admin::app.components.activities.index.edit')
+                                                        </a>
+                                                    </x-admin::dropdown.menu.item>
+                                                @endif
+
+                                                @if (bouncer()->hasPermission('activities.delete'))
+                                                    <x-admin::dropdown.menu.item @click="remove(activity)">
+                                                        <div class="flex items-center gap-2">
+                                                            <span class="icon-delete text-2xl"></span>
+
+                                                            @lang('admin::app.components.activities.index.delete')
+                                                        </div>
+                                                    </x-admin::dropdown.menu.item>
+                                                @endif
 
                                                 {!! view_render_event('admin.components.activities.content.activity.item.more_actions.dropdown.menu_item.after') !!}
                                             </x-slot>
@@ -605,35 +588,6 @@
                     });
                 },
 
-                unlinkEmail(activity) {
-                    this.$emitter.emit('open-confirm-modal', {
-                        agree: () => {
-                            let emailId = activity.parent_id ?? activity.id;
-
-                            this.$axios.delete(this.emailDetachEndpoint, {
-                                    data: {
-                                        email_id: emailId,
-                                    }
-                                })
-                                .then((response) => {
-                                    let relatedActivities = this.activities.filter(activity => activity.parent_id == emailId || activity.id == emailId);
-
-                                    relatedActivities.forEach(activity => {
-                                        const index = this.activities.findIndex(a => a === activity);
-
-                                        if (index !== -1) {
-                                            this.activities.splice(index, 1);
-                                        }
-                                    });
-
-                                    this.$emitter.emit('add-flash', { type: 'success', message: response.data.message });
-                                })
-                                .catch((error) => {
-                                    this.$emitter.emit('add-flash', { type: 'error', message: error.response.data.message });
-                                });
-                        }
-                    });
-                },
             },
         });
     </script>

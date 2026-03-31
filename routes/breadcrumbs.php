@@ -50,24 +50,6 @@ Breadcrumbs::for('quotes.edit', function (BreadcrumbTrail $trail, $quote) {
     $trail->push(trans('admin::app.quotes.edit.title'), route('admin.quotes.edit', $quote->id));
 });
 
-// Mail
-Breadcrumbs::for('mail', function (BreadcrumbTrail $trail) {
-    $trail->parent('dashboard');
-    $trail->push(trans('admin::app.layouts.mail.title'), route('admin.mail.index', ['route' => 'inbox']));
-});
-
-// Mail > [Compose | Inbox | Outbox | Draft | Sent | Trash]
-Breadcrumbs::for('mail.route', function (BreadcrumbTrail $trail, $route) {
-    $trail->parent('mail');
-    $trail->push(trans('admin::app.mail.index.'.$route), route('admin.mail.index', ['route' => $route]));
-});
-
-// Mail > [Inbox | Outbox | Draft | Sent | Trash] > Title
-Breadcrumbs::for('mail.route.view', function (BreadcrumbTrail $trail, $route, $email) {
-    $trail->parent('mail.route', $route);
-    $trail->push($email->subject ?? '', route('admin.mail.view', ['route' => $route, 'id' => $email->id]));
-});
-
 // Dashboard > Activities
 Breadcrumbs::for('activities', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');

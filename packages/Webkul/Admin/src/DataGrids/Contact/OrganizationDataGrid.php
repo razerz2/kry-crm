@@ -3,7 +3,9 @@
 namespace Webkul\Admin\DataGrids\Contact;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Webkul\Admin\DataGrids\Traits\CommercialDataGridTrait;
 use Webkul\Contact\Models\OrganizationProxy;
 use Webkul\Contact\Repositories\PersonRepository;
@@ -12,6 +14,11 @@ use Webkul\DataGrid\DataGrid;
 class OrganizationDataGrid extends DataGrid
 {
     use CommercialDataGridTrait;
+
+    /**
+     * Whether organization JSON contact columns are available.
+     */
+    protected bool $hasContactColumns = false;
 
     /**
      * Primary table for this DataGrid.
@@ -26,6 +33,9 @@ class OrganizationDataGrid extends DataGrid
     public function __construct(protected PersonRepository $personRepository)
     {
         $this->entityMorphClass = OrganizationProxy::modelClass();
+
+        $this->hasContactColumns = Schema::hasColumn('organizations', 'emails')
+            && Schema::hasColumn('organizations', 'contact_numbers');
     }
 
     /**
@@ -42,12 +52,31 @@ class OrganizationDataGrid extends DataGrid
                 'organizations.created_at'
             );
 
-        $this->applyCommercialJoins($queryBuilder, [
+        if ($this->hasContactColumns) {
+            $queryBuilder->addSelect(
+                'organizations.emails',
+                'organizations.contact_numbers'
+            );
+        } else {
+            $queryBuilder->addSelect(
+                DB::raw('NULL as emails'),
+                DB::raw('NULL as contact_numbers')
+            );
+        }
+
+        $commercialGroupByColumns = [
             'organizations.name',
             'organizations.cnpj',
             'organizations.address',
             'organizations.created_at',
-        ]);
+        ];
+
+        if ($this->hasContactColumns) {
+            $commercialGroupByColumns[] = 'organizations.emails';
+            $commercialGroupByColumns[] = 'organizations.contact_numbers';
+        }
+
+        $this->applyCommercialJoins($queryBuilder, $commercialGroupByColumns);
 
         if ($userIds = bouncer()->getAuthorizedUserIds()) {
             $queryBuilder->whereIn('organizations.user_id', $userIds);
@@ -88,7 +117,27 @@ class OrganizationDataGrid extends DataGrid
             'searchable' => true,
             'filterable' => true,
             'sortable' => false,
-            'closure' => fn ($row) => $row->cnpj ?? '—',
+            'closure' => fn ($row) => $row->cnpj ?? '-',
+        ]);
+
+        $this->addColumn([
+            'index' => 'emails',
+            'label' => trans('admin::app.contacts.persons.index.datagrid.emails'),
+            'type' => 'string',
+            'searchable' => $this->hasContactColumns,
+            'filterable' => $this->hasContactColumns,
+            'sortable' => false,
+            'closure' => fn ($row) => $this->getPrimaryContactValue($row->emails),
+        ]);
+
+        $this->addColumn([
+            'index' => 'contact_numbers',
+            'label' => trans('admin::app.contacts.persons.index.datagrid.contact-numbers'),
+            'type' => 'string',
+            'searchable' => $this->hasContactColumns,
+            'filterable' => $this->hasContactColumns,
+            'sortable' => false,
+            'closure' => fn ($row) => $this->getPrimaryContactValue($row->contact_numbers),
         ]);
 
         $this->addColumn([
@@ -163,5 +212,41 @@ class OrganizationDataGrid extends DataGrid
             'method' => 'PUT',
             'url' => route('admin.contacts.organizations.mass_delete'),
         ]);
+    }
+
+    /**
+     * Return the first non-empty contact value.
+     */
+    protected function getPrimaryContactValue(mixed $rawEntries): string
+    {
+        return $this->extractContactValues($rawEntries)->first() ?? '-';
+    }
+
+    /**
+     * Normalize JSON contact entries to a flat value list.
+     */
+    protected function extractContactValues(mixed $rawEntries): Collection
+    {
+        if (is_string($rawEntries)) {
+            $rawEntries = json_decode($rawEntries, true);
+        }
+
+        if (! is_array($rawEntries)) {
+            return collect();
+        }
+
+        return collect($rawEntries)
+            ->map(function ($entry) {
+                if (is_string($entry)) {
+                    return trim($entry);
+                }
+
+                if (is_array($entry)) {
+                    return trim((string) ($entry['value'] ?? ''));
+                }
+
+                return null;
+            })
+            ->filter();
     }
 }

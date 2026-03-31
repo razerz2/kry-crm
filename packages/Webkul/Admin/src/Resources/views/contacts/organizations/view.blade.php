@@ -3,6 +3,38 @@
         @lang('admin::app.contacts.organizations.view.title', ['name' => $organization->name])
     </x-slot>
 
+    @php
+        $organizationEmails = collect($organization->emails ?? [])
+            ->map(function ($email) {
+                if (is_string($email)) {
+                    return trim($email);
+                }
+
+                if (is_array($email)) {
+                    return trim((string) ($email['value'] ?? ''));
+                }
+
+                return null;
+            })
+            ->filter()
+            ->values();
+
+        $organizationContactNumbers = collect($organization->contact_numbers ?? [])
+            ->map(function ($number) {
+                if (is_string($number)) {
+                    return trim($number);
+                }
+
+                if (is_array($number)) {
+                    return trim((string) ($number['value'] ?? ''));
+                }
+
+                return null;
+            })
+            ->filter()
+            ->values();
+    @endphp
+
     <div class="flex gap-4 max-lg:flex-wrap">
         <!-- Left Panel -->
         <div class="max-lg:min-w-full max-lg:max-w-full lg:sticky lg:top-[73px] flex min-w-[394px] max-w-[394px] flex-col self-start rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 [&>div:last-child]:border-b-0">
@@ -90,6 +122,45 @@
                 </x-admin::accordion>
             </div>
 
+            <!-- Contact info -->
+            <div class="flex w-full flex-col gap-2 border-b border-gray-200 p-4 dark:border-gray-800">
+                <x-admin::accordion class="select-none !border-none">
+                    <x-slot:header class="!p-0">
+                        <h4 class="font-semibold dark:text-white">Informacoes de Contato</h4>
+                    </x-slot>
+
+                    <x-slot:content class="mt-3 !px-0 !pb-0">
+                        <div class="flex flex-col gap-2">
+                            @if ($organizationEmails->isNotEmpty())
+                                <div class="grid grid-cols-[1fr_2fr] items-start gap-1">
+                                    <div class="label dark:text-white">Emails</div>
+                                    <div class="flex flex-col gap-0.5 font-medium dark:text-white">
+                                        @foreach ($organizationEmails as $email)
+                                            <span>{{ $email }}</span>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+
+                            @if ($organizationContactNumbers->isNotEmpty())
+                                <div class="grid grid-cols-[1fr_2fr] items-start gap-1">
+                                    <div class="label dark:text-white">Telefones</div>
+                                    <div class="flex flex-col gap-0.5 font-medium dark:text-white">
+                                        @foreach ($organizationContactNumbers as $contactNumber)
+                                            <span>{{ $contactNumber }}</span>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+
+                            @if ($organizationEmails->isEmpty() && $organizationContactNumbers->isEmpty())
+                                <p class="text-sm text-gray-400 dark:text-gray-500">Nenhuma informacao de contato.</p>
+                            @endif
+                        </div>
+                    </x-slot>
+                </x-admin::accordion>
+            </div>
+
             <!-- Persons vinculadas -->
             @if ($organization->persons->isNotEmpty())
                 <div class="flex w-full flex-col gap-2 border-b border-gray-200 p-4 dark:border-gray-800">
@@ -144,7 +215,7 @@
                                 class="text-sm text-brandColor hover:underline"
                             >
                                 {{ $person->name }}
-                                @if ($person->job_title) — {{ $person->job_title }} @endif
+                                @if ($person->job_title) - {{ $person->job_title }} @endif
                             </a>
                         @endforeach
                     </div>

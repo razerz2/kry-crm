@@ -57,56 +57,6 @@ return [
         'route' => ['admin.quotes.delete', 'admin.quotes.mass_delete'],
         'sort' => 4,
     ], [
-        'key' => 'mail',
-        'name' => 'admin::app.acl.mail',
-        'route' => 'admin.mail.index',
-        'sort' => 4,
-    ], [
-        'key' => 'mail.inbox',
-        'name' => 'admin::app.acl.inbox',
-        'route' => 'admin.mail.index',
-        'sort' => 1,
-    ], [
-        'key' => 'mail.draft',
-        'name' => 'admin::app.acl.draft',
-        'route' => 'admin.mail.index',
-        'sort' => 2,
-    ], [
-        'key' => 'mail.outbox',
-        'name' => 'admin::app.acl.outbox',
-        'route' => 'admin.mail.index',
-        'sort' => 3,
-    ], [
-        'key' => 'mail.sent',
-        'name' => 'admin::app.acl.sent',
-        'route' => 'admin.mail.index',
-        'sort' => 4,
-    ], [
-        'key' => 'mail.trash',
-        'name' => 'admin::app.acl.trash',
-        'route' => 'admin.mail.index',
-        'sort' => 5,
-    ], [
-        'key' => 'mail.compose',
-        'name' => 'admin::app.acl.create',
-        'route' => ['admin.mail.store'],
-        'sort' => 6,
-    ], [
-        'key' => 'mail.view',
-        'name' => 'admin::app.acl.view',
-        'route' => 'admin.mail.view',
-        'sort' => 7,
-    ], [
-        'key' => 'mail.edit',
-        'name' => 'admin::app.acl.edit',
-        'route' => 'admin.mail.update',
-        'sort' => 8,
-    ], [
-        'key' => 'mail.delete',
-        'name' => 'admin::app.acl.delete',
-        'route' => ['admin.mail.delete', 'admin.mail.mass_delete'],
-        'sort' => 9,
-    ], [
         'key' => 'activities',
         'name' => 'admin::app.acl.activities',
         'route' => 'admin.activities.index',
