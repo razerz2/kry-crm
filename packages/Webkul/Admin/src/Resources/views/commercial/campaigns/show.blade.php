@@ -16,6 +16,11 @@
                         $statusClass = match($campaign->status) {
                             'draft'          => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
                             'ready'          => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+                            'scheduled'      => 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
+                            'running'        => 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200',
+                            'paused'         => 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+                            'completed'      => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+                            'canceled'       => 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
                             'sending'        => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
                             'sent'           => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
                             'partially_sent' => 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
@@ -39,6 +44,12 @@
                 @if (bouncer()->hasPermission('commercial.campaigns.dispatch') && ($campaign->total_deliveries > 0 || $campaign->isLocked()))
                     <a href="{{ route('admin.commercial.campaigns.deliveries', $campaign->id) }}" class="transparent-button">
                         @lang('admin::app.commercial.campaigns.dispatch.view-deliveries')
+                    </a>
+                @endif
+
+                @if (bouncer()->hasPermission('commercial.executions'))
+                    <a href="{{ route('admin.commercial.executions.index', ['campaign_id' => $campaign->id]) }}" class="transparent-button">
+                        @lang('admin::app.commercial.executions.index.menu-shortcut')
                     </a>
                 @endif
 
@@ -142,13 +153,19 @@
                                 </thead>
                                 <tbody class="divide-y divide-gray-100 bg-white dark:divide-gray-700 dark:bg-gray-900">
                                     @foreach ($audience as $i => $member)
+                                        @php
+                                            $entityType = str_contains(strtolower((string) $member->entity_type), 'organization')
+                                                ? 'organization'
+                                                : 'person';
+                                        @endphp
+
                                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
                                             <td class="px-4 py-2 text-gray-400 dark:text-gray-500">{{ $i + 1 }}</td>
                                             <td class="px-4 py-2 font-medium text-gray-800 dark:text-white">{{ $member->display_name }}</td>
                                             <td class="px-4 py-2">
                                                 <span class="rounded-full px-2 py-0.5 text-xs
-                                                    {{ $member->entity_type === 'person' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' : 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300' }}">
-                                                    @lang('admin::app.commercial.campaigns.audience.entity-' . $member->entity_type)
+                                                    {{ $entityType === 'person' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' : 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300' }}">
+                                                    @lang('admin::app.commercial.campaigns.audience.entity-' . $entityType)
                                                 </span>
                                             </td>
                                             <td class="px-4 py-2 text-gray-500 dark:text-gray-400">{{ $member->organization_name ?? '—' }}</td>
@@ -186,6 +203,35 @@
 
             {{-- Right: Stats + Filters Summary --}}
             <div class="flex w-[300px] max-w-full flex-col gap-2 max-sm:w-full">
+                <div class="box-shadow rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+                    <p class="mb-3 text-base font-semibold text-gray-800 dark:text-white">
+                        @lang('admin::app.commercial.campaigns.schedule.title')
+                    </p>
+
+                    <dl class="flex flex-col gap-2 text-sm">
+                        <div class="flex justify-between">
+                            <dt class="text-gray-500 dark:text-gray-400">@lang('admin::app.commercial.campaigns.schedule.execution-type')</dt>
+                            <dd class="font-medium text-gray-700 dark:text-gray-200">
+                                @lang('admin::app.commercial.campaigns.schedule.execution-types.' . ($campaign->execution_type ?? 'manual'))
+                            </dd>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <dt class="text-gray-500 dark:text-gray-400">@lang('admin::app.commercial.campaigns.schedule.next-run-at')</dt>
+                            <dd class="font-medium text-gray-700 dark:text-gray-200">
+                                {{ $campaign->next_run_at ? $campaign->next_run_at->setTimezone($campaign->timezone ?? config('app.timezone'))->format('d/m/Y H:i') : '-' }}
+                            </dd>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <dt class="text-gray-500 dark:text-gray-400">@lang('admin::app.commercial.campaigns.schedule.last-run-at')</dt>
+                            <dd class="font-medium text-gray-700 dark:text-gray-200">
+                                {{ $campaign->last_run_at ? $campaign->last_run_at->setTimezone($campaign->timezone ?? config('app.timezone'))->format('d/m/Y H:i') : '-' }}
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+
                 {{-- Stats --}}
                 <div class="box-shadow rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
                     <p class="mb-4 text-base font-semibold text-gray-800 dark:text-white">
@@ -257,6 +303,39 @@
                                 <div class="text-green-600 dark:text-green-400">✓ @lang('admin::app.commercial.campaigns.filters.only-with-phone')</div>
                             @endif
                         </dl>
+                    </div>
+                @endif
+
+                @if (($recentRuns ?? collect())->isNotEmpty())
+                    <div class="box-shadow rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+                        <p class="mb-3 text-base font-semibold text-gray-800 dark:text-white">
+                            @lang('admin::app.commercial.campaigns.schedule.recent-runs')
+                        </p>
+
+                        <div class="space-y-2 text-xs">
+                            @foreach ($recentRuns->take(8) as $run)
+                                <div class="rounded-md bg-gray-50 p-2 dark:bg-gray-800">
+                                    <div class="flex items-center justify-between">
+                                        @if (bouncer()->hasPermission('commercial.executions.view'))
+                                            <a
+                                                href="{{ route('admin.commercial.executions.show', $run->id) }}"
+                                                class="font-semibold text-brandColor hover:underline"
+                                            >
+                                                #{{ $run->id }}
+                                            </a>
+                                        @else
+                                            <span class="font-semibold text-gray-700 dark:text-gray-200">#{{ $run->id }}</span>
+                                        @endif
+                                        <span class="text-gray-500 dark:text-gray-400">
+                                            @lang('admin::app.commercial.campaigns.schedule.run-statuses.' . $run->status)
+                                        </span>
+                                    </div>
+                                    <div class="mt-1 text-gray-500 dark:text-gray-400">
+                                        {{ $run->scheduled_for ? $run->scheduled_for->setTimezone($campaign->timezone ?? config('app.timezone'))->format('d/m/Y H:i') : '-' }}
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
                 @endif
             </div>

@@ -381,4 +381,12 @@ class Core
     {
         return system_config()->getConfigData($field);
     }
+
+    /**
+     * Retrieve stored configuration value without default fallback.
+     */
+    public function getConfigDataWithoutDefault(string $field): mixed
+    {
+        return system_config()->getConfigDataWithoutDefault($field);
+    }
 }

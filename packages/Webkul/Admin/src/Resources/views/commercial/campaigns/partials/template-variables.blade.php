@@ -13,14 +13,16 @@
 
     <div class="flex flex-col gap-1.5">
         @foreach (\Webkul\Commercial\Services\Template\CommercialCampaignTemplateRenderer::VARIABLES as $key => $desc)
+            @php($templateVariable = '{{' . $key . '}}')
+
             <div class="flex items-start justify-between gap-2">
                 <button
                     type="button"
                     title="@lang('admin::app.commercial.campaigns.template.copy-hint')"
-                    onclick="navigator.clipboard.writeText('{{ '{{' . $key . '}}' }}')"
+                    onclick="navigator.clipboard.writeText('{{ $templateVariable }}')"
                     class="shrink-0 rounded bg-gray-100 px-1.5 py-0.5 font-mono text-xs text-gray-700 hover:bg-blue-100 hover:text-blue-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-blue-900 dark:hover:text-blue-300"
                 >
-                    {{ '{{' . $key . '}}' }}
+                    {{ $templateVariable }}
                 </button>
                 <span class="text-right text-xs text-gray-500 dark:text-gray-400">
                     @lang('admin::app.commercial.campaigns.template.var-' . str_replace(['.', '_'], '-', $key))

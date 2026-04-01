@@ -5,8 +5,10 @@ namespace Webkul\Commercial\Providers;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Webkul\Commercial\Console\Commands\AudiencePreviewCommand;
+use Webkul\Commercial\Console\Commands\CampaignScheduleScanCommand;
 use Webkul\Commercial\Repositories\CommercialCampaignDeliveryRepository;
 use Webkul\Commercial\Services\Audience\CommercialAudienceService;
+use Webkul\Commercial\Services\CampaignScheduleService;
 use Webkul\Commercial\Services\CommercialCampaignDeliveryService;
 use Webkul\Commercial\Services\CommercialCampaignMetricsService;
 use Webkul\Commercial\Services\CommercialCampaignService;
@@ -29,6 +31,7 @@ class CommercialServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 AudiencePreviewCommand::class,
+                CampaignScheduleScanCommand::class,
             ]);
         }
     }
@@ -44,6 +47,7 @@ class CommercialServiceProvider extends ServiceProvider
 
         // StateGuard is stateless
         $this->app->singleton(CommercialCampaignStateGuard::class);
+        $this->app->singleton(CampaignScheduleService::class);
 
         $this->app->singleton(CommercialCampaignService::class, function ($app) {
             return new CommercialCampaignService(

@@ -48,6 +48,8 @@ return [
         'inventory' => 'Inventory',
         'commercial' => 'Commercial',
         'commercial-campaigns' => 'Commercial Campaigns',
+        'commercial-executions' => 'Executions',
+        'commercial-deliveries' => 'Delivery Audit',
         'dispatch' => 'Dispatch',
     ],
 
@@ -2192,6 +2194,54 @@ return [
                 'title' => 'Email Settings',
                 'info' => 'Email configuration for the application.',
 
+                'smtp' => [
+                    'title' => 'SMTP Settings',
+                    'info' => 'Configure SMTP delivery for transactional and campaign emails.',
+
+                    'account' => [
+                        'title' => 'SMTP Account',
+                        'title-info' => 'Configure your SMTP server settings here.',
+                        'host' => 'Host',
+                        'port' => 'Port',
+                        'encryption' => 'Encryption Type',
+                        'username' => 'SMTP Username',
+                        'password' => 'SMTP Password',
+                        'from-name' => 'From Name',
+                        'from-address' => 'From Address',
+                        'timeout' => 'Timeout (seconds)',
+
+                        'encryption-options' => [
+                            'tls' => 'TLS',
+                            'ssl' => 'SSL',
+                            'null' => 'None',
+                        ],
+                    ],
+
+                    'test' => [
+                        'test-btn' => 'Test Configuration',
+                        'modal-title' => 'Test SMTP Configuration',
+                        'modal-info' => 'Send a real test email using the SMTP values currently filled in this form.',
+                        'recipient' => 'Test Recipient Email',
+                        'recipient-placeholder' => 'name@example.com',
+                        'send-btn' => 'Send Test Email',
+                        'testing-btn' => 'Sending...',
+                        'subject' => '[ :app_name ] SMTP Test Email',
+                        'body' => 'This is a SMTP test email sent at :datetime from :app_name.',
+                        'success' => 'SMTP test email sent successfully to :email.',
+                        'validation-error' => 'Please provide a valid recipient email and required SMTP fields.',
+
+                        'errors' => [
+                            'generic' => 'Could not send the SMTP test email.',
+                            'authentication' => 'SMTP authentication failed. Please verify username and password.',
+                            'host' => 'Could not resolve the SMTP host. Please verify the host name.',
+                            'port' => 'Could not connect to the SMTP server. Please verify host and port.',
+                            'timeout' => 'SMTP connection timed out. Please verify timeout, network, and firewall rules.',
+                            'tls' => 'TLS/SSL handshake failed. Please verify encryption mode and certificate settings.',
+                            'from-address' => 'Sender address was rejected. Please verify the "From Address".',
+                        ],
+                    ],
+                ],
+
                 'imap' => [
                     'title' => 'IMAP Settings',
                     'info' => 'IMAP email configuration for receiving emails.',
@@ -2205,6 +2255,101 @@ return [
                         'validate-cert' => 'Validate SSL Certificate',
                         'username' => 'IMAP Username',
                         'password' => 'IMAP Password',
+                    ],
+                ],
+            ],
+
+            'whatsapp' => [
+                'title' => 'WhatsApp Settings',
+                'info' => 'Configure WhatsApp providers and connection settings.',
+
+                'provider' => [
+                    'driver' => 'Active Provider',
+
+                    'options' => [
+                        'meta' => 'Meta Official',
+                        'waha' => 'WAHA',
+                        'evolution' => 'Evolution',
+                    ],
+                ],
+
+                'meta' => [
+                    'base-url' => 'Meta Base URL',
+                    'api-version' => 'API Version',
+                    'access-token' => 'Access Token',
+                    'business-account-id' => 'Business Account ID',
+                    'phone-number-id' => 'Phone Number ID',
+                    'webhook-verify-token' => 'Webhook Verify Token',
+                ],
+
+                'waha' => [
+                    'base-url' => 'WAHA Base URL',
+                    'api-key' => 'WAHA API Key',
+                    'session' => 'WAHA Session',
+                    'timeout' => 'WAHA Timeout (seconds)',
+                ],
+
+                'evolution' => [
+                    'base-url' => 'Evolution Base URL',
+                    'api-key' => 'Evolution API Key',
+                    'instance' => 'Evolution Instance',
+                    'timeout' => 'Evolution Timeout (seconds)',
+                ],
+
+                'test' => [
+                    'test-btn' => 'Test Configuration',
+                    'validation-error' => 'Please fill in the required fields for the selected provider.',
+
+                    'success' => [
+                        'meta' => 'Meta Official connection validated successfully.',
+                        'waha' => 'WAHA connection validated successfully.',
+                        'evolution' => 'Evolution connection validated successfully.',
+                    ],
+
+                    'errors' => [
+                        'generic' => 'Unable to validate WhatsApp configuration.',
+                        'invalid-driver' => 'Invalid WhatsApp provider selected.',
+                        'host' => 'Host is unreachable. Please verify URL, network, and firewall.',
+                        'meta-token' => 'Invalid Meta access token.',
+                        'meta-business-id' => 'Invalid Meta Business Account ID.',
+                        'meta-phone-id' => 'Invalid Meta Phone Number ID.',
+                        'waha-api-key' => 'Invalid WAHA API key.',
+                        'waha-session' => 'WAHA session was not found.',
+                        'evolution-api-key' => 'Invalid Evolution API key.',
+                        'evolution-instance' => 'Evolution instance was not found.',
+                    ],
+                ],
+
+                'test-message' => [
+                    'test-btn' => 'Send Test Message',
+                    'modal-title' => 'Send WhatsApp Test Message',
+                    'modal-info' => 'Send a real message using the currently selected provider and configuration.',
+                    'phone' => 'Phone Number',
+                    'phone-placeholder' => 'e.g. +5511999999999',
+                    'message' => 'Message',
+                    'message-placeholder' => 'Type a short test message...',
+                    'send-btn' => 'Send Message',
+                    'sending-btn' => 'Sending...',
+                    'validation-error' => 'Please provide both phone number and message.',
+
+                    'success' => [
+                        'meta' => 'Meta test message sent successfully to :phone.',
+                        'waha' => 'WAHA test message sent successfully to :phone.',
+                        'evolution' => 'Evolution test message sent successfully to :phone.',
+                    ],
+
+                    'errors' => [
+                        'generic' => 'Unable to send WhatsApp test message.',
+                        'invalid-driver' => 'Invalid WhatsApp provider selected.',
+                        'invalid-phone' => 'The phone number is invalid. Use international format with country code.',
+                        'host' => 'Host is unreachable. Please verify URL, network, and firewall.',
+                        'meta-token' => 'Invalid Meta access token.',
+                        'waha-api-key' => 'Invalid WAHA API key.',
+                        'waha-session' => 'WAHA session was not found.',
+                        'waha-session-disconnected' => 'WAHA session is disconnected or unavailable.',
+                        'evolution-api-key' => 'Invalid Evolution API key.',
+                        'evolution-instance' => 'Evolution instance was not found.',
+                        'evolution-instance-disconnected' => 'Evolution instance is disconnected or unavailable.',
                     ],
                 ],
             ],
@@ -2376,6 +2521,8 @@ return [
         'data_transfer_info' => 'Manage persons, products and leads data transfer related settings in the CRM',
         'commercial' => 'Commercial',
         'commercial-campaigns' => 'Campaigns',
+        'commercial-executions' => 'Executions',
+        'commercial-deliveries' => 'Delivery Audit',
     ],
 
     'user' => [
@@ -2475,6 +2622,11 @@ return [
             'statuses' => [
                 'draft' => 'Draft',
                 'ready' => 'Ready',
+                'scheduled' => 'Scheduled',
+                'running' => 'Running',
+                'paused' => 'Paused',
+                'completed' => 'Completed',
+                'canceled' => 'Canceled',
                 'archived' => 'Archived',
             ],
             'stats' => [
@@ -2527,6 +2679,8 @@ return [
                     'name' => 'Name',
                     'channel' => 'Channel',
                     'status' => 'Status',
+                    'execution-type' => 'Execution Type',
+                    'next-run-at' => 'Next Run',
                     'audience' => 'Audience',
                     'created-by' => 'Created By',
                     'created-at' => 'Created At',
@@ -2590,6 +2744,11 @@ return [
             'statuses' => [
                 'draft' => 'Draft',
                 'ready' => 'Ready',
+                'scheduled' => 'Scheduled',
+                'running' => 'Running',
+                'paused' => 'Paused',
+                'completed' => 'Completed',
+                'canceled' => 'Canceled',
                 'sending' => 'Sending',
                 'sent' => 'Sent',
                 'partially_sent' => 'Partially Sent',
@@ -2624,6 +2783,7 @@ return [
                 ],
                 'datagrid' => [
                     'id' => '#',
+                    'run' => 'Run',
                     'channel' => 'Channel',
                     'status' => 'Status',
                     'recipient' => 'Recipient',
@@ -2635,6 +2795,21 @@ return [
                     'sent-at' => 'Sent At',
                     'view' => 'View Detail',
                 ],
+                'errors' => [
+                    'generic' => 'Could not send the WhatsApp message.',
+                    'unsupported-provider' => 'Unsupported WhatsApp provider: :provider.',
+                    'empty-message' => 'Message body is empty.',
+                    'invalid-phone' => 'Invalid phone number. Use international format with country code.',
+                    'host' => 'Host is unreachable. Check URL, network and firewall.',
+                    'meta-token' => 'Invalid Meta access token.',
+                    'meta-phone-id' => 'Invalid Meta Phone Number ID.',
+                    'waha-api-key' => 'Invalid WAHA API key.',
+                    'waha-session' => 'WAHA session not found.',
+                    'waha-session-disconnected' => 'WAHA session is disconnected or unavailable.',
+                    'evolution-api-key' => 'Invalid Evolution API key.',
+                    'evolution-instance' => 'Evolution instance not found.',
+                    'evolution-instance-disconnected' => 'Evolution instance is disconnected or unavailable.',
+                ],
             ],
             'dispatch' => [
                 'btn' => 'Start Sending',
@@ -2643,6 +2818,79 @@ return [
                 'mark-ready-btn' => 'Mark as Ready',
                 'mark-draft-btn' => 'Revert to Draft',
                 'view-deliveries' => 'View Deliveries',
+            ],
+
+            'schedule' => [
+                'title' => 'Scheduling & Execution',
+                'execution-type' => 'Execution Type',
+                'timezone' => 'Timezone',
+                'timezone-placeholder' => 'Example: America/Sao_Paulo',
+                'run-at' => 'Run At',
+                'starts-at' => 'Starts At',
+                'ends-at' => 'Ends At',
+                'recurrence-type' => 'Recurrence',
+                'select-recurrence' => 'Select recurrence',
+                'time-of-day' => 'Time of Day',
+                'days-of-week' => 'Days of Week',
+                'day-of-month' => 'Day of Month',
+                'interval-value' => 'Interval Value',
+                'interval-unit' => 'Interval Unit',
+                'select-interval-unit' => 'Select interval unit',
+                'window-start' => 'Window Start',
+                'window-end' => 'Window End',
+                'max-runs' => 'Max Runs',
+                'next-run-at' => 'Next Run',
+                'last-run-at' => 'Last Run',
+                'scheduled-for' => 'Scheduled For',
+                'finished-at' => 'Finished At',
+                'status' => 'Status',
+                'recent-runs' => 'Recent Runs',
+                'schedule-btn' => 'Schedule',
+                'pause-btn' => 'Pause',
+                'resume-btn' => 'Resume',
+                'cancel-btn' => 'Cancel',
+                'run-now-btn' => 'Run Now',
+                'recalculate-next-btn' => 'Recalculate Next',
+                'schedule-success' => 'Campaign scheduled successfully.',
+                'pause-success' => 'Campaign paused successfully.',
+                'resume-success' => 'Campaign resumed successfully.',
+                'cancel-success' => 'Campaign canceled successfully.',
+                'run-now-success' => 'Campaign queued for immediate execution.',
+                'recalculate-next-success' => 'Next execution recalculated successfully.',
+                'execution-types' => [
+                    'manual' => 'Manual',
+                    'once' => 'One-time',
+                    'recurring' => 'Recurring',
+                    'windowed-recurring' => 'Recurring (Windowed)',
+                    'windowed_recurring' => 'Recurring (Windowed)',
+                ],
+                'recurrence-types' => [
+                    'daily' => 'Daily',
+                    'weekly' => 'Weekly',
+                    'monthly' => 'Monthly',
+                    'interval' => 'By Interval',
+                ],
+                'interval-units' => [
+                    'minutes' => 'Minutes',
+                    'hours' => 'Hours',
+                    'days' => 'Days',
+                ],
+                'run-statuses' => [
+                    'queued' => 'Queued',
+                    'running' => 'Running',
+                    'completed' => 'Completed',
+                    'failed' => 'Failed',
+                    'canceled' => 'Canceled',
+                ],
+                'weekdays' => [
+                    'sun' => 'Sunday',
+                    'mon' => 'Monday',
+                    'tue' => 'Tuesday',
+                    'wed' => 'Wednesday',
+                    'thu' => 'Thursday',
+                    'fri' => 'Friday',
+                    'sat' => 'Saturday',
+                ],
             ],
 
             'metrics' => [
@@ -2724,6 +2972,113 @@ return [
                 'var-channel' => 'Send channel: email or whatsapp',
                 'var-campaign-name' => 'Campaign name',
                 'var-campaign-channel' => 'Campaign channel',
+            ],
+        ],
+
+        'executions' => [
+            'trigger-types' => [
+                'scheduler' => 'Scheduled',
+                'manual' => 'Manual',
+            ],
+
+            'index' => [
+                'title' => 'Executions',
+                'menu-shortcut' => 'Executions',
+                'scoped-campaign' => 'Campaign: :name',
+                'back-to-campaigns' => 'Back to Campaigns',
+                'view-campaign' => 'View Campaign',
+            ],
+
+            'datagrid' => [
+                'id' => '#',
+                'campaign' => 'Campaign',
+                'campaign-filter' => 'Campaign',
+                'execution-type' => 'Execution Type',
+                'scheduled-for' => 'Scheduled For',
+                'started-at' => 'Started At',
+                'finished-at' => 'Finished At',
+                'status' => 'Status',
+                'total-deliveries' => 'Total Deliveries',
+                'sent' => 'Sent',
+                'failed' => 'Failed',
+                'next-run-at' => 'Next Run',
+                'view' => 'View',
+                'audit-deliveries' => 'Open Audit',
+            ],
+
+            'show' => [
+                'title' => 'Execution #:id',
+                'heading' => 'Execution #:id',
+                'back-btn' => 'Back to Executions',
+                'view-campaign' => 'View Campaign',
+                'open-delivery-audit' => 'Open Delivery Audit',
+                'run-info' => 'Execution Details',
+                'campaign-info' => 'Campaign Context',
+                'created-by' => 'Created By',
+                'delivery-list' => 'Deliveries in This Execution',
+            ],
+        ],
+
+        'delivery-audit' => [
+            'entity-types' => [
+                'person' => 'Person',
+                'organization' => 'Organization',
+            ],
+
+            'labels' => [
+                'no-campaign' => 'No campaign',
+            ],
+
+            'statuses' => [
+                'pending' => 'Pending',
+                'queued' => 'Queued',
+                'sending' => 'Sending',
+                'sent' => 'Sent',
+                'failed' => 'Failed',
+                'skipped' => 'Skipped',
+                'canceled' => 'Canceled',
+                'deduplicated' => 'Deduplicated',
+                'ignored' => 'Ignored',
+            ],
+
+            'index' => [
+                'title' => 'Delivery Audit',
+                'scoped-campaign' => 'Campaign: :name',
+                'scoped-run' => 'Execution: #:id',
+                'back-to-campaigns' => 'Back to Campaigns',
+                'view-executions' => 'View Executions',
+                'view-run' => 'View Execution',
+            ],
+
+            'datagrid' => [
+                'id' => '#',
+                'campaign' => 'Campaign',
+                'campaign-filter' => 'Campaign',
+                'run' => 'Run',
+                'entity' => 'Person/Company',
+                'entity-type' => 'Entity Type',
+                'channel' => 'Channel',
+                'destination' => 'Destination Used',
+                'normalized-destination' => 'Normalized Destination',
+                'status' => 'Status',
+                'sent-at' => 'Sent At',
+                'failed-at' => 'Failed At',
+                'error' => 'Error',
+                'provider-message-id' => 'Provider Message ID',
+                'view' => 'View',
+                'only-failures' => 'Only failures',
+            ],
+
+            'show' => [
+                'title' => 'Delivery #:id',
+                'heading' => 'Delivery #:id',
+                'back-btn' => 'Back to Audit',
+                'view-campaign' => 'View Campaign',
+                'view-run' => 'View Execution',
+                'delivery-info' => 'Delivery Information',
+                'logs-title' => 'Processing Log',
+                'context' => 'Context',
+                'no-logs' => 'No log entries for this delivery.',
             ],
         ],
     ],

@@ -15,13 +15,29 @@ class CommercialCampaign extends Model implements CommercialCampaignContract
     /**
      * Statuses that block edits, re-freeze and recalculation.
      */
-    public const LOCKED_STATUSES = ['sending', 'sent', 'partially_sent', 'failed'];
+    public const LOCKED_STATUSES = ['running', 'sending', 'sent', 'partially_sent', 'failed'];
 
     protected $fillable = [
         'name',
         'description',
         'channel',
         'status',
+        'execution_type',
+        'timezone',
+        'run_at',
+        'starts_at',
+        'ends_at',
+        'recurrence_type',
+        'interval_value',
+        'interval_unit',
+        'days_of_week',
+        'day_of_month',
+        'time_of_day',
+        'window_start_time',
+        'window_end_time',
+        'max_runs',
+        'last_run_at',
+        'next_run_at',
         'subject',
         'message_body',
         'filters_json',
@@ -45,9 +61,18 @@ class CommercialCampaign extends Model implements CommercialCampaignContract
 
     protected $casts = [
         'filters_json' => 'array',
+        'days_of_week' => 'array',
         'audience_generated_at' => 'datetime',
+        'run_at' => 'datetime',
+        'starts_at' => 'datetime',
+        'ends_at' => 'datetime',
         'dispatched_at' => 'datetime',
         'sent_at' => 'datetime',
+        'last_run_at' => 'datetime',
+        'next_run_at' => 'datetime',
+        'interval_value' => 'integer',
+        'day_of_month' => 'integer',
+        'max_runs' => 'integer',
         'total_audience' => 'integer',
         'total_with_email' => 'integer',
         'total_with_phone' => 'integer',
@@ -97,7 +122,7 @@ class CommercialCampaign extends Model implements CommercialCampaignContract
 
     public function isSending(): bool
     {
-        return $this->status === 'sending';
+        return in_array($this->status, ['running', 'sending'], true);
     }
 
     public function isSent(): bool
@@ -118,6 +143,31 @@ class CommercialCampaign extends Model implements CommercialCampaignContract
     public function isArchived(): bool
     {
         return $this->status === 'archived';
+    }
+
+    public function isScheduled(): bool
+    {
+        return $this->status === 'scheduled';
+    }
+
+    public function isRunning(): bool
+    {
+        return $this->status === 'running';
+    }
+
+    public function isPaused(): bool
+    {
+        return $this->status === 'paused';
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this->status === 'completed';
+    }
+
+    public function isCanceled(): bool
+    {
+        return $this->status === 'canceled';
     }
 
     /**
@@ -141,7 +191,8 @@ class CommercialCampaign extends Model implements CommercialCampaignContract
      */
     public function canDispatch(): bool
     {
-        return $this->status === 'ready' && $this->hasAudience();
+        return in_array($this->status, ['ready', 'scheduled', 'paused'], true)
+            && $this->hasAudience();
     }
 
     /**
@@ -150,5 +201,13 @@ class CommercialCampaign extends Model implements CommercialCampaignContract
     public function deliveries(): HasMany
     {
         return $this->hasMany(CommercialCampaignDeliveryProxy::modelClass(), 'commercial_campaign_id');
+    }
+
+    /**
+     * Execution runs relationship.
+     */
+    public function runs(): HasMany
+    {
+        return $this->hasMany(CommercialCampaignRunProxy::modelClass(), 'commercial_campaign_id');
     }
 }

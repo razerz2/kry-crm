@@ -4,7 +4,9 @@ namespace Webkul\Core\Providers;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Foundation\AliasLoader;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use Throwable;
 use Webkul\Core\Acl;
 use Webkul\Core\Console\Commands\Version;
 use Webkul\Core\Core;
@@ -27,6 +29,9 @@ class CoreServiceProvider extends ServiceProvider
     public function boot()
     {
         include __DIR__.'/../Http/helpers.php';
+
+        $this->applyConfiguredSmtpSettings();
+        $this->applyConfiguredWhatsAppSettings();
 
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
 
@@ -86,6 +91,86 @@ class CoreServiceProvider extends ServiceProvider
             $this->commands([
                 Version::class,
             ]);
+        }
+    }
+
+    /**
+     * Apply SMTP configuration stored in core settings to Laravel mail config.
+     */
+    protected function applyConfiguredSmtpSettings(): void
+    {
+        try {
+            if (! Schema::hasTable('core_config')) {
+                return;
+            }
+
+            $host = core()->getConfigData('email.smtp.host');
+            $port = core()->getConfigData('email.smtp.port');
+            $encryption = core()->getConfigData('email.smtp.encryption');
+            $username = core()->getConfigData('email.smtp.username');
+            $password = core()->getConfigData('email.smtp.password');
+            $fromName = core()->getConfigData('email.smtp.from_name');
+            $fromAddress = core()->getConfigData('email.smtp.from_address');
+            $timeout = core()->getConfigData('email.smtp.timeout');
+
+            if (
+                empty($host)
+                || empty($fromAddress)
+            ) {
+                return;
+            }
+
+            if ($encryption === 'null') {
+                $encryption = null;
+            }
+
+            if ($timeout === '') {
+                $timeout = null;
+            }
+
+            config([
+                'mail.default' => 'smtp',
+                'mail.mailers.smtp.host' => $host,
+                'mail.mailers.smtp.port' => (int) $port,
+                'mail.mailers.smtp.encryption' => $encryption,
+                'mail.mailers.smtp.username' => $username ?: null,
+                'mail.mailers.smtp.password' => $password ?: null,
+                'mail.mailers.smtp.timeout' => $timeout !== null ? (int) $timeout : null,
+                'mail.from.name' => $fromName ?: config('mail.from.name'),
+                'mail.from.address' => $fromAddress ?: config('mail.from.address'),
+            ]);
+
+            if ($this->app->bound('mail.manager')) {
+                $this->app->make('mail.manager')->purge('smtp');
+            }
+        } catch (Throwable) {
+            // If DB/config is not available yet (e.g. during installation), keep default mail config.
+        }
+    }
+
+    /**
+     * Apply WhatsApp provider selected in core settings for future campaign usage.
+     */
+    protected function applyConfiguredWhatsAppSettings(): void
+    {
+        try {
+            if (! Schema::hasTable('core_config')) {
+                return;
+            }
+
+            $driver = core()->getConfigData('whatsapp.provider.driver');
+
+            if (empty($driver)) {
+                return;
+            }
+
+            $provider = $driver === 'meta' ? 'meta_official' : $driver;
+
+            config([
+                'commercial.campaign.whatsapp_provider' => $provider,
+            ]);
+        } catch (Throwable) {
+            // Keep existing commercial provider config if dynamic settings are unavailable.
         }
     }
 }

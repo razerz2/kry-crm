@@ -4,6 +4,7 @@ namespace Webkul\Commercial\Services\Audience;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Webkul\Commercial\Enums\AccountProductStatus;
 use Webkul\Contact\Models\OrganizationProxy;
 use Webkul\Contact\Models\PersonProxy;
@@ -220,30 +221,63 @@ class CommercialAudienceService
     /**
      * Query organizations and map to AudienceItem collection.
      *
-     * Organizations have no email/phone fields directly.
-     * Heuristic: use the first person linked to the organization that has email/phone.
+     * Contact resolution rule:
+     * 1) Prefer the organization's own emails/contact_numbers
+     * 2) Fallback to a linked person when organization contacts are empty
      *
      * @return Collection<int, AudienceItem>
      */
     protected function queryOrganizations(AudienceFilter $filter): Collection
     {
         $orgClass = OrganizationProxy::modelClass();
+        $hasOrgEmails = Schema::hasColumn('organizations', 'emails');
+        $hasOrgPhones = Schema::hasColumn('organizations', 'contact_numbers');
 
-        $query = DB::table('organizations')
-            ->select([
-                'organizations.id',
-                'organizations.name',
-            ]);
+        $selectColumns = [
+            'organizations.id',
+            'organizations.name',
+        ];
+
+        if ($hasOrgEmails) {
+            $selectColumns[] = 'organizations.emails';
+        }
+
+        if ($hasOrgPhones) {
+            $selectColumns[] = 'organizations.contact_numbers';
+        }
+
+        $query = DB::table('organizations')->select($selectColumns);
 
         $this->applyCommercialFilters($query, $orgClass, $filter);
         $this->applySegmentFilter($query, $orgClass, $filter);
 
         if ($filter->search) {
             $search = '%'.$filter->search.'%';
-            $query->where('organizations.name', 'like', $search);
+
+            $query->where(function ($q) use ($search, $hasOrgEmails, $hasOrgPhones) {
+                $q->where('organizations.name', 'like', $search);
+
+                if ($hasOrgEmails) {
+                    $q->orWhere('organizations.emails', 'like', $search);
+                }
+
+                if ($hasOrgPhones) {
+                    $q->orWhere('organizations.contact_numbers', 'like', $search);
+                }
+            });
         }
 
-        $query->groupBy('organizations.id', 'organizations.name');
+        $groupBy = ['organizations.id', 'organizations.name'];
+
+        if ($hasOrgEmails) {
+            $groupBy[] = 'organizations.emails';
+        }
+
+        if ($hasOrgPhones) {
+            $groupBy[] = 'organizations.contact_numbers';
+        }
+
+        $query->groupBy(...$groupBy);
 
         $rows = $query->get();
 
@@ -254,9 +288,18 @@ class CommercialAudienceService
         $contactMap = $this->loadPrimaryContacts($orgIds, $filter->onlyPrimaryContactIfOrganization);
 
         return $rows->map(function ($row) use ($orgClass, $commercialMap, $contactMap) {
+            $email = $this->extractPrimaryEmail($row->emails ?? null);
+            $phone = $this->extractPrimaryPhone($row->contact_numbers ?? null);
+
             $contact = $contactMap[$row->id] ?? null;
-            $email = $contact ? $this->extractPrimaryEmail($contact->emails) : null;
-            $phone = $contact ? $this->extractPrimaryPhone($contact->contact_numbers) : null;
+
+            if (! $email && $contact) {
+                $email = $this->extractPrimaryEmail($contact->emails);
+            }
+
+            if (! $phone && $contact) {
+                $phone = $this->extractPrimaryPhone($contact->contact_numbers);
+            }
 
             $commercial = $commercialMap[$row->id] ?? ['products' => [], 'statuses' => [], 'summary' => ''];
 
@@ -476,58 +519,127 @@ class CommercialAudienceService
      * Extract the primary email from the JSON `emails` field.
      *
      * JSON format: [{"value": "email@example.com", "label": "work"}, ...]
-     * Heuristic: returns the first non-empty `value`.
+     * Rule: prefer primary contact entry, otherwise first valid email.
      */
     public function extractPrimaryEmail(?string $json): ?string
     {
-        if (! $json) {
+        $entries = $this->decodeContactEntries($json);
+        $preferred = $this->pickPreferredContactEntry($entries, true);
+
+        if (! $preferred) {
             return null;
         }
 
-        $entries = json_decode($json, true);
+        $value = trim((string) ($preferred['value'] ?? ''));
 
-        if (! is_array($entries)) {
-            return null;
-        }
-
-        foreach ($entries as $entry) {
-            $value = trim($entry['value'] ?? '');
-
-            if ($value !== '' && filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                return $value;
-            }
-        }
-
-        return null;
+        return filter_var($value, FILTER_VALIDATE_EMAIL) ? $value : null;
     }
 
     /**
      * Extract the primary phone from the JSON `contact_numbers` field.
      *
      * JSON format: [{"value": "+5511999999999", "label": "work"}, ...]
-     * Heuristic: returns the first non-empty `value`.
+     * Rule: prefer primary contact entry, otherwise first valid phone.
      */
     public function extractPrimaryPhone(?string $json): ?string
     {
-        if (! $json) {
+        $entries = $this->decodeContactEntries($json);
+        $preferred = $this->pickPreferredContactEntry($entries, false);
+
+        if (! $preferred) {
             return null;
+        }
+
+        $value = trim((string) ($preferred['value'] ?? ''));
+
+        return $value !== '' ? $value : null;
+    }
+
+    /**
+     * Decode emails/contact_numbers JSON into a list of associative entries.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    protected function decodeContactEntries(?string $json): array
+    {
+        if (! $json) {
+            return [];
         }
 
         $entries = json_decode($json, true);
 
-        if (! is_array($entries)) {
+        return is_array($entries) ? $entries : [];
+    }
+
+    /**
+     * Choose a deterministic contact entry.
+     *
+     * Priority:
+     * 1) entry explicitly marked as primary/principal
+     * 2) first valid entry in list order
+     *
+     * @param  array<int, array<string, mixed>>  $entries
+     * @return array<string, mixed>|null
+     */
+    protected function pickPreferredContactEntry(array $entries, bool $email): ?array
+    {
+        $validEntries = array_values(array_filter($entries, function ($entry) use ($email) {
+            if (! is_array($entry)) {
+                return false;
+            }
+
+            $value = trim((string) ($entry['value'] ?? ''));
+
+            if ($value === '') {
+                return false;
+            }
+
+            if ($email) {
+                return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+            }
+
+            return preg_replace('/\D+/', '', $value) !== '';
+        }));
+
+        if (empty($validEntries)) {
             return null;
         }
 
-        foreach ($entries as $entry) {
-            $value = trim($entry['value'] ?? '');
-
-            if ($value !== '') {
-                return $value;
+        foreach ($validEntries as $entry) {
+            if ($this->isPrimaryContactEntry($entry)) {
+                return $entry;
             }
         }
 
-        return null;
+        return $validEntries[0];
+    }
+
+    /**
+     * Determine if a contact entry is marked as primary.
+     *
+     * @param  array<string, mixed>  $entry
+     */
+    protected function isPrimaryContactEntry(array $entry): bool
+    {
+        foreach (['is_primary', 'primary', 'isPrimary', 'principal', 'default', 'main'] as $flagKey) {
+            if (! array_key_exists($flagKey, $entry)) {
+                continue;
+            }
+
+            $value = $entry[$flagKey];
+
+            if ($value === true || $value === 1 || $value === '1') {
+                return true;
+            }
+
+            if (is_string($value) && in_array(mb_strtolower(trim($value)), ['true', 'yes', 'sim'], true)) {
+                return true;
+            }
+        }
+
+        $label = mb_strtolower(trim((string) ($entry['label'] ?? '')));
+
+        return in_array($label, ['primary', 'principal', 'main', 'default'], true);
     }
 
     /**

@@ -533,6 +533,7 @@ return [
             'admin.commercial.campaigns.freeze_audience',
             'admin.commercial.campaigns.recalculate_audience',
             'admin.commercial.campaigns.preview_template',
+            'admin.commercial.campaigns.recalculate_next_run',
         ],
         'sort' => 3,
     ], [
@@ -545,15 +546,58 @@ return [
         'name' => 'admin::app.acl.dispatch',
         'route' => [
             'admin.commercial.campaigns.dispatch',
+            'admin.commercial.campaigns.run_now',
+            'admin.commercial.campaigns.schedule',
+            'admin.commercial.campaigns.pause',
+            'admin.commercial.campaigns.resume',
+            'admin.commercial.campaigns.cancel',
+            'admin.commercial.campaigns.recalculate_next_run',
             'admin.commercial.campaigns.mark_ready',
             'admin.commercial.campaigns.mark_draft',
             'admin.commercial.campaigns.deliveries',
         ],
         'sort' => 5,
     ], [
+        'key' => 'commercial.executions',
+        'name' => 'admin::app.acl.commercial-executions',
+        'route' => [
+            'admin.commercial.executions.index',
+        ],
+        'sort' => 2,
+    ], [
+        'key' => 'commercial.executions.view',
+        'name' => 'admin::app.acl.view',
+        'route' => [
+            'admin.commercial.executions.show',
+            'admin.commercial.executions.deliveries',
+        ],
+        'sort' => 1,
+    ], [
+        'key' => 'commercial.deliveries',
+        'name' => 'admin::app.acl.commercial-deliveries',
+        'route' => [
+            'admin.commercial.deliveries.index',
+        ],
+        'sort' => 3,
+    ], [
+        'key' => 'commercial.deliveries.view',
+        'name' => 'admin::app.acl.view',
+        'route' => [
+            'admin.commercial.deliveries.show',
+        ],
+        'sort' => 1,
+    ], [
         'key' => 'configuration',
         'name' => 'admin::app.acl.configuration',
-        'route' => 'admin.configuration.index',
+        'route' => [
+            'admin.configuration.index',
+            'admin.configuration.store',
+            'admin.configuration.search',
+            'admin.configuration.download',
+            'admin.configuration.smtp.test',
+            'admin.configuration.whatsapp.test',
+            'admin.configuration.whatsapp.test_message',
+        ],
         'sort' => 9,
     ],
 ];

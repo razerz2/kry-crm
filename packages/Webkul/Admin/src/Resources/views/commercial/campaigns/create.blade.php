@@ -122,6 +122,8 @@
                             </x-admin::form.control-group>
                         </div>
                     </div>
+
+                    @include('admin::commercial.campaigns.partials.schedule-fields')
                 </div>
 
                 {{-- Right: Filters + Template Variables --}}

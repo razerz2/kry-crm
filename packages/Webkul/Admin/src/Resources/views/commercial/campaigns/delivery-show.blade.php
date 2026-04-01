@@ -35,7 +35,7 @@
                     <span class="text-gray-500">
                         @lang('admin::app.commercial.campaigns.channels.' . $delivery->channel)
                         @if ($delivery->provider)
-                            · {{ $delivery->provider }}
+                            - {{ $delivery->provider }}
                         @endif
                     </span>
                     <span class="text-gray-400">
@@ -73,7 +73,14 @@
                             <dt class="text-xs font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
                                 @lang('admin::app.commercial.campaigns.audience.type')
                             </dt>
-                            <dd class="mt-0.5 text-gray-700 dark:text-gray-200">{{ $delivery->entity_type ?? '—' }}</dd>
+                            @php
+                                $deliveryEntityType = str_contains(strtolower((string) $delivery->entity_type), 'organization')
+                                    ? 'organization'
+                                    : 'person';
+                            @endphp
+                            <dd class="mt-0.5 text-gray-700 dark:text-gray-200">
+                                @lang('admin::app.commercial.campaigns.audience.entity-' . $deliveryEntityType)
+                            </dd>
                         </div>
 
                         @if ($delivery->recipient_email)

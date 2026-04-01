@@ -14,6 +14,7 @@ class CommercialCampaignDelivery extends Model implements CommercialCampaignDeli
 
     protected $fillable = [
         'commercial_campaign_id',
+        'commercial_campaign_run_id',
         'commercial_campaign_audience_id',
         'entity_type',
         'entity_id',
@@ -22,6 +23,7 @@ class CommercialCampaignDelivery extends Model implements CommercialCampaignDeli
         'recipient_name',
         'recipient_email',
         'recipient_phone',
+        'normalized_destination',
         'subject',
         'rendered_message',
         'status',
@@ -42,6 +44,11 @@ class CommercialCampaignDelivery extends Model implements CommercialCampaignDeli
     public function campaign(): BelongsTo
     {
         return $this->belongsTo(CommercialCampaignProxy::modelClass(), 'commercial_campaign_id');
+    }
+
+    public function run(): BelongsTo
+    {
+        return $this->belongsTo(CommercialCampaignRunProxy::modelClass(), 'commercial_campaign_run_id');
     }
 
     public function audienceMember(): BelongsTo

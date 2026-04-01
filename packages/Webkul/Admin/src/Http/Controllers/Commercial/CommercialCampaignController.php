@@ -6,12 +6,16 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Webkul\Admin\DataGrids\Commercial\CommercialCampaignAuditDeliveryDataGrid;
 use Webkul\Admin\DataGrids\Commercial\CommercialCampaignDataGrid;
 use Webkul\Admin\DataGrids\Commercial\CommercialCampaignDeliveryDataGrid;
+use Webkul\Admin\DataGrids\Commercial\CommercialCampaignRunDataGrid;
 use Webkul\Admin\Http\Controllers\Controller;
 use Webkul\Commercial\Models\CommercialCampaign;
 use Webkul\Commercial\Models\CommercialCampaignDelivery;
+use Webkul\Commercial\Models\CommercialCampaignRun;
 use Webkul\Commercial\Models\CrmProduct;
+use Webkul\Commercial\Services\CampaignScheduleService;
 use Webkul\Commercial\Services\CommercialCampaignDeliveryService;
 use Webkul\Commercial\Services\CommercialCampaignMetricsService;
 use Webkul\Commercial\Services\CommercialCampaignService;
@@ -25,6 +29,7 @@ class CommercialCampaignController extends Controller
         protected CommercialCampaignService $campaignService,
         protected CommercialCampaignDeliveryService $deliveryService,
         protected CommercialCampaignMetricsService $metricsService,
+        protected CampaignScheduleService $scheduleService,
         protected CommercialCampaignTemplateRenderer $renderer,
     ) {}
 
@@ -38,6 +43,80 @@ class CommercialCampaignController extends Controller
         }
 
         return view('admin::commercial.campaigns.index');
+    }
+
+    /**
+     * Display commercial campaign runs (executions).
+     */
+    public function executions(Request $request): View|JsonResponse
+    {
+        if ($request->ajax()) {
+            return datagrid(CommercialCampaignRunDataGrid::class)->process();
+        }
+
+        $campaign = null;
+
+        if ($campaignId = (int) $request->query('campaign_id')) {
+            $campaign = CommercialCampaign::find($campaignId);
+        }
+
+        return view('admin::commercial.executions.index', compact('campaign'));
+    }
+
+    /**
+     * Show execution details.
+     */
+    public function showExecution(int $id): View
+    {
+        $run = CommercialCampaignRun::with(['campaign', 'creator'])->findOrFail($id);
+
+        return view('admin::commercial.executions.show', compact('run'));
+    }
+
+    /**
+     * Open delivery audit scoped to execution.
+     */
+    public function executionDeliveries(int $id): RedirectResponse
+    {
+        $run = CommercialCampaignRun::findOrFail($id);
+
+        return redirect()->route('admin.commercial.deliveries.index', [
+            'campaign_id' => $run->commercial_campaign_id,
+            'run_id' => $run->id,
+        ]);
+    }
+
+    /**
+     * Display delivery audit across campaigns/runs.
+     */
+    public function deliveryAudit(Request $request): View|JsonResponse
+    {
+        if ($request->ajax()) {
+            return datagrid(CommercialCampaignAuditDeliveryDataGrid::class)->process();
+        }
+
+        $campaign = null;
+        $run = null;
+
+        if ($campaignId = (int) $request->query('campaign_id')) {
+            $campaign = CommercialCampaign::find($campaignId);
+        }
+
+        if ($runId = (int) $request->query('run_id')) {
+            $run = CommercialCampaignRun::with('campaign')->find($runId);
+        }
+
+        return view('admin::commercial.deliveries.index', compact('campaign', 'run'));
+    }
+
+    /**
+     * Show detail page for a delivery from global audit.
+     */
+    public function showAuditDelivery(int $id): View
+    {
+        $delivery = CommercialCampaignDelivery::with(['campaign', 'run', 'logs'])->findOrFail($id);
+
+        return view('admin::commercial.deliveries.show', compact('delivery'));
     }
 
     /**
@@ -61,9 +140,25 @@ class CommercialCampaignController extends Controller
             'channel' => 'required|in:email,whatsapp,both',
             'subject' => 'nullable|string|max:255',
             'message_body' => 'nullable|string',
+            'execution_type' => 'nullable|in:manual,once,recurring,windowed_recurring',
+            'timezone' => 'nullable|string|max:64',
+            'run_at' => 'nullable|date',
+            'starts_at' => 'nullable|date',
+            'ends_at' => 'nullable|date|after_or_equal:starts_at',
+            'recurrence_type' => 'nullable|in:daily,weekly,monthly,interval',
+            'interval_value' => 'nullable|integer|min:1|max:100000',
+            'interval_unit' => 'nullable|in:minutes,hours,days',
+            'days_of_week' => 'nullable|array',
+            'days_of_week.*' => 'integer|min:0|max:6',
+            'day_of_month' => 'nullable|integer|min:1|max:31',
+            'time_of_day' => 'nullable|date_format:H:i',
+            'window_start_time' => 'nullable|date_format:H:i',
+            'window_end_time' => 'nullable|date_format:H:i',
+            'max_runs' => 'nullable|integer|min:1|max:100000',
         ]);
 
         $validated['filters'] = $this->extractFilters($request);
+        $validated = array_merge($validated, $this->extractSchedule($request));
 
         $campaign = $this->campaignService->create($validated);
 
@@ -79,6 +174,10 @@ class CommercialCampaignController extends Controller
     {
         $campaign = CommercialCampaign::findOrFail($id);
         $audience = $this->campaignService->getAudience($campaign);
+        $recentRuns = CommercialCampaignRun::where('commercial_campaign_id', $campaign->id)
+            ->latest('id')
+            ->limit(20)
+            ->get();
         $products = CrmProduct::where('is_active', true)->orderBy('name')->get();
         $stats = $this->deliveryService->getDeliveryStats($campaign);
 
@@ -92,7 +191,7 @@ class CommercialCampaignController extends Controller
             ];
         }
 
-        return view('admin::commercial.campaigns.show', compact('campaign', 'audience', 'products', 'stats', 'metrics'));
+        return view('admin::commercial.campaigns.show', compact('campaign', 'audience', 'products', 'stats', 'metrics', 'recentRuns'));
     }
 
     /**
@@ -102,13 +201,17 @@ class CommercialCampaignController extends Controller
     {
         $campaign = CommercialCampaign::findOrFail($id);
         $audience = $this->campaignService->getAudience($campaign, 50);
+        $recentRuns = CommercialCampaignRun::where('commercial_campaign_id', $campaign->id)
+            ->latest('id')
+            ->limit(10)
+            ->get();
         $products = CrmProduct::where('is_active', true)->orderBy('name')->get();
         $stats = $this->deliveryService->getDeliveryStats($campaign);
         $readinessIssues = $this->campaignService->readinessIssues($campaign);
         $audienceStale = $this->campaignService->isAudienceStale($campaign);
 
         return view('admin::commercial.campaigns.edit', compact(
-            'campaign', 'audience', 'products', 'stats', 'readinessIssues', 'audienceStale'
+            'campaign', 'audience', 'products', 'stats', 'readinessIssues', 'audienceStale', 'recentRuns'
         ));
     }
 
@@ -123,12 +226,28 @@ class CommercialCampaignController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'channel' => 'required|in:email,whatsapp,both',
-            'status' => 'nullable|in:draft,ready,archived',
+            'status' => 'nullable|in:draft,ready,scheduled,running,paused,completed,canceled,archived,sent,failed,partially_sent',
             'subject' => 'nullable|string|max:255',
             'message_body' => 'nullable|string',
+            'execution_type' => 'nullable|in:manual,once,recurring,windowed_recurring',
+            'timezone' => 'nullable|string|max:64',
+            'run_at' => 'nullable|date',
+            'starts_at' => 'nullable|date',
+            'ends_at' => 'nullable|date|after_or_equal:starts_at',
+            'recurrence_type' => 'nullable|in:daily,weekly,monthly,interval',
+            'interval_value' => 'nullable|integer|min:1|max:100000',
+            'interval_unit' => 'nullable|in:minutes,hours,days',
+            'days_of_week' => 'nullable|array',
+            'days_of_week.*' => 'integer|min:0|max:6',
+            'day_of_month' => 'nullable|integer|min:1|max:31',
+            'time_of_day' => 'nullable|date_format:H:i',
+            'window_start_time' => 'nullable|date_format:H:i',
+            'window_end_time' => 'nullable|date_format:H:i',
+            'max_runs' => 'nullable|integer|min:1|max:100000',
         ]);
 
         $validated['filters'] = $this->extractFilters($request);
+        $validated = array_merge($validated, $this->extractSchedule($request, $campaign));
 
         try {
             $updated = $this->campaignService->update($campaign, $validated);
@@ -283,20 +402,129 @@ class CommercialCampaignController extends Controller
     }
 
     /**
-     * Dispatch the campaign (start sending).
+     * Schedule the campaign for automatic execution.
      */
-    public function dispatch(int $id): RedirectResponse
+    public function schedule(int $id): RedirectResponse
     {
         $campaign = CommercialCampaign::findOrFail($id);
 
         try {
-            $this->deliveryService->dispatch($campaign);
-            session()->flash('success', trans('admin::app.commercial.campaigns.dispatch-success'));
+            $this->scheduleService->scheduleCampaign($campaign, auth()->id());
+            session()->flash('success', trans('admin::app.commercial.campaigns.schedule.schedule-success'));
         } catch (\RuntimeException $e) {
             session()->flash('error', $e->getMessage());
         }
 
-        return redirect()->route('admin.commercial.campaigns.deliveries', $campaign->id);
+        return redirect()->route('admin.commercial.campaigns.edit', $campaign->id);
+    }
+
+    /**
+     * Pause automatic executions.
+     */
+    public function pause(int $id): RedirectResponse
+    {
+        $campaign = CommercialCampaign::findOrFail($id);
+
+        try {
+            $this->scheduleService->pauseCampaign($campaign, auth()->id());
+            session()->flash('success', trans('admin::app.commercial.campaigns.schedule.pause-success'));
+        } catch (\RuntimeException $e) {
+            session()->flash('error', $e->getMessage());
+        }
+
+        return redirect()->route('admin.commercial.campaigns.edit', $campaign->id);
+    }
+
+    /**
+     * Resume automatic executions.
+     */
+    public function resume(int $id): RedirectResponse
+    {
+        $campaign = CommercialCampaign::findOrFail($id);
+
+        try {
+            $this->scheduleService->resumeCampaign($campaign, auth()->id());
+            session()->flash('success', trans('admin::app.commercial.campaigns.schedule.resume-success'));
+        } catch (\RuntimeException $e) {
+            session()->flash('error', $e->getMessage());
+        }
+
+        return redirect()->route('admin.commercial.campaigns.edit', $campaign->id);
+    }
+
+    /**
+     * Cancel campaign and stop new executions.
+     */
+    public function cancel(int $id): RedirectResponse
+    {
+        $campaign = CommercialCampaign::findOrFail($id);
+
+        try {
+            $this->scheduleService->cancelCampaign($campaign, auth()->id());
+            session()->flash('success', trans('admin::app.commercial.campaigns.schedule.cancel-success'));
+        } catch (\RuntimeException $e) {
+            session()->flash('error', $e->getMessage());
+        }
+
+        return redirect()->route('admin.commercial.campaigns.edit', $campaign->id);
+    }
+
+    /**
+     * Queue an immediate execution run.
+     */
+    public function runNow(int $id): RedirectResponse
+    {
+        $campaign = CommercialCampaign::findOrFail($id);
+
+        try {
+            app(CommercialCampaignStateGuard::class)->assertDispatchable($campaign);
+            $this->scheduleService->queueImmediateExecution($campaign, auth()->id());
+            session()->flash('success', trans('admin::app.commercial.campaigns.schedule.run-now-success'));
+        } catch (\RuntimeException $e) {
+            $message = str_starts_with($e->getMessage(), 'campaign.')
+                ? $this->translateGuardException($e)
+                : $e->getMessage();
+
+            session()->flash('error', $message);
+        }
+
+        return redirect()->route('admin.commercial.campaigns.edit', $campaign->id);
+    }
+
+    /**
+     * Recalculate next_run_at based on current scheduling settings.
+     */
+    public function recalculateNextRun(int $id): RedirectResponse
+    {
+        $campaign = CommercialCampaign::findOrFail($id);
+
+        $this->scheduleService->recalculateNextRun($campaign, auth()->id());
+
+        session()->flash('success', trans('admin::app.commercial.campaigns.schedule.recalculate-next-success'));
+
+        return redirect()->route('admin.commercial.campaigns.edit', $campaign->id);
+    }
+
+    /**
+     * Dispatch the campaign (start sending).
+     */
+    public function dispatchCampaign(int $id): RedirectResponse
+    {
+        $campaign = CommercialCampaign::findOrFail($id);
+
+        try {
+            app(CommercialCampaignStateGuard::class)->assertDispatchable($campaign);
+            $this->scheduleService->queueImmediateExecution($campaign, auth()->id());
+            session()->flash('success', trans('admin::app.commercial.campaigns.dispatch-success'));
+        } catch (\RuntimeException $e) {
+            $message = str_starts_with($e->getMessage(), 'campaign.')
+                ? $this->translateGuardException($e)
+                : $e->getMessage();
+
+            session()->flash('error', $message);
+        }
+
+        return redirect()->route('admin.commercial.campaigns.edit', $campaign->id);
     }
 
     /**
@@ -421,6 +649,29 @@ class CommercialCampaignController extends Controller
         $translated = trans($transKey);
 
         return $translated !== $transKey ? $translated : $raw;
+    }
+
+    /**
+     * Extract and normalize schedule values from request.
+     */
+    protected function extractSchedule(Request $request, ?CommercialCampaign $campaign = null): array
+    {
+        return $this->scheduleService->prepareCampaignData([
+            'execution_type' => $request->input('execution_type'),
+            'timezone' => $request->input('timezone'),
+            'run_at' => $request->input('run_at'),
+            'starts_at' => $request->input('starts_at'),
+            'ends_at' => $request->input('ends_at'),
+            'recurrence_type' => $request->input('recurrence_type'),
+            'interval_value' => $request->input('interval_value'),
+            'interval_unit' => $request->input('interval_unit'),
+            'days_of_week' => $request->input('days_of_week', []),
+            'day_of_month' => $request->input('day_of_month'),
+            'time_of_day' => $request->input('time_of_day'),
+            'window_start_time' => $request->input('window_start_time'),
+            'window_end_time' => $request->input('window_end_time'),
+            'max_runs' => $request->input('max_runs'),
+        ], $campaign);
     }
 
     /**

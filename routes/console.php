@@ -20,3 +20,6 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('inbound-emails:process')->everyFiveMinutes();
+Schedule::command('commercial:campaigns:scan --limit='.(int) config('commercial.campaign.scan_limit', 25))
+    ->everyMinute()
+    ->withoutOverlapping();

@@ -41,7 +41,7 @@ class CommercialCampaignStateGuard
      * archived is read-only by policy; the locked statuses (sending/sent/…)
      * are blocked for data-integrity reasons.
      */
-    public const READ_ONLY_STATUSES = ['sending', 'sent', 'partially_sent', 'failed', 'archived'];
+    public const READ_ONLY_STATUSES = ['running', 'sending', 'sent', 'partially_sent', 'failed', 'archived'];
 
     /* ── Guards ──────────────────────────────────────────────────── */
 
@@ -80,7 +80,7 @@ class CommercialCampaignStateGuard
      */
     public function assertDispatchable(CommercialCampaign $campaign): void
     {
-        if ($campaign->status !== 'ready') {
+        if (! in_array($campaign->status, ['ready', 'scheduled', 'paused'], true)) {
             throw new \RuntimeException(
                 "campaign.dispatch-not-ready:{$campaign->status}"
             );

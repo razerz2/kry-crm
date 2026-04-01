@@ -10,19 +10,11 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Webkul\Commercial\Models\CommercialCampaign;
 use Webkul\Commercial\Models\CommercialCampaignDelivery;
+use Webkul\Commercial\Services\CampaignScheduleService;
 use Webkul\Commercial\Services\CommercialCampaignDeliveryService;
 
 /**
- * Step 1 of the campaign sending pipeline.
- *
- * Responsibilities:
- *  1. Create all delivery rows from the frozen audience (idempotent).
- *  2. Mark pending deliveries as "queued".
- *  3. Dispatch one SendCommercialCampaignDeliveryJob per queued delivery.
- *
- * A campaign that has all audience members as "skipped" (no contact info)
- * is handled gracefully — final status is computed at the end of the last
- * delivery job.
+ * Step 1 of the delivery pipeline for one campaign run.
  */
 class DispatchCommercialCampaignJob implements ShouldQueue
 {
@@ -30,10 +22,15 @@ class DispatchCommercialCampaignJob implements ShouldQueue
 
     public int $tries = 1;
 
-    public function __construct(public readonly int $campaignId) {}
+    public function __construct(
+        public readonly int $campaignId,
+        public readonly ?int $campaignRunId = null,
+    ) {}
 
-    public function handle(CommercialCampaignDeliveryService $deliveryService): void
-    {
+    public function handle(
+        CommercialCampaignDeliveryService $deliveryService,
+        CampaignScheduleService $scheduleService
+    ): void {
         $campaign = CommercialCampaign::find($this->campaignId);
 
         if (! $campaign) {
@@ -42,57 +39,71 @@ class DispatchCommercialCampaignJob implements ShouldQueue
             return;
         }
 
-        if ($campaign->status !== 'sending') {
-            Log::info("[DispatchCommercialCampaignJob] Campaign #{$this->campaignId} is not in 'sending' state ({$campaign->status}). Aborting.");
+        if (! in_array($campaign->status, ['running', 'sending'], true)) {
+            Log::info("[DispatchCommercialCampaignJob] Campaign #{$this->campaignId} is not in dispatch state ({$campaign->status}).");
 
             return;
         }
 
-        Log::info("[DispatchCommercialCampaignJob] Creating delivery rows for campaign #{$this->campaignId}.");
+        $deliveryService->createDeliveries($campaign, $this->campaignRunId);
 
-        // 1. Create delivery rows (idempotent – insertOrIgnore)
-        $total = $deliveryService->createDeliveries($campaign);
-
-        Log::info("[DispatchCommercialCampaignJob] {$total} delivery rows for campaign #{$this->campaignId}. Queuing send jobs.");
-
-        // 2. Queue individual send jobs for pending rows
         $queue = config('commercial.campaign.queue', 'default');
         $chunkSize = (int) config('commercial.campaign.delivery_chunk_size', 100);
 
         CommercialCampaignDelivery::where('commercial_campaign_id', $this->campaignId)
+            ->when(
+                $this->campaignRunId !== null,
+                fn ($query) => $query->where('commercial_campaign_run_id', $this->campaignRunId)
+            )
             ->where('status', 'pending')
             ->chunkById($chunkSize, function ($deliveries) use ($queue) {
                 $now = now()->toDateTimeString();
-
-                // Bulk-update to queued
                 $ids = $deliveries->pluck('id')->all();
+
                 CommercialCampaignDelivery::whereIn('id', $ids)
                     ->update(['status' => 'queued', 'queued_at' => $now]);
 
-                // Dispatch individual jobs
                 foreach ($deliveries as $delivery) {
-                    SendCommercialCampaignDeliveryJob::dispatch($delivery->id)->onQueue($queue);
+                    SendCommercialCampaignDeliveryJob::dispatch($delivery->id, $this->campaignRunId)
+                        ->onQueue($queue);
                 }
             });
 
-        // 3. If every row is already terminal (all skipped), finalize immediately
         $inProgress = CommercialCampaignDelivery::where('commercial_campaign_id', $this->campaignId)
+            ->when(
+                $this->campaignRunId !== null,
+                fn ($query) => $query->where('commercial_campaign_run_id', $this->campaignRunId)
+            )
             ->whereIn('status', ['pending', 'queued', 'sending'])
             ->count();
 
         if ($inProgress === 0) {
-            Log::info("[DispatchCommercialCampaignJob] All deliveries are terminal for campaign #{$this->campaignId}. Finalizing.");
-            $deliveryService->updateCampaignFinalStatus($campaign->fresh());
+            if ($this->campaignRunId !== null) {
+                $scheduleService->finalizeRun($this->campaignId, $this->campaignRunId);
+            } else {
+                $deliveryService->updateCampaignFinalStatus($campaign->fresh());
+            }
         }
     }
 
     public function failed(\Throwable $exception): void
     {
-        Log::error("[DispatchCommercialCampaignJob] Job failed for campaign #{$this->campaignId}: {$exception->getMessage()}");
+        Log::error("[DispatchCommercialCampaignJob] Failed for campaign #{$this->campaignId}: {$exception->getMessage()}");
+
+        if ($this->campaignRunId !== null) {
+            app(CampaignScheduleService::class)->failRun(
+                $this->campaignId,
+                $this->campaignRunId,
+                $exception->getMessage()
+            );
+
+            return;
+        }
 
         $campaign = CommercialCampaign::find($this->campaignId);
-        if ($campaign && $campaign->status === 'sending') {
-            $campaign->update(['status' => 'failed']);
+        if ($campaign && in_array($campaign->status, ['running', 'sending'], true)) {
+            $campaign->update(['status' => 'failed', 'next_run_at' => null]);
         }
     }
 }
+

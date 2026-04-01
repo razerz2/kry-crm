@@ -185,4 +185,16 @@ class SystemConfig
 
         return $coreConfigValue->value;
     }
+
+    /**
+     * Retrieve stored configuration value without default fallback.
+     */
+    public function getConfigDataWithoutDefault(string $field): mixed
+    {
+        $coreConfigValue = $this->coreConfigRepository->findOneWhere([
+            'code' => $field,
+        ]);
+
+        return $coreConfigValue?->value;
+    }
 }

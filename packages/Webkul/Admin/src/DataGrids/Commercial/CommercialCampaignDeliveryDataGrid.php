@@ -19,6 +19,7 @@ class CommercialCampaignDeliveryDataGrid extends DataGrid
             ->where('d.commercial_campaign_id', $campaignId)
             ->addSelect([
                 'd.id',
+                'd.commercial_campaign_run_id',
                 'd.channel',
                 'd.provider',
                 'd.recipient_name',
@@ -36,6 +37,7 @@ class CommercialCampaignDeliveryDataGrid extends DataGrid
         $this->addFilter('id', 'd.id');
         $this->addFilter('channel', 'd.channel');
         $this->addFilter('provider', 'd.provider');
+        $this->addFilter('commercial_campaign_run_id', 'd.commercial_campaign_run_id');
         $this->addFilter('status', 'd.status');
         $this->addFilter('recipient_name', 'd.recipient_name');
         $this->addFilter('recipient_email', 'd.recipient_email');
@@ -53,6 +55,15 @@ class CommercialCampaignDeliveryDataGrid extends DataGrid
             'sortable' => true,
             'searchable' => false,
             'filterable' => true,
+        ]);
+
+        $this->addColumn([
+            'index' => 'commercial_campaign_run_id',
+            'label' => trans('admin::app.commercial.campaigns.deliveries.datagrid.run'),
+            'type' => 'integer',
+            'sortable' => true,
+            'filterable' => true,
+            'closure' => fn ($row) => $row->commercial_campaign_run_id ?: '-',
         ]);
 
         $this->addColumn([
@@ -131,9 +142,10 @@ class CommercialCampaignDeliveryDataGrid extends DataGrid
         $this->addColumn([
             'index' => 'sent_at',
             'label' => trans('admin::app.commercial.campaigns.deliveries.datagrid.sent-at'),
-            'type' => 'datetime_range',
+            'type' => 'datetime',
             'sortable' => true,
             'filterable' => true,
+            'filterable_type' => 'datetime_range',
         ]);
     }
 

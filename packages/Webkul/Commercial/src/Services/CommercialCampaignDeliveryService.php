@@ -4,6 +4,7 @@ namespace Webkul\Commercial\Services;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Webkul\Commercial\Jobs\DispatchCommercialCampaignJob;
 use Webkul\Commercial\Models\CommercialCampaign;
 use Webkul\Commercial\Models\CommercialCampaignAudience;
@@ -21,7 +22,7 @@ class CommercialCampaignDeliveryService
     /**
      * Statuses that lock a campaign from further edits.
      */
-    public const LOCKED_STATUSES = ['sending', 'sent', 'partially_sent', 'failed'];
+    public const LOCKED_STATUSES = ['running', 'sending', 'sent', 'partially_sent', 'failed'];
 
     public function __construct(
         protected CommercialCampaignDeliveryRepository $deliveryRepo,
@@ -36,16 +37,19 @@ class CommercialCampaignDeliveryService
     /**
      * Validate preconditions and start the dispatch.
      *
-     * Sets campaign status to "sending" and dispatches the background job.
+     * Dispatches the background job for one campaign execution run.
      * Does NOT create delivery rows synchronously.
      *
      * @throws \RuntimeException if campaign is not dispatchable
      */
-    public function dispatch(CommercialCampaign $campaign): void
-    {
-        if ($campaign->status !== 'ready') {
+    public function dispatch(
+        CommercialCampaign $campaign,
+        ?int $campaignRunId = null,
+        bool $updateCampaignState = true
+    ): void {
+        if (! in_array($campaign->status, ['ready', 'scheduled', 'running', 'paused'], true)) {
             throw new \RuntimeException(
-                "Campaign #{$campaign->id} must be in 'ready' status to dispatch (current: {$campaign->status})."
+                "Campaign #{$campaign->id} is not dispatchable in the current status ({$campaign->status})."
             );
         }
 
@@ -55,13 +59,15 @@ class CommercialCampaignDeliveryService
             );
         }
 
-        $campaign->update([
-            'status' => 'sending',
-            'dispatched_at' => now(),
-            'updated_by' => Auth::id(),
-        ]);
+        if ($updateCampaignState) {
+            $campaign->update([
+                'status' => 'running',
+                'dispatched_at' => now(),
+                'updated_by' => Auth::id(),
+            ]);
+        }
 
-        DispatchCommercialCampaignJob::dispatch($campaign->id)
+        DispatchCommercialCampaignJob::dispatch($campaign->id, $campaignRunId)
             ->onQueue(config('commercial.campaign.queue', 'default'));
     }
 
@@ -76,18 +82,19 @@ class CommercialCampaignDeliveryService
      *
      * @return int number of rows inserted
      */
-    public function createDeliveries(CommercialCampaign $campaign): int
+    public function createDeliveries(CommercialCampaign $campaign, ?int $campaignRunId = null): int
     {
         $campaignChannel = $campaign->channel;
         $insertedTotal = 0;
         $chunkSize = (int) config('commercial.campaign.delivery_chunk_size', 200);
+        $dedupe = $this->loadDeliveryDedupeState($campaign->id, $campaignRunId);
 
         $campaign->audienceMembers()
-            ->chunkById($chunkSize, function ($members) use ($campaign, $campaignChannel, &$insertedTotal) {
+            ->chunkById($chunkSize, function ($members) use ($campaign, $campaignChannel, $campaignRunId, &$insertedTotal, &$dedupe) {
                 $rows = [];
 
                 foreach ($members as $member) {
-                    foreach ($this->buildDeliveryRows($campaign, $member, $campaignChannel) as $row) {
+                    foreach ($this->buildDeliveryRows($campaign, $member, $campaignChannel, $campaignRunId, $dedupe) as $row) {
                         $rows[] = $row;
                     }
                 }
@@ -117,65 +124,230 @@ class CommercialCampaignDeliveryService
     protected function buildDeliveryRows(
         CommercialCampaign $campaign,
         CommercialCampaignAudience $member,
-        string $campaignChannel
+        string $campaignChannel,
+        ?int $campaignRunId = null,
+        array &$dedupe = []
     ): array {
         $rows = [];
         $now = now()->toDateTimeString();
+        $whatsAppProvider = $this->resolveWhatsAppProvider();
         $base = [
             'commercial_campaign_id' => $campaign->id,
+            'commercial_campaign_run_id' => $campaignRunId,
             'commercial_campaign_audience_id' => $member->id,
             'entity_type' => $member->entity_type,
             'entity_id' => $member->entity_id,
             'recipient_name' => $member->display_name,
-            'created_by' => $campaign->updated_by,
+            'created_by' => $campaign->updated_by ?? $campaign->created_by,
             'created_at' => $now,
             'updated_at' => $now,
         ];
 
         if (in_array($campaignChannel, ['email', 'both'], true)) {
-            if ($member->email) {
-                $ctx = TemplateRenderContext::fromAudienceMember($member, $campaign, 'email');
-                $rows[] = array_merge($base, [
-                    'channel' => 'email',
-                    'provider' => config('commercial.campaign.email_provider', 'internal_email'),
-                    'recipient_email' => $member->email,
-                    'subject' => $this->renderer->renderSubject($campaign->subject ?? '', $ctx),
-                    'rendered_message' => $this->renderer->renderBody($campaign->message_body ?? '', $ctx),
-                    'status' => 'pending',
-                ]);
-            } else {
-                $rows[] = array_merge($base, [
-                    'channel' => 'email',
-                    'provider' => config('commercial.campaign.email_provider', 'internal_email'),
-                    'rendered_message' => '',
-                    'status' => 'skipped',
-                    'failure_reason' => 'No email address',
-                ]);
-            }
+            $this->appendDeliveryRow(
+                rows: $rows,
+                dedupe: $dedupe,
+                campaign: $campaign,
+                member: $member,
+                base: $base,
+                channel: 'email',
+                provider: config('commercial.campaign.email_provider', 'internal_email'),
+                destination: $member->email,
+            );
         }
 
         if (in_array($campaignChannel, ['whatsapp', 'both'], true)) {
-            if ($member->phone) {
-                $ctx = TemplateRenderContext::fromAudienceMember($member, $campaign, 'whatsapp');
-                $rows[] = array_merge($base, [
-                    'channel' => 'whatsapp',
-                    'provider' => config('commercial.campaign.whatsapp_provider', 'waha'),
-                    'recipient_phone' => $member->phone,
-                    'rendered_message' => $this->renderer->renderBody($campaign->message_body ?? '', $ctx),
-                    'status' => 'pending',
-                ]);
-            } else {
-                $rows[] = array_merge($base, [
-                    'channel' => 'whatsapp',
-                    'provider' => config('commercial.campaign.whatsapp_provider', 'waha'),
-                    'rendered_message' => '',
-                    'status' => 'skipped',
-                    'failure_reason' => 'No phone number',
-                ]);
-            }
+            $this->appendDeliveryRow(
+                rows: $rows,
+                dedupe: $dedupe,
+                campaign: $campaign,
+                member: $member,
+                base: $base,
+                channel: 'whatsapp',
+                provider: $whatsAppProvider,
+                destination: $member->phone,
+            );
         }
 
         return $rows;
+    }
+
+    protected function appendDeliveryRow(
+        array &$rows,
+        array &$dedupe,
+        CommercialCampaign $campaign,
+        CommercialCampaignAudience $member,
+        array $base,
+        string $channel,
+        ?string $provider,
+        ?string $destination
+    ): void {
+        $entityKey = $this->entityDedupeKey(
+            (int) ($base['commercial_campaign_run_id'] ?? 0),
+            (string) $member->entity_type,
+            (int) $member->entity_id,
+            $channel
+        );
+
+        if (isset($dedupe['entity'][$entityKey])) {
+            return;
+        }
+
+        $normalizedDestination = $this->normalizeDestination($channel, $destination);
+
+        if ($normalizedDestination) {
+            $destinationKey = $this->destinationDedupeKey(
+                (int) ($base['commercial_campaign_run_id'] ?? 0),
+                $channel,
+                $normalizedDestination
+            );
+
+            if (isset($dedupe['destination'][$destinationKey])) {
+                return;
+            }
+        }
+
+        $ctx = TemplateRenderContext::fromAudienceMember($member, $campaign, $channel);
+        $row = array_merge($base, [
+            'channel' => $channel,
+            'provider' => $provider,
+            'recipient_email' => null,
+            'recipient_phone' => null,
+            'subject' => null,
+            'failure_reason' => null,
+            'rendered_message' => '',
+        ]);
+
+        if ($this->hasNormalizedDestinationColumn()) {
+            $row['normalized_destination'] = $normalizedDestination;
+        }
+
+        if ($channel === 'email') {
+            if ($destination && $normalizedDestination) {
+                $row['recipient_email'] = $destination;
+                $row['subject'] = $this->renderer->renderSubject($campaign->subject ?? '', $ctx);
+                $row['rendered_message'] = $this->renderer->renderBody($campaign->message_body ?? '', $ctx);
+                $row['status'] = 'pending';
+            } else {
+                $row['status'] = 'skipped';
+                $row['failure_reason'] = 'No email address';
+            }
+        } else {
+            if ($destination && $normalizedDestination) {
+                $row['recipient_phone'] = $destination;
+                $row['rendered_message'] = $this->renderer->renderBody($campaign->message_body ?? '', $ctx);
+                $row['status'] = 'pending';
+            } else {
+                $row['status'] = 'skipped';
+                $row['failure_reason'] = 'No phone number';
+            }
+        }
+
+        $rows[] = $row;
+        $dedupe['entity'][$entityKey] = true;
+
+        if (! empty($destinationKey ?? null)) {
+            $dedupe['destination'][$destinationKey] = true;
+        }
+    }
+
+    protected function loadDeliveryDedupeState(int $campaignId, ?int $campaignRunId): array
+    {
+        $state = [
+            'entity' => [],
+            'destination' => [],
+        ];
+
+        $query = DB::table('commercial_campaign_deliveries')
+            ->where('commercial_campaign_id', $campaignId)
+            ->select([
+                'id',
+                'commercial_campaign_run_id',
+                'entity_type',
+                'entity_id',
+                'channel',
+                'recipient_email',
+                'recipient_phone',
+            ]);
+
+        $hasNormalizedDestination = $this->hasNormalizedDestinationColumn();
+
+        if ($hasNormalizedDestination) {
+            $query->addSelect('normalized_destination');
+        }
+
+        if ($campaignRunId !== null) {
+            $query->where('commercial_campaign_run_id', $campaignRunId);
+        } else {
+            $query->whereNull('commercial_campaign_run_id');
+        }
+
+        $query->orderBy('id')
+            ->chunkById(500, function ($rows) use (&$state, $hasNormalizedDestination) {
+                foreach ($rows as $row) {
+                    $runId = (int) ($row->commercial_campaign_run_id ?? 0);
+                    $channel = (string) $row->channel;
+
+                    $state['entity'][$this->entityDedupeKey(
+                        $runId,
+                        (string) $row->entity_type,
+                        (int) $row->entity_id,
+                        $channel
+                    )] = true;
+
+                    $normalized = ($hasNormalizedDestination ? $row->normalized_destination : null)
+                        ?: $this->normalizeDestination(
+                            $channel,
+                            $channel === 'email' ? $row->recipient_email : $row->recipient_phone
+                        );
+
+                    if ($normalized) {
+                        $state['destination'][$this->destinationDedupeKey($runId, $channel, $normalized)] = true;
+                    }
+                }
+            }, 'id');
+
+        return $state;
+    }
+
+    protected function entityDedupeKey(int $runId, string $entityType, int $entityId, string $channel): string
+    {
+        return $runId.'|'.$entityType.'|'.$entityId.'|'.$channel;
+    }
+
+    protected function destinationDedupeKey(int $runId, string $channel, string $normalizedDestination): string
+    {
+        return $runId.'|'.$channel.'|'.$normalizedDestination;
+    }
+
+    protected function normalizeDestination(string $channel, ?string $destination): ?string
+    {
+        $destination = trim((string) $destination);
+
+        if ($destination === '') {
+            return null;
+        }
+
+        if ($channel === 'email') {
+            $normalized = mb_strtolower($destination);
+
+            return filter_var($normalized, FILTER_VALIDATE_EMAIL) ? $normalized : null;
+        }
+
+        $digits = preg_replace('/\D+/', '', $destination) ?: '';
+
+        return $digits !== '' ? $digits : null;
+    }
+
+    protected function hasNormalizedDestinationColumn(): bool
+    {
+        static $hasColumn = null;
+
+        if ($hasColumn === null) {
+            $hasColumn = Schema::hasColumn('commercial_campaign_deliveries', 'normalized_destination');
+        }
+
+        return $hasColumn;
     }
 
     /* ── Individual delivery processing ─────────────────────────── */
@@ -293,6 +465,25 @@ class CommercialCampaignDeliveryService
             'message' => $message,
             'context_json' => ! empty($context) ? $context : null,
         ]);
+    }
+
+    protected function resolveWhatsAppProvider(): string
+    {
+        try {
+            $configuredDriver = (string) core()->getConfigData('whatsapp.provider.driver');
+        } catch (\Throwable) {
+            $configuredDriver = '';
+        }
+
+        if ($configuredDriver === '') {
+            $configuredDriver = (string) config('commercial.campaign.whatsapp_provider', 'waha');
+        }
+
+        return match ($configuredDriver) {
+            'meta', 'meta_official' => 'meta_official',
+            'evolution'             => 'evolution',
+            default                 => 'waha',
+        };
     }
 
     /* ── Private ─────────────────────────────────────────────────── */

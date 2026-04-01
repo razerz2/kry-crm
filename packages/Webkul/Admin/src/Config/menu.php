@@ -245,6 +245,18 @@ return [
         'route' => 'admin.commercial.campaigns.index',
         'sort' => 1,
         'icon-class' => '',
+    ], [
+        'key' => 'commercial.executions',
+        'name' => 'admin::app.layouts.commercial-executions',
+        'route' => 'admin.commercial.executions.index',
+        'sort' => 2,
+        'icon-class' => '',
+    ], [
+        'key' => 'commercial.deliveries',
+        'name' => 'admin::app.layouts.commercial-deliveries',
+        'route' => 'admin.commercial.deliveries.index',
+        'sort' => 3,
+        'icon-class' => '',
     ],
 
     /**

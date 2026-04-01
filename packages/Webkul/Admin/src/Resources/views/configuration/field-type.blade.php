@@ -456,13 +456,42 @@
                 }
 
                 dependElement.addEventListener('change', (event) => {
-                    this.field['is_visible'] = 
-                        event.target.type === 'checkbox' 
-                        ? event.target.checked
-                        : this.validations.split(',').slice(1).includes(event.target.value);
+                    const dependValues = this.getDependValues();
+
+                    if (event.target.type === 'checkbox') {
+                        this.field['is_visible'] = event.target.checked;
+
+                        return;
+                    }
+
+                    if (dependValues.length) {
+                        this.field['is_visible'] = dependValues.includes(String(event.target.value));
+
+                        return;
+                    }
+
+                    this.field['is_visible'] = this.validations.split(',').slice(1).includes(event.target.value);
                 });
 
                 dependElement.dispatchEvent(new Event('change'));
+            },
+
+            methods: {
+                getDependValues() {
+                    const depends = this.field?.depends || '';
+
+                    if (! depends.includes(':')) {
+                        return [];
+                    }
+
+                    const [, values] = depends.split(':');
+
+                    return String(values || '')
+                        .replace(/\|/g, ',')
+                        .split(',')
+                        .map(value => value.trim())
+                        .filter(Boolean);
+                },
             },
         });
 

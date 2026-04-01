@@ -65,9 +65,10 @@ class CommercialCampaignService
             $data['total_with_email'] = 0;
             $data['total_with_phone'] = 0;
 
-            // If ready, revert to draft so dispatch is blocked until re-freeze
-            if ($campaign->status === 'ready') {
+            // If actively operable, revert to draft so execution is blocked until re-freeze
+            if (in_array($campaign->status, ['ready', 'scheduled', 'paused'], true)) {
                 $data['status'] = 'draft';
+                $data['next_run_at'] = null;
             }
         }
 
@@ -138,9 +139,11 @@ class CommercialCampaignService
      *
      * @throws \RuntimeException if campaign is locked
      */
-    public function freezeAudience(CommercialCampaign $campaign): CommercialCampaign
+    public function freezeAudience(CommercialCampaign $campaign, bool $enforceGuard = true): CommercialCampaign
     {
-        $this->stateGuard->assertAudienceCanBeUpdated($campaign);
+        if ($enforceGuard) {
+            $this->stateGuard->assertAudienceCanBeUpdated($campaign);
+        }
 
         $filters = $campaign->filters_json ?? [];
         $filter = $this->buildAudienceFilter($filters);
@@ -166,6 +169,17 @@ class CommercialCampaignService
         ]);
 
         return $campaign->fresh();
+    }
+
+    /**
+     * Refresh audience during an execution run.
+     *
+     * This bypasses the edit-state guard because recurring executions run while
+     * campaign status is "running".
+     */
+    public function freezeAudienceForExecution(CommercialCampaign $campaign): CommercialCampaign
+    {
+        return $this->freezeAudience($campaign, false);
     }
 
     /**

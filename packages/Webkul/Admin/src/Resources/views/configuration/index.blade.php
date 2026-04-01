@@ -54,29 +54,52 @@
                 </div>
 
                 <div class="box-shadow max-1580:grid-cols-3 mt-2 grid grid-cols-4 flex-wrap justify-between gap-x-12 gap-y-6 rounded bg-white p-4 dark:bg-gray-900 max-xl:grid-cols-2 max-lg:gap-y-4 max-sm:grid-cols-1">
-                    <!-- Menus cards -->
-                    @foreach ($item->getChildren() as $key => $child)
-                        <a 
+                    @if ($item->getChildren()->isNotEmpty())
+                        <!-- Menus cards -->
+                        @foreach ($item->getChildren() as $key => $child)
+                            <a 
+                                class="flex max-w-[360px] items-center gap-2 rounded-lg p-2 transition-all hover:bg-gray-100 dark:hover:bg-gray-950"
+                                href="{{ route('admin.configuration.index', ($item->getKey() . '/' . $key)) }}"
+                            >
+                                @if ($icon = $child->getIcon())
+                                    <div class="rounded-lg bg-gray-100 p-3 dark:bg-gray-800">
+                                        <i class="{{ $child->getIcon() }} text-3xl "></i>
+                                    </div>
+                                @endif
+
+                                <div class="grid">
+                                    <p class="mb-1.5 text-base font-semibold text-gray-800 dark:text-white">
+                                        {{ $child->getName() }}
+                                    </p>
+                                    
+                                    <p class="text-xs text-gray-600 dark:text-gray-300">
+                                        {{ $child->getInfo() }}
+                                    </p>
+                                </div>
+                            </a>
+                        @endforeach
+                    @else
+                        <a
                             class="flex max-w-[360px] items-center gap-2 rounded-lg p-2 transition-all hover:bg-gray-100 dark:hover:bg-gray-950"
-                            href="{{ route('admin.configuration.index', ($item->getKey() . '/' . $key)) }}"
+                            href="{{ route('admin.configuration.index', $item->getKey()) }}"
                         >
-                            @if ($icon = $child->getIcon())
+                            @if ($icon = $item->getIcon())
                                 <div class="rounded-lg bg-gray-100 p-3 dark:bg-gray-800">
-                                    <i class="{{ $child->getIcon() }} text-3xl "></i>
+                                    <i class="{{ $item->getIcon() }} text-3xl "></i>
                                 </div>
                             @endif
 
                             <div class="grid">
                                 <p class="mb-1.5 text-base font-semibold text-gray-800 dark:text-white">
-                                    {{ $child->getName() }}
+                                    {{ $item->getName() }}
                                 </p>
-                                
+
                                 <p class="text-xs text-gray-600 dark:text-gray-300">
-                                    {{ $child->getInfo() }}
+                                    {{ $item->getInfo() }}
                                 </p>
                             </div>
                         </a>
-                    @endforeach
+                    @endif
                 </div>
             </div>
         @endforeach

@@ -20,6 +20,11 @@
                         $statusClass = match($campaign->status) {
                             'draft'          => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
                             'ready'          => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+                            'scheduled'      => 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
+                            'running'        => 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200',
+                            'paused'         => 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+                            'completed'      => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+                            'canceled'       => 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
                             'sending'        => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
                             'sent'           => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
                             'partially_sent' => 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
@@ -70,26 +75,85 @@
                             </button>
                         </form>
                     @endif
-                @endif
 
-                {{-- Dispatch button --}}
-                @if (bouncer()->hasPermission('commercial.campaigns.dispatch') && $campaign->canDispatch())
-                    <form
-                        action="{{ route('admin.commercial.campaigns.dispatch', $campaign->id) }}"
-                        method="POST"
-                        onsubmit="return confirm('{{ trans('admin::app.commercial.campaigns.dispatch.confirm', ['count' => $campaign->total_audience]) }}')"
-                    >
-                        @csrf
-                        <button type="submit" class="primary-button !bg-green-600 hover:!bg-green-700">
-                            @lang('admin::app.commercial.campaigns.dispatch.btn')
-                        </button>
-                    </form>
+                    @if ($campaign->execution_type === 'manual' && $campaign->canDispatch())
+                        <form
+                            action="{{ route('admin.commercial.campaigns.dispatch', $campaign->id) }}"
+                            method="POST"
+                            onsubmit="return confirm('{{ trans('admin::app.commercial.campaigns.dispatch.confirm', ['count' => $campaign->total_audience]) }}')"
+                        >
+                            @csrf
+                            <button type="submit" class="primary-button !bg-green-600 hover:!bg-green-700">
+                                @lang('admin::app.commercial.campaigns.dispatch.btn')
+                            </button>
+                        </form>
+                    @endif
+
+                    @if (in_array($campaign->status, ['ready', 'scheduled', 'paused'], true))
+                        <form action="{{ route('admin.commercial.campaigns.run_now', $campaign->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="secondary-button">
+                                @lang('admin::app.commercial.campaigns.schedule.run-now-btn')
+                            </button>
+                        </form>
+                    @endif
+
+                    @if ($campaign->execution_type !== 'manual' && in_array($campaign->status, ['ready', 'paused', 'completed'], true))
+                        <form action="{{ route('admin.commercial.campaigns.schedule', $campaign->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="primary-button">
+                                @lang('admin::app.commercial.campaigns.schedule.schedule-btn')
+                            </button>
+                        </form>
+                    @endif
+
+                    @if ($campaign->execution_type !== 'manual')
+                        <form action="{{ route('admin.commercial.campaigns.recalculate_next_run', $campaign->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="transparent-button">
+                                @lang('admin::app.commercial.campaigns.schedule.recalculate-next-btn')
+                            </button>
+                        </form>
+                    @endif
+
+                    @if ($campaign->isScheduled())
+                        <form action="{{ route('admin.commercial.campaigns.pause', $campaign->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="transparent-button">
+                                @lang('admin::app.commercial.campaigns.schedule.pause-btn')
+                            </button>
+                        </form>
+                    @endif
+
+                    @if ($campaign->isPaused())
+                        <form action="{{ route('admin.commercial.campaigns.resume', $campaign->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="primary-button">
+                                @lang('admin::app.commercial.campaigns.schedule.resume-btn')
+                            </button>
+                        </form>
+                    @endif
+
+                    @if (! $campaign->isCanceled() && ! $campaign->isCompleted())
+                        <form action="{{ route('admin.commercial.campaigns.cancel', $campaign->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="transparent-button">
+                                @lang('admin::app.commercial.campaigns.schedule.cancel-btn')
+                            </button>
+                        </form>
+                    @endif
                 @endif
 
                 {{-- View deliveries --}}
                 @if ($campaign->isLocked() || $campaign->total_deliveries > 0)
                     <a href="{{ route('admin.commercial.campaigns.deliveries', $campaign->id) }}" class="primary-button">
                         @lang('admin::app.commercial.campaigns.dispatch.view-deliveries')
+                    </a>
+                @endif
+
+                @if (bouncer()->hasPermission('commercial.executions'))
+                    <a href="{{ route('admin.commercial.executions.index', ['campaign_id' => $campaign->id]) }}" class="transparent-button">
+                        @lang('admin::app.commercial.executions.index.menu-shortcut')
                     </a>
                 @endif
             </div>
@@ -105,14 +169,14 @@
         {{-- Locked (sent/failed/sending) banner --}}
         @if ($campaign->isLocked())
             <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
-                🔒 {{ trans('admin::app.commercial.campaigns.dispatch.locked-banner', ['status' => trans('admin::app.commercial.campaigns.statuses.' . $campaign->status)]) }}
+                {{ trans('admin::app.commercial.campaigns.dispatch.locked-banner', ['status' => trans('admin::app.commercial.campaigns.statuses.' . $campaign->status)]) }}
             </div>
         @endif
 
         {{-- Audience stale warning --}}
         @if ($audienceStale ?? false)
             <div class="rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-700 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-300">
-                ⚠ @lang('admin::app.commercial.campaigns.guard.audience-stale-warning')
+                @lang('admin::app.commercial.campaigns.guard.audience-stale-warning')
             </div>
         @endif
 
@@ -159,6 +223,55 @@
         {{-- Delivery stats (shown after first dispatch) --}}
         @if (($stats['total'] ?? 0) > 0)
             @include('admin::commercial.campaigns.partials.delivery-stats', ['stats' => $stats])
+        @endif
+
+        @if (($recentRuns ?? collect())->isNotEmpty())
+            <div class="box-shadow rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+                <p class="mb-3 text-base font-semibold text-gray-800 dark:text-white">
+                    @lang('admin::app.commercial.campaigns.schedule.recent-runs')
+                </p>
+
+                <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-800">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">#</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">@lang('admin::app.commercial.campaigns.schedule.status')</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">@lang('admin::app.commercial.campaigns.schedule.scheduled-for')</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium uppercase tracking-wider text-gray-500">@lang('admin::app.commercial.campaigns.schedule.finished-at')</th>
+                                <th class="px-4 py-2 text-right text-xs font-medium uppercase tracking-wider text-gray-500">@lang('admin::app.commercial.campaigns.deliveries.stats-title')</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 bg-white dark:divide-gray-700 dark:bg-gray-900">
+                            @foreach ($recentRuns as $run)
+                                <tr>
+                                    <td class="px-4 py-2 font-medium text-gray-800 dark:text-white">
+                                        @if (bouncer()->hasPermission('commercial.executions.view'))
+                                            <a href="{{ route('admin.commercial.executions.show', $run->id) }}" class="text-brandColor hover:underline">
+                                                #{{ $run->id }}
+                                            </a>
+                                        @else
+                                            #{{ $run->id }}
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-2 text-gray-600 dark:text-gray-300">
+                                        @lang('admin::app.commercial.campaigns.schedule.run-statuses.' . $run->status)
+                                    </td>
+                                    <td class="px-4 py-2 text-gray-600 dark:text-gray-300">
+                                        {{ $run->scheduled_for ? $run->scheduled_for->setTimezone($campaign->timezone ?? config('app.timezone'))->format('d/m/Y H:i') : '-' }}
+                                    </td>
+                                    <td class="px-4 py-2 text-gray-600 dark:text-gray-300">
+                                        {{ $run->finished_at ? $run->finished_at->setTimezone($campaign->timezone ?? config('app.timezone'))->format('d/m/Y H:i') : '-' }}
+                                    </td>
+                                    <td class="px-4 py-2 text-right text-gray-600 dark:text-gray-300">
+                                        {{ number_format($run->total_deliveries) }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         @endif
 
         <div class="flex gap-2.5 max-xl:flex-wrap">
@@ -250,6 +363,18 @@
                                     <option value="ready" {{ old('status', $campaign->status) === 'ready' ? 'selected' : '' }}>
                                         @lang('admin::app.commercial.campaigns.statuses.ready')
                                     </option>
+                                    <option value="scheduled" {{ old('status', $campaign->status) === 'scheduled' ? 'selected' : '' }}>
+                                        @lang('admin::app.commercial.campaigns.statuses.scheduled')
+                                    </option>
+                                    <option value="paused" {{ old('status', $campaign->status) === 'paused' ? 'selected' : '' }}>
+                                        @lang('admin::app.commercial.campaigns.statuses.paused')
+                                    </option>
+                                    <option value="completed" {{ old('status', $campaign->status) === 'completed' ? 'selected' : '' }}>
+                                        @lang('admin::app.commercial.campaigns.statuses.completed')
+                                    </option>
+                                    <option value="canceled" {{ old('status', $campaign->status) === 'canceled' ? 'selected' : '' }}>
+                                        @lang('admin::app.commercial.campaigns.statuses.canceled')
+                                    </option>
                                     <option value="archived" {{ old('status', $campaign->status) === 'archived' ? 'selected' : '' }}>
                                         @lang('admin::app.commercial.campaigns.statuses.archived')
                                     </option>
@@ -298,6 +423,8 @@
                             @endif
                         </div>
                     </div>
+
+                    @include('admin::commercial.campaigns.partials.schedule-fields', ['campaign' => $campaign])
                 </x-admin::form>
 
                 {{-- Template Preview --}}

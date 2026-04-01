@@ -144,11 +144,211 @@ return [
             ],
         ],
     ], [
+        'key' => 'email',
+        'name' => 'admin::app.configuration.index.email.title',
+        'info' => 'admin::app.configuration.index.email.info',
+        'sort' => 3,
+    ], [
+        'key' => 'email.smtp',
+        'name' => 'admin::app.configuration.index.email.smtp.title',
+        'info' => 'admin::app.configuration.index.email.smtp.info',
+        'icon' => 'icon-settings-mail',
+        'sort' => 1,
+    ], [
+        'key' => 'email.smtp.account',
+        'name' => 'admin::app.configuration.index.email.smtp.account.title',
+        'info' => 'admin::app.configuration.index.email.smtp.account.title-info',
+        'sort' => 1,
+        'fields' => [
+            [
+                'name' => 'host',
+                'title' => 'admin::app.configuration.index.email.smtp.account.host',
+                'type' => 'text',
+                'default' => env('MAIL_HOST', ''),
+                'validation' => 'required|string|max:255',
+            ], [
+                'name' => 'port',
+                'title' => 'admin::app.configuration.index.email.smtp.account.port',
+                'type' => 'number',
+                'default' => (int) env('MAIL_PORT', 587),
+                'validation' => 'required|integer|min:1|max:65535',
+            ], [
+                'name' => 'encryption',
+                'title' => 'admin::app.configuration.index.email.smtp.account.encryption',
+                'type' => 'select',
+                'default' => env('MAIL_ENCRYPTION', 'tls') ?: 'null',
+                'options' => [
+                    [
+                        'title' => 'admin::app.configuration.index.email.smtp.account.encryption-options.tls',
+                        'value' => 'tls',
+                    ], [
+                        'title' => 'admin::app.configuration.index.email.smtp.account.encryption-options.ssl',
+                        'value' => 'ssl',
+                    ], [
+                        'title' => 'admin::app.configuration.index.email.smtp.account.encryption-options.null',
+                        'value' => 'null',
+                    ],
+                ],
+                'validation' => 'required|in:tls,ssl,null',
+            ], [
+                'name' => 'username',
+                'title' => 'admin::app.configuration.index.email.smtp.account.username',
+                'type' => 'text',
+                'default' => env('MAIL_USERNAME', ''),
+                'validation' => 'nullable|string|max:255',
+            ], [
+                'name' => 'password',
+                'title' => 'admin::app.configuration.index.email.smtp.account.password',
+                'type' => 'password',
+                'default' => env('MAIL_PASSWORD', ''),
+                'validation' => 'nullable|string|max:255',
+            ], [
+                'name' => 'from_name',
+                'title' => 'admin::app.configuration.index.email.smtp.account.from-name',
+                'type' => 'text',
+                'default' => env('MAIL_FROM_NAME', env('APP_NAME', 'Krayin CRM')),
+                'validation' => 'required|string|max:255',
+            ], [
+                'name' => 'from_address',
+                'title' => 'admin::app.configuration.index.email.smtp.account.from-address',
+                'type' => 'text',
+                'default' => env('MAIL_FROM_ADDRESS', ''),
+                'validation' => 'required|email|max:255',
+            ], [
+                'name' => 'timeout',
+                'title' => 'admin::app.configuration.index.email.smtp.account.timeout',
+                'type' => 'number',
+                'default' => null,
+                'validation' => 'nullable|integer|min:1|max:300',
+            ],
+        ],
+    ], [
+        'key' => 'whatsapp',
+        'name' => 'admin::app.configuration.index.whatsapp.title',
+        'info' => 'admin::app.configuration.index.whatsapp.info',
+        'icon' => 'icon-settings-webhooks',
+        'sort' => 4,
+        'fields' => [
+            [
+                'name' => 'provider.driver',
+                'title' => 'admin::app.configuration.index.whatsapp.provider.driver',
+                'type' => 'select',
+                'default' => env('COMMERCIAL_WHATSAPP_PROVIDER', 'waha') === 'meta_official' ? 'meta' : env('COMMERCIAL_WHATSAPP_PROVIDER', 'waha'),
+                'options' => [
+                    [
+                        'title' => 'admin::app.configuration.index.whatsapp.provider.options.meta',
+                        'value' => 'meta',
+                    ], [
+                        'title' => 'admin::app.configuration.index.whatsapp.provider.options.waha',
+                        'value' => 'waha',
+                    ], [
+                        'title' => 'admin::app.configuration.index.whatsapp.provider.options.evolution',
+                        'value' => 'evolution',
+                    ],
+                ],
+                'validation' => 'required|in:meta,waha,evolution',
+            ],
+
+            [
+                'name' => 'meta.base_url',
+                'title' => 'admin::app.configuration.index.whatsapp.meta.base-url',
+                'type' => 'text',
+                'default' => 'https://graph.facebook.com',
+                'depends' => 'provider.driver:meta',
+                'validation' => 'nullable|url|max:255',
+            ], [
+                'name' => 'meta.api_version',
+                'title' => 'admin::app.configuration.index.whatsapp.meta.api-version',
+                'type' => 'text',
+                'default' => 'v21.0',
+                'depends' => 'provider.driver:meta',
+                'validation' => 'required_if:whatsapp.provider.driver,meta|string|max:20',
+            ], [
+                'name' => 'meta.access_token',
+                'title' => 'admin::app.configuration.index.whatsapp.meta.access-token',
+                'type' => 'password',
+                'depends' => 'provider.driver:meta',
+                'validation' => 'required_if:whatsapp.provider.driver,meta|string|max:2048',
+            ], [
+                'name' => 'meta.business_account_id',
+                'title' => 'admin::app.configuration.index.whatsapp.meta.business-account-id',
+                'type' => 'text',
+                'depends' => 'provider.driver:meta',
+                'validation' => 'required_if:whatsapp.provider.driver,meta|string|max:255',
+            ], [
+                'name' => 'meta.phone_number_id',
+                'title' => 'admin::app.configuration.index.whatsapp.meta.phone-number-id',
+                'type' => 'text',
+                'depends' => 'provider.driver:meta',
+                'validation' => 'required_if:whatsapp.provider.driver,meta|string|max:255',
+            ], [
+                'name' => 'meta.webhook_verify_token',
+                'title' => 'admin::app.configuration.index.whatsapp.meta.webhook-verify-token',
+                'type' => 'password',
+                'depends' => 'provider.driver:meta',
+                'validation' => 'nullable|string|max:255',
+            ],
+
+            [
+                'name' => 'waha.base_url',
+                'title' => 'admin::app.configuration.index.whatsapp.waha.base-url',
+                'type' => 'text',
+                'depends' => 'provider.driver:waha',
+                'validation' => 'required_if:whatsapp.provider.driver,waha|url|max:255',
+            ], [
+                'name' => 'waha.api_key',
+                'title' => 'admin::app.configuration.index.whatsapp.waha.api-key',
+                'type' => 'password',
+                'depends' => 'provider.driver:waha',
+                'validation' => 'required_if:whatsapp.provider.driver,waha|string|max:2048',
+            ], [
+                'name' => 'waha.session',
+                'title' => 'admin::app.configuration.index.whatsapp.waha.session',
+                'type' => 'text',
+                'depends' => 'provider.driver:waha',
+                'validation' => 'required_if:whatsapp.provider.driver,waha|string|max:255',
+            ], [
+                'name' => 'waha.timeout',
+                'title' => 'admin::app.configuration.index.whatsapp.waha.timeout',
+                'type' => 'number',
+                'default' => 30,
+                'depends' => 'provider.driver:waha',
+                'validation' => 'nullable|integer|min:1|max:300',
+            ],
+
+            [
+                'name' => 'evolution.base_url',
+                'title' => 'admin::app.configuration.index.whatsapp.evolution.base-url',
+                'type' => 'text',
+                'depends' => 'provider.driver:evolution',
+                'validation' => 'required_if:whatsapp.provider.driver,evolution|url|max:255',
+            ], [
+                'name' => 'evolution.api_key',
+                'title' => 'admin::app.configuration.index.whatsapp.evolution.api-key',
+                'type' => 'password',
+                'depends' => 'provider.driver:evolution',
+                'validation' => 'required_if:whatsapp.provider.driver,evolution|string|max:2048',
+            ], [
+                'name' => 'evolution.instance',
+                'title' => 'admin::app.configuration.index.whatsapp.evolution.instance',
+                'type' => 'text',
+                'depends' => 'provider.driver:evolution',
+                'validation' => 'required_if:whatsapp.provider.driver,evolution|string|max:255',
+            ], [
+                'name' => 'evolution.timeout',
+                'title' => 'admin::app.configuration.index.whatsapp.evolution.timeout',
+                'type' => 'number',
+                'default' => 30,
+                'depends' => 'provider.driver:evolution',
+                'validation' => 'nullable|integer|min:1|max:300',
+            ],
+        ],
+    ], [
         'key' => 'general.magic_ai',
         'name' => 'admin::app.configuration.index.magic-ai.title',
         'info' => 'admin::app.configuration.index.magic-ai.info',
         'icon' => 'icon-setting',
-        'sort' => 3,
+        'sort' => 5,
     ], [
         'key' => 'general.magic_ai.settings',
         'name' => 'admin::app.configuration.index.magic-ai.settings.title',

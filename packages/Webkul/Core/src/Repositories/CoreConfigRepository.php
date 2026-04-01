@@ -80,7 +80,12 @@ class CoreConfigRepository extends Repository
                 stripos($title, $searchTerm) !== false
                 && count($path)
             ) {
-                $queryParam = $path[1]['key'] ?? $configuration->getKey();
+                $queryParam = $path[1]['key']
+                    ?? (method_exists($configuration, 'getKey') ? $configuration->getKey() : ($path[0]['key'] ?? null));
+
+                if (! $queryParam) {
+                    continue;
+                }
 
                 $results[] = [
                     'title' => implode(' > ', [...Arr::pluck($path, 'title'), $title]),
