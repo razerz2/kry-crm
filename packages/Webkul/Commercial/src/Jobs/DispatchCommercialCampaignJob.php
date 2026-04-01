@@ -106,4 +106,3 @@ class DispatchCommercialCampaignJob implements ShouldQueue
         }
     }
 }
-

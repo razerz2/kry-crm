@@ -481,8 +481,8 @@ class CommercialCampaignDeliveryService
 
         return match ($configuredDriver) {
             'meta', 'meta_official' => 'meta_official',
-            'evolution'             => 'evolution',
-            default                 => 'waha',
+            'evolution' => 'evolution',
+            default => 'waha',
         };
     }
 

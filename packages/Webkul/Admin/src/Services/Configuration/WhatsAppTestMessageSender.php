@@ -21,10 +21,10 @@ class WhatsAppTestMessageSender
             $normalizedPhone = $this->normalizePhone($phone);
 
             return match ($driver) {
-                'meta'      => $this->sendViaMeta($config, $normalizedPhone, $message),
-                'waha'      => $this->sendViaWaha($config, $normalizedPhone, $message),
+                'meta' => $this->sendViaMeta($config, $normalizedPhone, $message),
+                'waha' => $this->sendViaWaha($config, $normalizedPhone, $message),
                 'evolution' => $this->sendViaEvolution($config, $normalizedPhone, $message),
-                default     => [
+                default => [
                     'success' => false,
                     'message' => trans('admin::app.configuration.index.whatsapp.test-message.errors.invalid-driver'),
                 ],

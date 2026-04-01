@@ -28,9 +28,9 @@ class WhatsAppCampaignSender implements CampaignChannelSenderInterface
 
         $providerMessageId = match ($provider) {
             'meta_official' => $this->sendViaMetaOfficial($config, $phone, $message),
-            'waha'          => $this->sendViaWaha($config, $phone, $message),
-            'evolution'     => $this->sendViaEvolution($config, $phone, $message),
-            default         => throw new RuntimeException(
+            'waha' => $this->sendViaWaha($config, $phone, $message),
+            'evolution' => $this->sendViaEvolution($config, $phone, $message),
+            default => throw new RuntimeException(
                 trans('admin::app.commercial.campaigns.deliveries.errors.unsupported-provider', ['provider' => $provider])
             ),
         };

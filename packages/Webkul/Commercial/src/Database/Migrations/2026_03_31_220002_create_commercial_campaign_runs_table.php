@@ -53,4 +53,3 @@ return new class extends Migration
         Schema::dropIfExists('commercial_campaign_runs');
     }
 };
-

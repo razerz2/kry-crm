@@ -2,9 +2,9 @@
 
 namespace Webkul\Admin\Http\Controllers\Configuration;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
@@ -87,22 +87,22 @@ class ConfigurationController extends Controller
                 'test_email' => $request->input('test_email'),
             ]),
             [
-                'host'         => ['required', 'string', 'max:255'],
-                'port'         => ['required', 'integer', 'min:1', 'max:65535'],
-                'encryption'   => ['required', 'in:tls,ssl,null'],
-                'username'     => ['nullable', 'string', 'max:255'],
-                'password'     => ['nullable', 'string', 'max:255'],
-                'from_name'    => ['required', 'string', 'max:255'],
+                'host' => ['required', 'string', 'max:255'],
+                'port' => ['required', 'integer', 'min:1', 'max:65535'],
+                'encryption' => ['required', 'in:tls,ssl,null'],
+                'username' => ['nullable', 'string', 'max:255'],
+                'password' => ['nullable', 'string', 'max:255'],
+                'from_name' => ['required', 'string', 'max:255'],
                 'from_address' => ['required', 'email', 'max:255'],
-                'timeout'      => ['nullable', 'integer', 'min:1', 'max:300'],
-                'test_email'   => ['required', 'email', 'max:255'],
+                'timeout' => ['nullable', 'integer', 'min:1', 'max:300'],
+                'test_email' => ['required', 'email', 'max:255'],
             ]
         );
 
         if ($validator->fails()) {
             return new JsonResponse([
                 'message' => trans('admin::app.configuration.index.email.smtp.test.validation-error'),
-                'errors'  => $validator->errors(),
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -152,7 +152,7 @@ class ConfigurationController extends Controller
         if ($validator->fails()) {
             return new JsonResponse([
                 'message' => trans('admin::app.configuration.index.whatsapp.test.validation-error'),
-                'errors'  => $validator->errors(),
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -190,7 +190,7 @@ class ConfigurationController extends Controller
         if ($validator->fails()) {
             return new JsonResponse([
                 'message' => trans('admin::app.configuration.index.whatsapp.test-message.validation-error'),
-                'errors'  => $validator->errors(),
+                'errors' => $validator->errors(),
             ], 422);
         }
 

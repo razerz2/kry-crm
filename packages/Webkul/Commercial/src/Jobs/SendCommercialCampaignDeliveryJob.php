@@ -106,4 +106,3 @@ class SendCommercialCampaignDeliveryJob implements ShouldQueue
         }
     }
 }
-

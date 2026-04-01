@@ -62,4 +62,3 @@ class CommercialCampaignRun extends Model implements CommercialCampaignRunContra
         return $this->belongsTo(UserProxy::modelClass(), 'created_by');
     }
 }
-

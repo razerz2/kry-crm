@@ -19,10 +19,10 @@ class WhatsAppConnectionTester
 
         try {
             return match ($driver) {
-                'meta'      => $this->testMetaConnection($config),
-                'waha'      => $this->testWahaConnection($config),
+                'meta' => $this->testMetaConnection($config),
+                'waha' => $this->testWahaConnection($config),
                 'evolution' => $this->testEvolutionConnection($config),
-                default     => [
+                default => [
                     'success' => false,
                     'message' => trans('admin::app.configuration.index.whatsapp.test.errors.invalid-driver'),
                 ],

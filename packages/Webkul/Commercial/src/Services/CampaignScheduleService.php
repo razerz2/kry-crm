@@ -16,7 +16,9 @@ use Webkul\Commercial\Models\CommercialCampaignRun;
 class CampaignScheduleService
 {
     public const EXECUTION_TYPES = ['manual', 'once', 'recurring', 'windowed_recurring'];
+
     public const RECURRENCE_TYPES = ['daily', 'weekly', 'monthly', 'interval'];
+
     public const INTERVAL_UNITS = ['minutes', 'hours', 'days'];
 
     /**
